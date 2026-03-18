@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>Radio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0a0a0f;
+  --surface:   #12121a;
+  --border:    #1e1e2e;
+  --accent:    #00d4ff;
+  --accent2:   #ff6b35;
+  --green:     #39ff82;
+  --amber:     #ffb347;
+  --text:      #c8d0e0;
+  --muted:     #4a5060;
+  --mono:      'Share Tech Mono', monospace;
+  --sans:      'Barlow Condensed', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow-x: hidden;
+}
+
+/* scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ---- HEADER ---- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,15,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px 10px;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 0.7em;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.signal-bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 14px;
+  margin-left: auto;
+}
+.signal-bars span {
+  width: 3px;
+  background: var(--muted);
+  border-radius: 1px;
+  transition: background 0.3s;
+}
+.signal-bars span:nth-child(1) { height: 4px; }
+.signal-bars span:nth-child(2) { height: 7px; }
+.signal-bars span:nth-child(3) { height: 10px; }
+.signal-bars span:nth-child(4) { height: 14px; }
+.signal-bars.active span { background: var(--green); }
+.signal-bars.active span:nth-child(4) { background: var(--accent); }
+
+/* now playing strip */
+.now-playing {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-height: 52px;
+}
+.np-station {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1em;
+  letter-spacing: 0.5px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.np-station.idle { color: var(--muted); font-weight: 300; }
+
+.np-meta {
+  font-family: var(--mono);
+  font-size: 0.68em;
+  color: var(--accent);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 1em;
+}
+
+.np-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.btn-stop {
+  background: rgba(255,107,53,0.15);
+  border: 1px solid var(--accent2);
+  color: var(--accent2);
+  font-family: var(--mono);
+  font-size: 0.72em;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-stop:active { background: rgba(255,107,53,0.35); }
+
+.vol-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vol-icon { font-size: 0.9em; color: var(--muted); }
+input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  cursor: pointer;
+}
+.vol-val {
+  font-family: var(--mono);
+  font-size: 0.7em;
+  color: var(--muted);
+  width: 28px;
+  text-align: right;
+}
+
+/* ---- STATION LIST ---- */
+main { padding: 10px 12px 24px; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.62em;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 14px 4px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.section-music .section-label::before  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.section-german .section-label::before { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.section-atc .section-label::before    { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+.station-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.station-btn::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.section-music  .station-btn::after { background: var(--green); }
+.section-german .station-btn::after { background: var(--amber); }
+.section-atc    .station-btn::after { background: var(--accent); }
+
+.station-btn.active {
+  border-color: transparent;
+  background: rgba(255,255,255,0.05);
+}
+.station-btn.active::after { opacity: 1; }
+
+.section-music  .station-btn.active { border-color: rgba(57,255,130,0.3); background: rgba(57,255,130,0.06); }
+.section-german .station-btn.active { border-color: rgba(255,179,71,0.3); background: rgba(255,179,71,0.06); }
+.section-atc    .station-btn.active { border-color: rgba(0,212,255,0.3);  background: rgba(0,212,255,0.06); }
+
+.station-btn:active { opacity: 0.7; }
+
+.stn-num {
+  font-family: var(--mono);
+  font-size: 0.65em;
+  color: var(--muted);
+  min-width: 20px;
+}
+.stn-name {
+  font-family: var(--sans);
+  font-size: 0.95em;
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  letter-spacing: 0.3px;
+}
+.station-btn.active .stn-name { color: #fff; }
+
+.stn-live {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 0.6em;
+  color: var(--green);
+}
+.station-btn.active .stn-live { display: flex; }
+.live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ---- LOADING OVERLAY ---- */
+.loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.4s;
+}
+.loading.hidden { opacity: 0; pointer-events: none; }
+.loader-ring {
+  width: 48px; height: 48px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-text {
+  font-family: var(--mono);
+  font-size: 0.7em;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+/* error toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(255,80,80,0.9);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.75em;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: transform 0.3s;
+  z-index: 200;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="loading" id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-text">INITIALIZING</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<audio id="audio" preload="none"></audio>
+
+<header>
+  <div class="header-top">
+    <div class="logo">&#9632; Wolfgang's Radio</div>
+    <div class="signal-bars" id="sigbars">
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="now-playing">
+    <div class="np-station idle" id="npStation">Select a station</div>
+    <div class="np-meta" id="npMeta"></div>
+    <div class="np-controls">
+      <button class="btn-stop" onclick="stopPlay()">&#9632; STOP</button>
+      <div class="vol-wrap">
+        <span class="vol-icon">&#128264;</span>
+        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
+          oninput="setVolume(this.value)">
+        <span class="vol-val" id="volVal">80</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="stationList"></main>
+
+<script>
+// ------------------------------------------------------------------ //
+//  STATION DATA                                                       //
+// ------------------------------------------------------------------ //
+const STATIONS = [
+  // Music
+  { n:1,  name:"KEXP Seattle",         url:"http://live-aacplus-64.kexp.org/kexp64.aac",                          cat:"music" },
+  { n:2,  name:"Capital FM",           url:"http://media-ice.musicradio.com/CapitalMP3Low",                        cat:"music" },
+  { n:3,  name:"Radio Paradise",       url:"http://stream.radioparadise.com/mp3-32",                               cat:"music" },
+  { n:4,  name:"SomaFM Indie Pop",     url:"http://ice1.somafm.com/indiepop-64-mp3",                               cat:"music" },
+  { n:5,  name:"SomaFM Groovesalad",   url:"http://ice1.somafm.com/groovesalad-64-mp3",                            cat:"music" },
+  // German
+  { n:6,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                          cat:"german" },
+  { n:7,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german" },
+  { n:8,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                        cat:"german" },
+  { n:9,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                     cat:"german" },
+  { n:10, name:"Deutschlandfunk Nova", url:"http://st01.sslstream.dlf.de/dlf/nova/128/mp3/stream.mp3",             cat:"german" },
+  // ATC - KMYF
+  { n:11, name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                            cat:"atc" },
+  { n:12, name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                       cat:"atc" },
+  { n:13, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                   cat:"atc" },
+  { n:14, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                              cat:"atc" },
+  { n:15, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                 cat:"atc" },
+  // ATC - KSAN
+  { n:16, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                       cat:"atc" },
+  { n:17, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                       cat:"atc" },
+  { n:18, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                       cat:"atc" },
+  { n:19, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                   cat:"atc" },
+  { n:20, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                   cat:"atc" },
+  { n:21, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                       cat:"atc" },
+  // ATC - Other
+  { n:22, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                        cat:"atc" },
+  { n:23, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                       cat:"atc" },
+  { n:24, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                   cat:"atc" },
+  { n:25, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                       cat:"atc" },
+];
+
+// ------------------------------------------------------------------ //
+//  STATE                                                              //
+// ------------------------------------------------------------------ //
+const audio   = document.getElementById('audio');
+let curIdx    = -1;
+let metaTimer = null;
+
+// ------------------------------------------------------------------ //
+//  BUILD UI                                                           //
+// ------------------------------------------------------------------ //
+function buildUI() {
+  const list = document.getElementById('stationList');
+  const cats = [
+    { key:'music',  label:'Music' },
+    { key:'german', label:'German Radio' },
+    { key:'atc',    label:'ATC \u2014 San Diego' },
+  ];
+
+  cats.forEach(cat => {
+    const stns = STATIONS.filter(s => s.cat === cat.key);
+    if (!stns.length) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'section-' + cat.key;
+
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.textContent = cat.label;
+    sec.appendChild(lbl);
+
+    stns.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'station-btn';
+      btn.id = 'stn-' + s.n;
+      btn.onclick = () => play(s);
+      btn.innerHTML =
+        '<span class="stn-num">' + s.n + '</span>' +
+        '<span class="stn-name">' + s.name + '</span>' +
+        '<span class="stn-live"><span class="live-dot"></span>LIVE</span>';
+      sec.appendChild(btn);
+    });
+
+    list.appendChild(sec);
+  });
+
+  document.getElementById('loader').classList.add('hidden');
+}
+
+// ------------------------------------------------------------------ //
+//  PLAYBACK                                                           //
+// ------------------------------------------------------------------ //
+function play(station) {
+  // deactivate old
+  if (curIdx >= 0) {
+    const old = document.getElementById('stn-' + STATIONS[curIdx].n);
+    if (old) old.classList.remove('active');
+  }
+
+  curIdx = STATIONS.indexOf(station);
+
+  // update header
+  document.getElementById('npStation').textContent = station.name;
+  document.getElementById('npStation').classList.remove('idle');
+  document.getElementById('npMeta').textContent = 'Connecting...';
+  document.getElementById('sigbars').classList.remove('active');
+
+  // highlight button
+  const btn = document.getElementById('stn-' + station.n);
+  if (btn) btn.classList.add('active');
+
+  // start audio
+  audio.pause();
+  audio.src = station.url;
+  audio.volume = parseFloat(document.getElementById('volSlider').value);
+  audio.load();
+
+  const playPromise = audio.play();
+  if (playPromise) {
+    playPromise
+      .then(() => {
+        document.getElementById('sigbars').classList.add('active');
+        document.getElementById('npMeta').textContent = '';
+        startMetaPoll(station);
+      })
+      .catch(e => {
+        document.getElementById('npMeta').textContent = 'Tap to play';
+        showToast('Tap play again');
+      });
+  }
+}
+
+function stopPlay() {
+  audio.pause();
+  audio.src = '';
+  if (curIdx >= 0) {
+    const btn = document.getElementById('stn-' + STATIONS[curIdx].n);
+    if (btn) btn.classList.remove('active');
+    curIdx = -1;
+  }
+  document.getElementById('npStation').textContent = 'Select a station';
+  document.getElementById('npStation').classList.add('idle');
+  document.getElementById('npMeta').textContent = '';
+  document.getElementById('sigbars').classList.remove('active');
+  if (metaTimer) { clearInterval(metaTimer); metaTimer = null; }
+}
+
+function setVolume(v) {
+  audio.volume = parseFloat(v);
+  document.getElementById('volVal').textContent = Math.round(v * 100);
+}
+
+// ------------------------------------------------------------------ //
+//  ICY METADATA via fetch proxy workaround                           //
+//  Safari blocks icy-metadata headers directly; use title tag        //
+//  from audio element when available                                 //
+// ------------------------------------------------------------------ //
+function startMetaPoll(station) {
+  if (metaTimer) clearInterval(metaTimer);
+  // For ATC feeds there's no song metadata - clear after short delay
+  if (station.cat === 'atc') {
+    setTimeout(() => {
+      if (curIdx >= 0 && STATIONS[curIdx] === station)
+        document.getElementById('npMeta').textContent = 'Live ATC feed';
+    }, 2000);
+    return;
+  }
+  // For music: poll audio element's title if available
+  metaTimer = setInterval(() => {
+    if (curIdx < 0) return;
+    // Some browsers expose ICY title via MediaSession or audio.title
+    const ms = navigator.mediaSession;
+    if (ms && ms.metadata && ms.metadata.title) {
+      document.getElementById('npMeta').textContent =
+        ms.metadata.artist
+          ? ms.metadata.artist + ' \u2014 ' + ms.metadata.title
+          : ms.metadata.title;
+    }
+  }, 5000);
+}
+
+// ------------------------------------------------------------------ //
+//  AUDIO EVENT HANDLERS                                              //
+// ------------------------------------------------------------------ //
+audio.addEventListener('waiting', () => {
+  document.getElementById('npMeta').textContent = 'Buffering...';
+  document.getElementById('sigbars').classList.remove('active');
+});
+audio.addEventListener('playing', () => {
+  document.getElementById('sigbars').classList.add('active');
+  if (document.getElementById('npMeta').textContent === 'Buffering...' ||
+      document.getElementById('npMeta').textContent === 'Connecting...') {
+    document.getElementById('npMeta').textContent =
+      curIdx >= 0 && STATIONS[curIdx].cat === 'atc' ? 'Live ATC feed' : '';
+  }
+});
+audio.addEventListener('error', () => {
+  document.getElementById('npMeta').textContent = 'Stream error \u2014 try again';
+  document.getElementById('sigbars').classList.remove('active');
+  showToast('Stream failed');
+});
+audio.addEventListener('stalled', () => {
+  document.getElementById('npMeta').textContent = 'Stalled \u2014 reconnecting...';
+  // Auto-retry after 4s
+  setTimeout(() => {
+    if (curIdx >= 0 && audio.paused) {
+      const s = STATIONS[curIdx];
+      audio.src = s.url + '?r=' + Date.now();
+      audio.play().catch(() => {});
+    }
+  }, 4000);
+});
+
+// ------------------------------------------------------------------ //
+//  TOAST                                                              //
+// ------------------------------------------------------------------ //
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ------------------------------------------------------------------ //
+//  MEDIA SESSION (lock screen controls)                              //
+// ------------------------------------------------------------------ //
+function updateMediaSession(name) {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: name, artist: 'Live Radio' });
+    navigator.mediaSession.setActionHandler('pause', stopPlay);
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (curIdx >= 0) audio.play().catch(() => {});
+    });
+  }
+}
+audio.addEventListener('play', () => {
+  if (curIdx >= 0) updateMediaSession(STATIONS[curIdx].name);
+});
+
+// ------------------------------------------------------------------ //
+//  INIT                                                               //
+// ------------------------------------------------------------------ //
+window.addEventListener('load', buildUI);
+</script>
+</body>
+</html>
