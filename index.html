@@ -86,6 +86,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .sec-german .stn-btn::after{background:var(--amber)}
 .sec-atc .stn-btn::after{background:var(--accent)}
 .sec-music .stn-btn.active{border-color:rgba(57,255,130,0.3);background:rgba(57,255,130,0.05)}
+.sec-german .stn-btn{padding:14px 16px;margin-bottom:6px}
+.sec-german .stn-name{font-size:1.12em;font-weight:700}
+.sec-german .stn-num{font-size:0.75em}
 .sec-german .stn-btn.active{border-color:rgba(255,179,71,0.3);background:rgba(255,179,71,0.05)}
 .sec-atc .stn-btn.active{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
 .stn-btn.active::after{opacity:1}
@@ -170,7 +173,10 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="header-top">
     <div class="logo">&#9632; RADIO</div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div class="clock-display" id="clockDisplay">00:00:00</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div style="font-family:var(--mono);font-size:0.62em;color:var(--muted);letter-spacing:1px"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
+    </div>
   </div>
   <div class="now-playing">
     <div class="np-station idle" id="npStation">Select a station</div>
@@ -190,7 +196,8 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
-  <div class="tab" onclick="switchTab('viz',this)">VISUALIZER</div>
+  <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
+  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
   <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
   <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
 </div>
@@ -198,6 +205,32 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <!-- STATIONS -->
 <div class="panel active" id="panel-stations">
   <div id="stationList"></div>
+</div>
+
+<!-- MP3 -->
+<div class="panel" id="panel-mp3">
+  <div class="card">
+    <div class="card-title">LOCAL MP3 PLAYER</div>
+    <span class="lbl">Select one or more MP3 files from your device</span>
+    <label id="mp3PickerLabel" style="display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;border:1px dashed var(--accent);border-radius:6px;cursor:pointer;
+      font-family:var(--mono);font-size:0.72em;color:var(--accent);margin-top:4px">
+      &#128194; CHOOSE FILES
+      <input type="file" id="mp3FileInput" accept="audio/*" multiple style="display:none" onchange="loadMp3Files(this.files)">
+    </label>
+  </div>
+  <div id="mp3TrackList" style="display:none">
+    <div class="section-label" style="margin-top:4px">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--amber);box-shadow:0 0 5px var(--amber);display:inline-block"></span>
+      &nbsp;TRACKS
+    </div>
+    <div id="mp3Tracks"></div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <div class="pill" onclick="mp3Prev()">&#9664; PREV</div>
+      <div class="pill" id="mp3ShufPill" onclick="toggleMp3Shuffle()">SHUFFLE: OFF</div>
+      <div class="pill" id="mp3RepPill" onclick="toggleMp3Repeat()">REPEAT: OFF</div>
+    </div>
+  </div>
 </div>
 
 <!-- VISUALIZER -->
@@ -271,31 +304,28 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 //  STATIONS
 // ============================================================
 const STATIONS = [
-  {n:1,  name:"KEXP Seattle",         url:"http://live-aacplus-64.kexp.org/kexp64.aac",                            cat:"music"},
-  {n:2,  name:"Capital FM",           url:"http://media-ice.musicradio.com/CapitalMP3Low",                          cat:"music"},
-  {n:3,  name:"Radio Paradise",       url:"http://stream.radioparadise.com/mp3-32",                                 cat:"music"},
-  {n:4,  name:"SomaFM Indie Pop",     url:"http://ice1.somafm.com/indiepop-64-mp3",                                 cat:"music"},
-  {n:5,  name:"SomaFM Groovesalad",   url:"http://ice1.somafm.com/groovesalad-64-mp3",                              cat:"music"},
-  {n:6,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
-  {n:7,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:8,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
-  {n:9,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
-  {n:10, name:"Deutschlandfunk Nova", url:"http://st01.sslstream.dlf.de/dlf/nova/128/mp3/stream.mp3",               cat:"german"},
-  {n:11, name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
-  {n:12, name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
-  {n:13, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
-  {n:14, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
-  {n:15, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
-  {n:16, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
-  {n:17, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
-  {n:18, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                         cat:"atc"},
-  {n:19, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
-  {n:20, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
-  {n:21, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                         cat:"atc"},
-  {n:22, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
-  {n:23, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
-  {n:24, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
-  {n:25, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
+  {n:1,  name:"SomaFM Indie Pop",     url:"http://ice1.somafm.com/indiepop-64-mp3",                                 cat:"music"},
+  {n:2,  name:"SomaFM Groovesalad",   url:"http://ice1.somafm.com/groovesalad-64-mp3",                              cat:"music"},
+  {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
+  {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
+  {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
+  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                       cat:"german"},
+  {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
+  {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
+  {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
+  {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
+  {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
+  {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
+  {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                         cat:"atc"},
+  {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
+  {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
+  {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                         cat:"atc"},
+  {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
+  {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
+  {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
+  {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
 ];
 
 // ============================================================
@@ -329,7 +359,7 @@ let synthLevel = 0;
 function buildUI() {
   // station list
   const list = document.getElementById('stationList');
-  [{key:'music',label:'Music'},{key:'german',label:'German Radio'},{key:'atc',label:'ATC \u2014 San Diego'}]
+  [{key:'german',label:'German Radio'},{key:'music',label:'Music'},{key:'atc',label:'ATC \u2014 San Diego'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
@@ -389,6 +419,10 @@ function tickClock() {
   const mm = String(now.getMinutes()).padStart(2,'0');
   const ss = String(now.getSeconds()).padStart(2,'0');
   document.getElementById('clockDisplay').textContent = hh+':'+mm+':'+ss;
+  const uh = String(now.getUTCHours()).padStart(2,'0');
+  const um = String(now.getUTCMinutes()).padStart(2,'0');
+  const us = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
   checkSleepTimer();
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
 }
@@ -441,6 +475,7 @@ function stopPlay() {
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
   audio.pause(); audio.src = '';
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
+  if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
   document.getElementById('npStation').textContent = 'Select a station';
   document.getElementById('npStation').classList.add('idle');
   document.getElementById('npMeta').textContent = '\u00a0';
@@ -532,7 +567,7 @@ function startSynthViz() {
     ctx.fillStyle = '#12121a';
     ctx.fillRect(0, 0, W, H);
 
-    const playing = curIdx >= 0 && !audio.paused;
+    const playing = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
     t += 0.04;
 
     if (!playing) {
@@ -604,8 +639,8 @@ function startSynthViz() {
     } // end synthetic else
 
     // pick current station color theme
-    const cat = STATIONS[curIdx].cat;
-    const color = cat==='atc' ? [0,212,255] : cat==='german' ? [255,179,71] : [57,255,130];
+    const cat = curIdx >= 0 ? STATIONS[curIdx].cat : 'mp3';
+    const color = cat==='atc' ? [0,212,255] : cat==='german' ? [255,179,71] : cat==='mp3' ? [180,100,255] : [57,255,130];
 
     if (vizMode === 'fft') {
       // Mirrored FFT with glow, peaks, and floor reflection
@@ -1044,6 +1079,125 @@ function showToast(msg, type) {
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('show'), 3000);
 }
+
+// ============================================================
+//  MP3 PLAYER
+// ============================================================
+let mp3Tracks   = [];
+let mp3CurIdx   = -1;
+let mp3Shuffle  = false;
+let mp3Repeat   = false;
+let mp3Order    = [];
+
+function loadMp3Files(files) {
+  if (!files.length) return;
+  // Stop any stream
+  stopPlay();
+  // Revoke old object URLs
+  mp3Tracks.forEach(t => URL.revokeObjectURL(t.url));
+  mp3Tracks = Array.from(files).map((f,i) => ({
+    idx: i,
+    name: f.name.replace(/\.[^.]+$/, ''),
+    url:  URL.createObjectURL(f)
+  }));
+  mp3CurIdx = -1;
+  mp3Order  = mp3Tracks.map((_,i) => i);
+  buildMp3List();
+  document.getElementById('mp3TrackList').style.display = '';
+  document.getElementById('mp3PickerLabel').textContent = '📂 ' + files.length + ' file' + (files.length>1?'s':'')+' loaded — tap to change';
+  // Re-attach hidden input after textContent wipe
+  const inp = document.createElement('input');
+  inp.type='file'; inp.id='mp3FileInput'; inp.accept='audio/*'; inp.multiple=true;
+  inp.style.display='none'; inp.onchange=function(){loadMp3Files(this.files);};
+  document.getElementById('mp3PickerLabel').appendChild(inp);
+}
+
+function buildMp3List() {
+  const container = document.getElementById('mp3Tracks');
+  container.innerHTML = '';
+  mp3Tracks.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className = 'stn-btn'; b.id = 'mp3-'+i;
+    b.style.cssText = 'padding:11px 12px;margin-bottom:4px';
+    b.onclick = () => playMp3(i);
+    b.innerHTML = '<span class="stn-num" style="font-size:0.65em;color:var(--muted)">'+(i+1)+'</span>'
+      +'<span class="stn-name" style="font-size:0.88em;font-weight:500">'+escHtml(t.name)+'</span>'
+      +'<span class="stn-live"><span class="live-dot"></span>▶</span>';
+    container.appendChild(b);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function playMp3(i) {
+  // deactivate stream station if any
+  if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
+  // deactivate old mp3 track
+  if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
+  mp3CurIdx = i;
+  const t = mp3Tracks[i];
+  document.getElementById('mp3-'+i)?.classList.add('active');
+  document.getElementById('npStation').textContent = t.name;
+  document.getElementById('npStation').classList.remove('idle');
+  document.getElementById('npMeta').textContent = 'Local MP3';
+  document.getElementById('sigbars').classList.remove('active');
+  audio.pause();
+  audio.src = t.url;
+  audio.load();
+  audio.play().then(() => {
+    document.getElementById('sigbars').classList.add('active');
+    updateMediaSession(t.name);
+    tryLiveAudio();
+  }).catch(() => {
+    document.getElementById('npMeta').textContent = 'Tap again to play';
+  });
+}
+
+function mp3Next() {
+  if (!mp3Tracks.length) return;
+  let next;
+  if (mp3Shuffle) {
+    next = Math.floor(Math.random() * mp3Tracks.length);
+  } else {
+    next = (mp3CurIdx + 1) % mp3Tracks.length;
+  }
+  playMp3(next);
+}
+
+function mp3Prev() {
+  if (!mp3Tracks.length) return;
+  const prev = mp3CurIdx <= 0 ? mp3Tracks.length - 1 : mp3CurIdx - 1;
+  playMp3(prev);
+}
+
+function toggleMp3Shuffle() {
+  mp3Shuffle = !mp3Shuffle;
+  document.getElementById('mp3ShufPill').textContent = 'SHUFFLE: ' + (mp3Shuffle ? 'ON' : 'OFF');
+  document.getElementById('mp3ShufPill').classList.toggle('active', mp3Shuffle);
+}
+
+function toggleMp3Repeat() {
+  mp3Repeat = !mp3Repeat;
+  document.getElementById('mp3RepPill').textContent = 'REPEAT: ' + (mp3Repeat ? 'ON' : 'OFF');
+  document.getElementById('mp3RepPill').classList.toggle('active', mp3Repeat);
+}
+
+// Auto-advance to next track when MP3 ends
+audio.addEventListener('ended', () => {
+  if (mp3CurIdx < 0) return; // was a stream, ignore
+  if (mp3Repeat) { playMp3(mp3CurIdx); }
+  else if (mp3CurIdx < mp3Tracks.length - 1 || mp3Shuffle) { mp3Next(); }
+  else { // end of list
+    document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
+    mp3CurIdx = -1;
+    document.getElementById('npStation').textContent = 'Select a station';
+    document.getElementById('npStation').classList.add('idle');
+    document.getElementById('npMeta').textContent = '\u00a0';
+    document.getElementById('sigbars').classList.remove('active');
+  }
+});
 
 window.addEventListener('load', buildUI);
 </script>
