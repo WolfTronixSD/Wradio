@@ -8,6 +8,8 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>Radio</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js" async defer></script>
 <style>
 :root {
   --bg:#0a0a0f; --surface:#12121a; --border:#1e1e2e;
@@ -211,13 +213,26 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <div class="panel" id="panel-mp3">
   <div class="card">
     <div class="card-title">LOCAL MP3 PLAYER</div>
-    <span class="lbl">Select one or more MP3 files from your device</span>
+    <span class="lbl">Pick files from your device</span>
     <label id="mp3PickerLabel" style="display:flex;align-items:center;justify-content:center;gap:8px;
       width:100%;padding:12px;border:1px dashed var(--accent);border-radius:6px;cursor:pointer;
       font-family:var(--mono);font-size:0.72em;color:var(--accent);margin-top:4px">
-      &#128194; CHOOSE FILES
+      &#128194; CHOOSE LOCAL FILES
       <input type="file" id="mp3FileInput" accept="audio/*" multiple style="display:none" onchange="loadMp3Files(this.files)">
     </label>
+    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-family:var(--mono);font-size:0.6em;color:var(--muted)">OR</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <span class="lbl">Stream from Google Drive</span>
+    <button id="gdrivePicker" onclick="openGDrivePicker()" style="display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;border:1px dashed #4285F4;border-radius:6px;cursor:pointer;
+      font-family:var(--mono);font-size:0.72em;color:#4285F4;background:transparent;margin-top:4px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 3l5.72 9.9L6.28 3zm-3.1 13.5l2.86-4.95 2.86 4.95H3.18zm8.1 0h5.72l-5.72-9.9-2.86 4.95 2.86 4.95zm2.86-4.95L17 21H7l3.14-9.45z"/></svg>
+      OPEN GOOGLE DRIVE
+    </button>
+    <div id="gdriveStatus" style="font-family:var(--mono);font-size:0.62em;color:var(--muted);text-align:center;margin-top:6px;min-height:1em"></div>
   </div>
   <div id="mp3TrackList" style="display:none">
     <div class="section-label" style="margin-top:4px">
@@ -1198,6 +1213,106 @@ audio.addEventListener('ended', () => {
     document.getElementById('sigbars').classList.remove('active');
   }
 });
+
+// ============================================================
+//  GOOGLE DRIVE PICKER
+// ============================================================
+// Only Client ID needed — no API key in public code
+// Get yours: console.cloud.google.com → Credentials → OAuth Client ID (Web app)
+// Authorized JS origins: https://wolftronixsd.github.io
+const GDRIVE_CLIENT_ID = '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com';
+const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly';
+
+let gAccessToken = null;
+let gapiReady    = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const gapiScript = document.querySelector('script[src*="apis.google.com/js/api"]');
+  if (gapiScript) gapiScript.onload = () => gapi.load('picker', () => { gapiReady = true; });
+});
+
+function openGDrivePicker() {
+  if (GDRIVE_CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
+    setGStatus('⚠ Paste your OAuth Client ID into the HTML first', 'var(--amber)');
+    return;
+  }
+  setGStatus('Signing in to Google...', 'var(--accent)');
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GDRIVE_CLIENT_ID,
+    scope: GDRIVE_SCOPE,
+    callback: (resp) => {
+      if (resp.error) { setGStatus('Sign-in failed: ' + resp.error, 'var(--red)'); return; }
+      gAccessToken = resp.access_token;
+      setGStatus('Signed in. Opening Drive...', 'var(--green)');
+      if (!gapiReady) {
+        gapi.load('picker', () => { gapiReady = true; buildPicker(); });
+      } else {
+        buildPicker();
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+function buildPicker() {
+  const view = new google.picker.DocsView()
+    .setMimeTypes('audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/aac,audio/flac,audio/x-m4a,audio/mp4')
+    .setMode(google.picker.DocsViewMode.LIST)
+    .setIncludeFolders(true);
+
+  // No setDeveloperKey() call — API key not needed
+  const picker = new google.picker.PickerBuilder()
+    .addView(view)
+    .setOAuthToken(gAccessToken)
+    .setTitle('Select audio files')
+    .setCallback(pickerCallback)
+    .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+    .build();
+  picker.setVisible(true);
+}
+
+async function pickerCallback(data) {
+  if (data.action !== google.picker.Action.PICKED) return;
+  const docs = data.docs;
+  setGStatus('Loading ' + docs.length + ' file(s) from Drive...', 'var(--accent)');
+
+  stopPlay();
+  mp3Tracks.forEach(t => { if (t.url && t.url.startsWith('blob:')) URL.revokeObjectURL(t.url); });
+  mp3Tracks = [];
+  mp3CurIdx = -1;
+
+  let loaded = 0;
+  for (const doc of docs) {
+    try {
+      setGStatus('Fetching ' + (loaded+1) + '/' + docs.length + ': ' + doc.name, 'var(--accent)');
+      const resp = await fetch(
+        'https://www.googleapis.com/drive/v3/files/' + doc.id + '?alt=media',
+        { headers: { Authorization: 'Bearer ' + gAccessToken } }
+      );
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      mp3Tracks.push({ idx: loaded, name: doc.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(blob) });
+      loaded++;
+    } catch(e) {
+      console.warn('Drive fetch failed:', doc.name, e);
+    }
+  }
+
+  if (!mp3Tracks.length) {
+    setGStatus('Failed to load. Check file permissions.', 'var(--red)'); return;
+  }
+  mp3Order = mp3Tracks.map((_,i) => i);
+  buildMp3List();
+  document.getElementById('mp3TrackList').style.display = '';
+  setGStatus('✓ ' + loaded + ' track' + (loaded>1?'s':'') + ' loaded from Drive', 'var(--green)');
+  document.getElementById('gdrivePicker').textContent = '✓ ' + loaded + ' tracks — tap to change';
+}
+
+function setGStatus(msg, color) {
+  const el = document.getElementById('gdriveStatus');
+  el.textContent = msg;
+  el.style.color = color || 'var(--muted)';
+}
 
 window.addEventListener('load', buildUI);
 </script>
