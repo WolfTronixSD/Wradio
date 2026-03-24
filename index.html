@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.20</title>
+<title>Radio v2.21</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -177,7 +177,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.20</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.21</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -195,6 +195,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
           oninput="setVolume(this.value)">
         <span class="vol-val" id="volVal">80</span>
       </div>
+    </div>
+    <!-- Seek bar — only visible during MP3 playback -->
+    <div id="seekRow" style="display:none;align-items:center;gap:6px;margin-top:6px">
+      <span id="seekCur" style="font-family:var(--mono);font-size:0.65em;color:var(--muted);min-width:36px;text-align:right">0:00</span>
+      <input type="range" id="seekSlider" min="0" max="100" step="0.1" value="0"
+        style="flex:1"
+        oninput="seekMp3(this.value)"
+        onmousedown="seekDragging=true" ontouchstart="seekDragging=true"
+        onmouseup="seekDragging=false"   ontouchend="seekDragging=false">
+      <span id="seekDur" style="font-family:var(--mono);font-size:0.65em;color:var(--muted);min-width:36px">0:00</span>
     </div>
     <div class="vu-wrap" id="vuWrap"></div>
   </div>
@@ -326,7 +336,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.20 <span style="color:var(--muted);font-size:0.85em">2026-03-24 04:03</span></span>
+        <span style="color:var(--accent)">v2.21 <span style="color:var(--muted);font-size:0.85em">2026-03-24 05:30</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -343,7 +353,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.20 <span style="color:var(--muted);font-size:0.85em">2026-03-24 04:03</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.21 <span style="color:var(--muted);font-size:0.85em">2026-03-24 05:30</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Viz fixed for radio streams<br>
+        crossorigin set dynamically: on for streams, off for MP3<br>
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.20 <span style="color:var(--muted);font-size:0.85em">2026-03-24 04:03</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         No-cache meta tags: iPhone sees updates faster<br>
         Removed crossorigin: fixes visualizer crash on iOS Safari<br>
@@ -427,11 +443,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.20  (2026-03-24)
+//  Version : v2.21  (2026-03-24)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.21 - Viz fixed for radio: crossorigin set dynamically per source type
+//          play() sets crossorigin=anonymous (Web Audio needs it for streams)
+//          playMp3() removes crossorigin (blob URLs break with it on iOS)
 //  v2.20 - No-cache meta tags: iPhone picks up updates faster
 //          Removed crossorigin attribute: fixes viz CORS crash on iOS
 //          Viz canvas: retry resize loop + in-draw recovery for iOS
@@ -536,6 +555,9 @@ let alarmPending = null; // station to play when user taps PLAY on wake overlay
 let synthPhase = 0;
 let synthLevel = 0;
 
+// Seek bar — true while user is dragging so we don't fight the slider
+let seekDragging = false;
+
 // ============================================================
 //  BUILD UI
 // ============================================================
@@ -634,7 +656,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-24 04:03';
+  if (verDate) verDate.textContent = '2026-03-24 05:30';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -684,6 +706,13 @@ function tickClock() {
   document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
   checkSleepTimer();
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
+  // Update seek bar for MP3
+  if (mp3CurIdx >= 0 && !seekDragging && audio.duration && isFinite(audio.duration)) {
+    const pct = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('seekSlider').value = pct;
+    document.getElementById('seekCur').textContent = fmtTime(audio.currentTime);
+    document.getElementById('seekDur').textContent = fmtTime(audio.duration);
+  }
 }
 
 // ============================================================
@@ -714,15 +743,17 @@ function play(station) {
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('stn-'+station.n)?.classList.add('active');
 
+  // Radio streams need crossorigin for Web Audio CORS; MP3 blobs do not
   audio.pause();
+  audio.crossOrigin = 'anonymous';
   audio.src = station.url;
   audio.volume = parseFloat(document.getElementById('volSlider').value);
   audio.load();
   audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC feed' : '';
+    document.getElementById('seekRow').style.display = 'none'; // no seek for live streams
     updateMediaSession(station.name);
-    // Attempt real Web Audio FFT connection
     tryLiveAudio();
   }).catch(() => {
     document.getElementById('npMeta').textContent = 'Tap again to play';
@@ -769,12 +800,28 @@ function stopPlay() {
   document.getElementById('npMeta').textContent = '\u00a0';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+  document.getElementById('seekRow').style.display = 'none';
+  document.getElementById('seekSlider').value = 0;
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
 }
 
 function setVolume(v) {
   audio.volume = parseFloat(v);
   document.getElementById('volVal').textContent = Math.round(v*100);
+}
+
+// Format seconds → m:ss
+function fmtTime(s) {
+  if (!isFinite(s) || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// Called when user drags the seek slider
+function seekMp3(val) {
+  if (mp3CurIdx < 0 || !audio.duration || !isFinite(audio.duration)) return;
+  audio.currentTime = (parseFloat(val) / 100) * audio.duration;
 }
 
 // ============================================================
@@ -1486,11 +1533,19 @@ function playMp3(i) {
   document.getElementById('npMeta').textContent = 'Local MP3';
   document.getElementById('sigbars').classList.remove('active');
   audio.pause();
+  // Blob URLs don't need crossorigin — removing it prevents iOS CORS errors
+  audio.removeAttribute('crossorigin');
   audio.src = t.url;
   audio.load();
   audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
     document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+    // Show seek bar for MP3
+    const seekRow = document.getElementById('seekRow');
+    seekRow.style.display = 'flex';
+    document.getElementById('seekSlider').value = 0;
+    document.getElementById('seekCur').textContent = '0:00';
+    document.getElementById('seekDur').textContent = '0:00';
     updateMediaSession(t.name);
     tryLiveAudio();
   }).catch(() => {
