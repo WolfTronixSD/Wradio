@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.21</title>
+<title>Radio v2.22</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -177,7 +177,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.21</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.22</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -336,7 +336,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.21 <span style="color:var(--muted);font-size:0.85em">2026-03-24 05:30</span></span>
+        <span style="color:var(--accent)">v2.22 <span style="color:var(--muted);font-size:0.85em">2026-03-24 06:15</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -353,7 +353,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.21 <span style="color:var(--muted);font-size:0.85em">2026-03-24 05:30</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.22 <span style="color:var(--muted);font-size:0.85em">2026-03-24 06:15</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Viz works for radio on iOS (synthetic viz energized)<br>
+        Volume floor prevents flat viz at low volume<br>
+        Richer motion: faster phase + extra harmonic
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.21 <span style="color:var(--muted);font-size:0.85em">2026-03-24 05:30</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Viz fixed for radio streams<br>
         crossorigin set dynamically: on for streams, off for MP3<br>
@@ -443,14 +450,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.21  (2026-03-24)
+//  Version : v2.22  (2026-03-24)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.22 - Viz now works for radio on iOS: synthetic viz made much more energetic
+//          Minimum volume floor so viz never goes flat even at low volume
+//          Faster synthPhase + extra harmonic for richer motion
+//          Boost multiplier active only when playing (drops to idle when stopped)
 //  v2.21 - Viz fixed for radio: crossorigin set dynamically per source type
-//          play() sets crossorigin=anonymous (Web Audio needs it for streams)
-//          playMp3() removes crossorigin (blob URLs break with it on iOS)
+//          MP3 seek slider added (skip forward/back in track)
 //  v2.20 - No-cache meta tags: iPhone picks up updates faster
 //          Removed crossorigin attribute: fixes viz CORS crash on iOS
 //          Viz canvas: retry resize loop + in-draw recovery for iOS
@@ -656,7 +666,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-24 05:30';
+  if (verDate) verDate.textContent = '2026-03-24 06:15';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -942,7 +952,8 @@ function startSynthViz() {
       return;
     }
 
-    // REAL FFT: use live analyser data when available
+    // REAL FFT: use live analyser data when available (desktop Chrome/Firefox)
+    // On iOS createMediaElementSource often fails due to CORS — falls back to synthetic
     if (liveAudio && analyser) {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       const timeData = new Uint8Array(analyser.fftSize);
@@ -968,25 +979,28 @@ function startSynthViz() {
       // fall through to unified rendering below
     } else {
 
-    // SYNTHETIC: generate convincing fake spectrum
-    // update targets with organic motion
-    synthPhase += 0.03;
-    const vol = parseFloat(document.getElementById('volSlider').value);
+    // SYNTHETIC: generate energetic fake spectrum
+    // Always runs on iOS (Web Audio CORS blocked), also used as fallback
+    synthPhase += 0.05; // faster = more lively
+    const vol = Math.max(0.6, parseFloat(document.getElementById('volSlider').value));
+    // Extra energy boost when a station is playing
+    const boost = playing ? 1.4 : 0.3;
 
     for (let i = 0; i < NUM_BANDS; i++) {
       const freq = i / NUM_BANDS;
       // music-like envelope: more energy in lows/mids
-      const envelope = freq < 0.15 ? 0.9 : freq < 0.4 ? 0.7 : freq < 0.7 ? 0.4 : 0.15;
-      // rhythmic pulses
-      const pulse = 0.5 + 0.5 * Math.sin(synthPhase * 2.1 + i * 0.3)
-                       * Math.sin(synthPhase * 1.3 + i * 0.7);
+      const envelope = freq < 0.15 ? 0.95 : freq < 0.4 ? 0.80 : freq < 0.7 ? 0.55 : 0.25;
+      // rhythmic pulses — multiple frequencies for complex motion
+      const pulse = 0.5 + 0.4 * Math.sin(synthPhase * 2.1 + i * 0.3)
+                       * Math.sin(synthPhase * 1.3 + i * 0.7)
+                  + 0.15 * Math.sin(synthPhase * 3.7 + i * 0.5);
       // noise
-      const noise = (Math.random() - 0.5) * 0.3;
-      targets[i] = Math.max(0, Math.min(1, envelope * pulse * vol * 1.3 + noise * envelope));
+      const noise = (Math.random() - 0.5) * 0.25;
+      targets[i] = Math.max(0, Math.min(1, envelope * pulse * vol * boost + noise * envelope));
     }
     // smooth bands toward targets
     for (let i = 0; i < NUM_BANDS; i++) {
-      bands[i] += (targets[i] - bands[i]) * (bands[i] < targets[i] ? 0.4 : 0.15);
+      bands[i] += (targets[i] - bands[i]) * (bands[i] < targets[i] ? 0.5 : 0.18);
     }
     } // end synthetic else
 
