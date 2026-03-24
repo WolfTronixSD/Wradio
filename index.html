@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.20</title>
+<title>Radio v2.22</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -36,66 +36,38 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
 .now-playing{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px}
 .np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-station.idle{color:var(--muted);font-weight:300}
-.np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em}
 .np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
 .btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);
   font-family:var(--mono);font-size:0.68em;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer}
-.btn-stop:active{background:rgba(255,68,102,0.3)}
 .vol-wrap{flex:1;display:flex;align-items:center;gap:6px}
-.vol-icon{font-size:0.85em;color:var(--muted)}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-  background:var(--accent);box-shadow:0 0 8px var(--accent);cursor:pointer}
-.vol-val{font-family:var(--mono);font-size:0.68em;color:var(--muted);width:28px;text-align:right}
-.vu-wrap{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
-.vu-bar{flex:1;border-radius:1px;background:var(--border);transition:height 0.08s;min-height:2px}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
 
 /* TABS */
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);
-  position:sticky;top:0;z-index:90}
-.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;letter-spacing:1px;
-  text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:90}
+.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 
 /* PANELS */
 .panel{display:none;padding:10px 12px 80px}
 .panel.active{display:block}
 
-/* VISUALIZER */
-#vizCanvas{width:100%;height:150px;border-radius:6px;background:var(--surface);
-  border:1px solid var(--border);display:block;cursor:pointer}
-.viz-controls{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.viz-btn{font-family:var(--mono);font-size:0.65em;letter-spacing:1px;padding:5px 10px;
-  border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
-.viz-btn.active{border-color:var(--accent);color:var(--accent)}
-
-/* STATIONS & MP3 LIST */
-.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);
-  padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px;
-  display:flex;align-items:center;gap:8px}
-.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;
-  background:var(--surface);border:1px solid var(--border);border-radius:6px;
-  cursor:pointer;text-align:left;gap:10px;position:relative;overflow:hidden}
+/* STATIONS */
+.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:left;gap:10px}
 .stn-btn.active{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
 .stn-num{font-family:var(--mono);font-size:0.62em;color:var(--muted);min-width:20px}
 .stn-name{font-family:var(--sans);font-size:0.92em;font-weight:500;color:var(--text);flex:1}
 .stn-live{display:none;align-items:center;gap:4px;font-family:var(--mono);font-size:0.58em;color:var(--green)}
 .stn-btn.active .stn-live{display:flex}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
-.card-title{font-family:var(--mono);font-size:0.65em;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
-.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.pill{font-family:var(--mono);font-size:0.7em;padding:6px 12px;border:1px solid var(--border);
-  border-radius:20px;background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s}
-.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
+.atc-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
 
 /* TOAST */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);
-  font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;
-  transition:transform 0.3s;z-index:500;white-space:nowrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;transition:transform 0.3s;z-index:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -106,11 +78,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 <header>
   <div class="header-top">
-    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.20</span></div>
+    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.22</span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+    <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted);letter-spacing:1px"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
+      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted)"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
     </div>
   </div>
   <div class="now-playing">
@@ -119,19 +91,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="np-controls">
       <button class="btn-stop" id="btnStop" onclick="toggleStop()">■ STOP</button>
       <div class="vol-wrap">
-        <span class="vol-icon">🔉</span>
         <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8" oninput="setVolume(this.value)">
-        <span class="vol-val" id="volVal">80</span>
       </div>
     </div>
-    <div class="vu-wrap" id="vuWrap"></div>
   </div>
 </header>
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
   <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
-  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
   <div class="tab" onclick="switchTab('info',this)">INFO</div>
 </div>
 
@@ -140,44 +108,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 
 <div class="panel" id="panel-mp3">
-  <div class="card">
-    <div class="card-title">LOCAL MP3 PLAYER</div>
-    <label id="mp3PickerLabel" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:1px dashed var(--accent);border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:0.72em;color:var(--accent)">
-      📁 CHOOSE LOCAL FILES
+  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px">
+    <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1px dashed var(--accent);cursor:pointer;font-family:var(--mono);font-size:0.72em;color:var(--accent)">
+      📁 LOAD LOCAL MP3s
       <input type="file" id="mp3FileInput" multiple accept="audio/*" style="display:none" onchange="loadMp3Files(this.files)">
     </label>
-    <div style="text-align:center; margin: 10px 0; font-size: 0.6em; color: var(--muted)">OR</div>
-    <button id="gdrivePicker" onclick="openGDrivePicker()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:1px dashed #4285F4;border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:0.72em;color:#4285F4;background:transparent">
-      OPEN GOOGLE DRIVE
-    </button>
-    <div id="gdriveStatus" style="font-family:var(--mono);font-size:0.62em;color:var(--muted);text-align:center;margin-top:6px"></div>
   </div>
-  <div id="mp3TrackList" style="display:none">
-    <div class="section-label">TRACKS</div>
+  <div id="mp3TrackList" style="display:none;margin-top:10px">
     <div id="mp3Tracks"></div>
-    <div class="pill-row" style="margin-top:10px">
-        <div class="pill" onclick="mp3Prev()">◀ PREV</div>
-        <div class="pill" onclick="mp3Next()">NEXT ▶</div>
-        <div class="pill" id="mp3ShufPill" onclick="toggleMp3Shuffle()">SHUFFLE: OFF</div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="panel-viz">
-  <canvas id="vizCanvas"></canvas>
-  <div class="viz-controls">
-    <button class="viz-btn active" onclick="setVizMode('fft',this)">FFT</button>
-    <button class="viz-btn" onclick="setVizMode('scope',this)">SCOPE</button>
   </div>
 </div>
 
 <div class="panel" id="panel-info">
-  <div class="card">
-    <div class="card-title">ABOUT v2.20</div>
-    <div style="font-family:var(--mono);font-size:0.7em;line-height:1.8em;color:var(--muted)">
-      • Fixed iOS MP3 background playback via Media Session API<br>
-      • Added auto-resume heartbeat for suspended AudioContext<br>
-      • Improved Google Drive fetch reliability
+  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px">
+    <div style="font-family:var(--mono);font-size:0.7em;line-height:1.8em">
+      <span style="color:var(--accent)">WolfTronix v2.22</span><br>
+      • All Music, German, & ATC Stations Restored<br>
+      • KSMO Added<br>
+      • iOS Background MP3 Support Active
     </div>
   </div>
 </div>
@@ -185,31 +133,137 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <script>
 const audio = document.getElementById('audio');
 const STATIONS = [
-  {n:1, name:"181.FM Awesome 80s", url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
-  {n:2, name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3", cat:"music"},
-  {n:3, name:"Antenne Bayern", url:"https://stream.antenne.de/antenne/stream/mp3", cat:"german"},
-  {n:4, name:"SWR3", url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
-  {n:5, name:"KMYF Tower", url:"https://d.liveatc.net/kmyf1_twr", cat:"atc"}
+  /* MUSIC */
+  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3", cat:"music"},
+  /* GERMAN */
+  {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3", cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
+  {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
+  {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
+  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
+  /* ATC SAN DIEGO */
+  {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
+  {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
+  {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
+  {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"},
+  {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
+  {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
+  {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del", cat:"atc"},
+  {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east", cat:"atc"},
+  {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west", cat:"atc"},
+  {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all", cat:"atc"},
+  {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
+  {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd", cat:"atc"},
+  {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr", cat:"atc"},
+  {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
+  /* ATC SANTA MONICA */
+  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo2_atis", cat:"atc"},
+  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo2_s", cat:"atc"},
+  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo2_gnd", cat:"atc"}
 ];
 
-let curIdx = -1;
-let mp3Tracks = [];
-let mp3CurIdx = -1;
-let mp3Shuffle = false;
-let audioCtx = null, analyser = null;
+let curIdx = -1, mp3Tracks = [], mp3CurIdx = -1;
 
-// --- INITIALIZE UI ---
 function buildUI() {
     const list = document.getElementById('stationList');
-    STATIONS.forEach(s => {
-        const b = document.createElement('button');
-        b.className = 'stn-btn'; b.id = 'stn-'+s.n;
-        b.onclick = () => playStation(s);
-        b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span><span class="stn-live"><span class="live-dot"></span>LIVE</span>`;
-        list.appendChild(b);
+    const categories = [
+        {key:'german', label:'GERMAN RADIO'},
+        {key:'music', label:'MUSIC'},
+        {key:'atc', label:'ATC — SAN DIEGO & KSMO'}
+    ];
+
+    categories.forEach(cat => {
+        const stns = STATIONS.filter(s => s.cat === cat.key);
+        if(!stns.length) return;
+        const lbl = document.createElement('div');
+        lbl.className = 'section-label'; lbl.textContent = cat.label;
+        list.appendChild(lbl);
+
+        stns.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'stn-btn'; b.id = 'stn-'+s.n;
+            b.onclick = () => playStation(s);
+            b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span><span class="stn-live"><span class="live-dot"></span>LIVE</span>`;
+            list.appendChild(b);
+        });
+
+        if(cat.key === 'atc') {
+            const row = document.createElement('div');
+            row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginTop = '8px';
+            const links = [
+                {h:'https://skyvector.com/', c:'#2a6496', b:'rgba(42,100,150,0.1)', l:'SKYVECTOR'},
+                {h:'https://www.liveatc.net/', c:'#2a7a3a', b:'rgba(42,122,58,0.1)', l:'LIVEATC'},
+                {h:'https://flightaware.com/', c:'#7a3a8a', b:'rgba(122,58,138,0.1)', l:'FLIGHTAWARE'}
+            ];
+            links.forEach(link => {
+                const a = document.createElement('a'); a.href = link.h; a.target = '_blank';
+                a.className = 'atc-link'; a.style.color = link.c; a.style.borderColor = link.c; a.style.background = link.b;
+                a.textContent = link.l; row.appendChild(a);
+            });
+            list.appendChild(row);
+            
+            const row2 = document.createElement('div');
+            row2.style.display = 'flex'; row2.style.gap = '6px'; row2.style.marginTop = '6px';
+            const links2 = [
+                {h:'https://www.plusoneflyers.org/', c:'#b07a20', b:'rgba(176,122,32,0.1)', l:'PLUS ONE'},
+                {h:'https://my.schedulemaster.com/', c:'#206060', b:'rgba(32,96,96,0.1)', l:'SCHEDULE'}
+            ];
+            links2.forEach(link => {
+                const a = document.createElement('a'); a.href = link.h; a.target = '_blank';
+                a.className = 'atc-link'; a.style.color = link.c; a.style.borderColor = link.c; a.style.background = link.b;
+                a.textContent = link.l; row2.appendChild(a);
+            });
+            list.appendChild(row2);
+        }
     });
     setInterval(tickClock, 1000);
-    startVUMeter();
+}
+
+function playStation(station) {
+    stopPlay();
+    curIdx = STATIONS.indexOf(station);
+    document.getElementById('stn-'+station.n).classList.add('active');
+    document.getElementById('npStation').textContent = station.name;
+    document.getElementById('npStation').classList.remove('idle');
+    audio.src = station.url;
+    audio.play().then(() => {
+        updateMediaSession(station.name, "Live Feed");
+        document.getElementById('sigbars').classList.add('active');
+    }).catch(() => showToast("Tap to play"));
+}
+
+function playMp3(i) {
+    stopPlay();
+    mp3CurIdx = i;
+    const t = mp3Tracks[i];
+    document.getElementById('mp3-'+i)?.classList.add('active');
+    document.getElementById('npStation').textContent = t.name;
+    document.getElementById('npStation').classList.remove('idle');
+    audio.src = t.url;
+    audio.play().then(() => updateMediaSession(t.name, "Local MP3"));
+}
+
+function toggleStop() {
+    if (!audio.paused) { audio.pause(); document.getElementById('btnStop').innerHTML = '▶ RESUME'; }
+    else if (audio.src) { audio.play(); document.getElementById('btnStop').innerHTML = '■ STOP'; }
+}
+
+function stopPlay() {
+    audio.pause();
+    document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sigbars').classList.remove('active');
+    curIdx = -1; mp3CurIdx = -1;
+}
+
+function setVolume(v) { audio.volume = v; }
+
+function updateMediaSession(title, artist) {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album: "WolfTronix Radio" });
+    navigator.mediaSession.setActionHandler('play', () => audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
 }
 
 function tickClock() {
@@ -223,200 +277,24 @@ function switchTab(id, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-'+id).classList.add('active');
     el.classList.add('active');
-    if (id === 'viz') startSynthViz();
 }
 
-// --- PLAYBACK CORE ---
-function playStation(station) {
-    stopPlay();
-    curIdx = STATIONS.indexOf(station);
-    document.getElementById('stn-'+station.n).classList.add('active');
-    document.getElementById('npStation').textContent = station.name;
-    document.getElementById('npStation').classList.remove('idle');
-    
-    audio.src = station.url;
-    audio.play().then(() => {
-        updateMediaSession(station.name, "Live Radio");
-        initWebAudio();
-    }).catch(e => showToast("Tap again to play"));
-}
-
-function playMp3(i) {
-    stopPlay();
-    mp3CurIdx = i;
-    const t = mp3Tracks[i];
-    document.getElementById('mp3-'+i)?.classList.add('active');
-    document.getElementById('npStation').textContent = t.name;
-    document.getElementById('npStation').classList.remove('idle');
-
-    audio.src = t.url;
-    audio.play().then(() => {
-        updateMediaSession(t.name, "Local MP3");
-        initWebAudio();
-    });
-}
-
-function toggleStop() {
-    if (!audio.paused) {
-        audio.pause();
-        document.getElementById('btnStop').innerHTML = '▶ RESUME';
-    } else if (audio.src) {
-        audio.play();
-        document.getElementById('btnStop').innerHTML = '■ STOP';
-    }
-}
-
-function stopPlay() {
-    audio.pause();
-    document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btnStop').innerHTML = '■ STOP';
-    curIdx = -1; mp3CurIdx = -1;
-}
-
-function setVolume(v) {
-    audio.volume = v;
-    document.getElementById('volVal').textContent = Math.round(v*100);
-}
-
-// --- iOS MEDIA SESSION & BACKGROUND FIXES ---
-function updateMediaSession(title, artist) {
-    if (!('mediaSession' in navigator)) return;
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
-        artist: artist,
-        album: "WolfTronix Radio",
-        artwork: [{ src: 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/png' }]
-    });
-
-    navigator.mediaSession.setActionHandler('play', () => audio.play());
-    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', () => mp3Prev());
-    navigator.mediaSession.setActionHandler('nexttrack', () => mp3Next());
-}
-
-audio.addEventListener('timeupdate', () => {
-    if (mp3CurIdx >= 0 && 'mediaSession' in navigator && isFinite(audio.duration)) {
-        navigator.mediaSession.setPositionState({
-            duration: audio.duration,
-            playbackRate: audio.playbackRate,
-            position: audio.currentTime
-        });
-    }
-});
-
-audio.addEventListener('ended', () => {
-    if (mp3CurIdx >= 0) mp3Next();
-});
-
-// HEARTBEAT: Auto-resume if iOS suspends audio context
-setInterval(() => {
-    if ((curIdx >= 0 || mp3CurIdx >= 0) && audio.paused && !document.getElementById('btnStop').innerHTML.includes('RESUME')) {
-        audio.play().catch(()=>{});
-    }
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-}, 3000);
-
-// --- MP3 LOADING ---
 function loadMp3Files(files) {
-    mp3Tracks = Array.from(files).map((f, i) => ({
-        idx: i,
-        name: f.name.replace(/\.[^.]+$/, ''),
-        url: URL.createObjectURL(f)
-    }));
-    buildMp3List();
-    document.getElementById('mp3TrackList').style.display = 'block';
-}
-
-function buildMp3List() {
+    mp3Tracks = Array.from(files).map((f, i) => ({ idx: i, name: f.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(f) }));
     const container = document.getElementById('mp3Tracks');
     container.innerHTML = '';
     mp3Tracks.forEach((t, i) => {
-        const b = document.createElement('button');
-        b.className = 'stn-btn'; b.id = 'mp3-' + i;
+        const b = document.createElement('button'); b.className = 'stn-btn'; b.id = 'mp3-' + i;
         b.onclick = () => playMp3(i);
         b.innerHTML = `<span class="stn-num">${i+1}</span><span class="stn-name">${t.name}</span>`;
         container.appendChild(b);
     });
-}
-
-function mp3Next() {
-    let next = mp3Shuffle ? Math.floor(Math.random()*mp3Tracks.length) : (mp3CurIdx + 1) % mp3Tracks.length;
-    playMp3(next);
-}
-
-function mp3Prev() {
-    let prev = (mp3CurIdx - 1 + mp3Tracks.length) % mp3Tracks.length;
-    playMp3(prev);
-}
-
-function toggleMp3Shuffle() {
-    mp3Shuffle = !mp3Shuffle;
-    document.getElementById('mp3ShufPill').classList.toggle('active', mp3Shuffle);
-}
-
-// --- WEB AUDIO & VIZ ---
-function initWebAudio() {
-    if (audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    const source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-}
-
-function startVUMeter() {
-    const vu = document.getElementById('vuWrap');
-    for(let i=0; i<20; i++) vu.appendChild(document.createElement('div')).className='vu-bar';
-    const bars = document.querySelectorAll('.vu-bar');
-    function draw() {
-        requestAnimationFrame(draw);
-        let level = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused ? Math.random() * 0.8 : 0;
-        bars.forEach((b, i) => {
-            b.style.height = (i/20 < level) ? (2+level*15)+'px' : '2px';
-            b.style.background = (i/20 < level) ? 'var(--green)' : 'var(--border)';
-        });
-    }
-    draw();
+    document.getElementById('mp3TrackList').style.display = 'block';
 }
 
 function showToast(m) {
-    const t = document.getElementById('toast');
-    t.textContent = m; t.className = 'toast show';
+    const t = document.getElementById('toast'); t.textContent = m; t.className = 'toast show';
     setTimeout(() => t.className = 'toast', 3000);
-}
-
-// --- GOOGLE DRIVE ---
-const GDRIVE_CLIENT_ID = '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com'; // PASTE YOUR ID HERE
-
-function openGDrivePicker() {
-    if (GDRIVE_CLIENT_ID.includes('YOUR_CLIENT')) {
-        showToast("Update Client ID in code first"); return;
-    }
-    google.accounts.oauth2.initTokenClient({
-        client_id: GDRIVE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.readonly',
-        callback: (tokenResponse) => {
-            if (tokenResponse.access_token) fetchDriveFiles(tokenResponse.access_token);
-        }
-    }).requestAccessToken();
-}
-
-async function fetchDriveFiles(token) {
-    document.getElementById('gdriveStatus').textContent = "Loading from Drive...";
-    const response = await fetch('https://www.googleapis.com/drive/v3/files?q=mimeType contains "audio"&fields=files(id, name)', {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await response.json();
-    mp3Tracks = data.files.map((f, i) => ({
-        idx: i,
-        name: f.name,
-        url: `https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&acknowledgeAbuse=true`
-    }));
-    // Note: Fetching binary blobs from Drive requires Auth headers on the audio request.
-    // For simplicity, this version assumes public links or local blobs.
-    buildMp3List();
-    document.getElementById('mp3TrackList').style.display = 'block';
-    document.getElementById('gdriveStatus').textContent = `${mp3Tracks.length} tracks loaded`;
 }
 
 window.addEventListener('load', buildUI);
