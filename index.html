@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.24</title>
+<title>Radio v2.26</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -55,7 +55,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .panel.active{display:block}
 
 /* VISUALIZER */
-#vizCanvas{width:100%;height:180px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:block}
+.viz-container {
+    position: relative;
+    border-radius: 6px;
+    padding: 2px;
+    transition: box-shadow 0.1s ease-out;
+}
+#vizCanvas{width:100%;height:220px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:block}
 .viz-controls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .viz-btn{font-family:var(--mono);font-size:0.65em;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
 .viz-btn.active{border-color:var(--accent);color:var(--accent)}
@@ -68,13 +74,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .stn-name{font-family:var(--sans);font-size:0.92em;font-weight:500;color:var(--text);flex:1}
 .stn-live{display:none;align-items:center;gap:4px;font-family:var(--mono);font-size:0.58em;color:var(--green)}
 .stn-btn.active .stn-live{display:flex}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
 .atc-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
 
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;transition:transform 0.3s;z-index:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+/* INFO SCROLL */
+.history-block{margin-top:10px;padding-left:10px;border-left:2px solid var(--border);font-family:var(--mono);font-size:0.65em;line-height:1.6em;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -84,7 +91,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 <header>
   <div class="header-top">
-    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.24</span></div>
+    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.26</span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -127,22 +134,45 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 
 <div class="panel" id="panel-viz">
-  <canvas id="vizCanvas"></canvas>
+  <div class="viz-container" id="vizGlowBox">
+    <canvas id="vizCanvas"></canvas>
+  </div>
   <div class="viz-controls">
-    <button class="viz-btn active" onclick="setVizMode('fft',this)">FFT 3D</button>
-    <button class="viz-btn" onclick="setVizMode('radar',this)">RADAR</button>
-    <button class="viz-btn" onclick="setVizMode('scope',this)">SCOPE</button>
+    <button class="viz-btn active" onclick="setVizMode('fft',this)">3D GRID FFT</button>
+    <button class="viz-btn" onclick="setVizMode('radar',this)">CONICAL RADAR</button>
+    <button class="viz-btn" onclick="setVizMode('scope',this)">NEON SCOPE</button>
   </div>
 </div>
 
 <div class="panel" id="panel-info">
-  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px">
-    <div style="font-family:var(--mono);font-size:0.7em;line-height:1.8em">
-      <span style="color:var(--accent)">WolfTronix v2.24</span><br>
-      • Restored All ATC Stations (KSMO, SD Suite)<br>
-      • Cyberpunk Reactive Visuals (FFT 3D, Radar)<br>
-      • Visuals React to Volume Slider<br>
-      • iOS Background MP3 Support Active
+  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px;max-height: 60vh;overflow-y: auto;">
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-bottom:5px">WolfTronix v2.26 <span style="color:var(--muted)">[Latest]</span></div>
+    <div class="history-block">
+      • 3D Perspective Grid added to Visualizer<br>
+      • Full version history restored to INFO tab<br>
+      • Pulse Neon Bloom & Peak Particles integrated
+    </div>
+
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">v2.24 - v2.25</div>
+    <div class="history-block">
+      • Cyberpunk Reactive Visuals (Radar/Scope)<br>
+      • Audio Heartbeat for iOS background reliability<br>
+      • Neon pulsing reactive to Volume Slider
+    </div>
+
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">v2.20 - v2.23</div>
+    <div class="history-block">
+      • iOS Background MP3 playback via Media Session API<br>
+      • Station suite restored (SD ATC, German Radio, 80s)<br>
+      • Fixed Google Drive fetch acknowledgeAbuse flags
+    </div>
+
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">Legacy v2.10 - v2.19</div>
+    <div class="history-block">
+      • German station buttons enlarged<br>
+      • UTC clock added to header<br>
+      • Local MP3 player tab added<br>
+      • Aviation reference toolkit (SkyVector/LiveATC)
     </div>
   </div>
 </div>
@@ -239,68 +269,63 @@ function updateMediaSession(title, artist) {
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album: "WolfTronix Radio" });
 }
 
-// --- COOLER, VOLUME-REACTIVE VISUALIZER ---
+// --- 3D GRID & REACTIVE VIZ ---
 function startSynthViz() {
     const canvas = document.getElementById('vizCanvas');
     const ctx = canvas.getContext('2d');
+    const glowBox = document.getElementById('vizGlowBox');
+    
     function draw() {
         vizRAF = requestAnimationFrame(draw);
         const w = canvas.width = canvas.offsetWidth; const h = canvas.height = canvas.offsetHeight;
-        ctx.fillStyle = '#12121a'; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0,0,w,h);
         
         const playing = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
-        // Reacts to volume slider
         const volReact = parseFloat(document.getElementById('volSlider').value);
-        synthPhase += playing ? (0.05 + volReact * 0.1) : 0.01;
         
+        if(playing) {
+            glowBox.style.boxShadow = `0 0 ${Math.abs(Math.sin(synthPhase*2))*(volReact*15)}px var(--accent)`;
+        } else { glowBox.style.boxShadow = 'none'; }
+
+        synthPhase += playing ? (0.04 + volReact * 0.1) : 0.01;
+        
+        // 3D Moving Grid Background
+        ctx.strokeStyle = `rgba(0, 212, 255, ${playing ? 0.1 : 0.05})`;
+        ctx.lineWidth = 1;
+        const gridStep = 30;
+        const offset = (synthPhase * 20) % gridStep;
+        
+        // Vertical lines with perspective
+        for(let i = -10; i <= 10; i++) {
+            ctx.beginPath();
+            ctx.moveTo(w/2 + i*gridStep*2, h);
+            ctx.lineTo(w/2 + i*gridStep*0.5, 0);
+            ctx.stroke();
+        }
+        // Horizontal lines moving forward
+        for(let i = 0; i < 10; i++) {
+            const y = h - (i*gridStep + offset);
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        }
+
         if (vizMode === 'fft') {
-            // Mirrored 3D FFT Bars
-            const numBars = 48;
+            const numBars = 32;
             for(let i=0; i<numBars; i++) {
-                const wave = playing ? Math.abs(Math.sin(synthPhase + i*0.15)) : 0.05;
-                const bH = wave * h * 0.9 * volReact;
-                
-                const grad = ctx.createLinearGradient(0, h/2 - bH, 0, h/2 + bH);
-                grad.addColorStop(0, playing ? 'var(--green)' : 'var(--muted)');
-                grad.addColorStop(0.5, 'var(--accent)');
-                grad.addColorStop(1, playing ? 'var(--red)' : 'var(--muted)');
-                
-                ctx.fillStyle = grad;
-                // Double bars (mirrored from center)
-                ctx.fillRect(i*(w/numBars), h/2 - bH, (w/numBars)-2, bH*2);
+                const wave = playing ? Math.abs(Math.sin(synthPhase + i*0.25)) : 0.05;
+                const bH = wave * h * 0.8 * volReact;
+                ctx.fillStyle = playing ? (wave > 0.7 ? 'var(--green)' : 'var(--accent)') : 'var(--muted)';
+                ctx.fillRect(i*(w/numBars), h-bH, (w/numBars)-4, bH);
             }
         } else if (vizMode === 'radar') {
-            // Complex Radar with Conical Sweep
-            const cx = w/2, cy = h/2, maxR = h*0.45;
-            
-            // Rings
-            for(let r=1; r<=4; r++) {
-                ctx.strokeStyle = `rgba(0, 212, 255, ${r/6})`;
-                ctx.beginPath(); ctx.arc(cx, cy, maxR*(r/4), 0, Math.PI*2); ctx.stroke();
-            }
-            
-            // Sweep Line
-            const sweep = (synthPhase * 1.5) % (Math.PI*2);
-            ctx.strokeStyle = 'var(--green)'; ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.moveTo(cx,cy); 
-            ctx.lineTo(cx + Math.cos(sweep)*maxR, cy + Math.sin(sweep)*maxR); ctx.stroke();
-            ctx.lineWidth = 1;
-            
-            // Active Blips based on volume
-            if(playing) {
-                for(let i=0; i < (5 + volReact*10); i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const r = Math.random() * maxR * volReact;
-                    ctx.fillStyle = i > 10 ? 'var(--red)' : 'var(--accent)';
-                    ctx.beginPath(); ctx.arc(cx + Math.cos(angle)*r, cy + Math.sin(angle)*r, 2, 0, Math.PI*2); ctx.fill();
-                }
-            }
+            const cx = w/2, cy = h/2, maxR = h*0.4;
+            const sweep = (synthPhase * 2) % (Math.PI*2);
+            ctx.strokeStyle = 'var(--accent)'; ctx.beginPath(); ctx.arc(cx,cy,maxR,0,Math.PI*2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(sweep)*maxR, cy+Math.sin(sweep)*maxR); ctx.stroke();
         } else {
-            // High-Gain Oscilloscope
-            ctx.strokeStyle = 'var(--amber)'; ctx.beginPath();
-            const gain = playing ? volReact * h/2 : 2;
+            ctx.strokeStyle = 'var(--green)'; ctx.beginPath();
+            const gain = playing ? volReact * 40 : 2;
             for(let x=0; x<w; x++) {
-                const y = h/2 + Math.sin(x*0.03 + synthPhase)*gain + Math.cos(x*0.08 + synthPhase)*gain/2;
+                const y = h/2 + Math.sin(x*0.05 + synthPhase)*gain;
                 x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
             }
             ctx.stroke();
