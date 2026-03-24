@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.15</title>
+<title>Radio v2.19</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -159,7 +159,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 </head>
 <body>
 
-<audio id="audio" preload="none" crossorigin="anonymous"></audio>
+<audio id="audio" preload="none" crossorigin="anonymous" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- ALARM WAKE OVERLAY -->
@@ -173,7 +173,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.75em;color:var(--muted);letter-spacing:1px">v2.15</span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.85em;color:var(--accent);letter-spacing:1px">v2.19</span> <span style="font-size:0.75em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -184,7 +184,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="np-station idle" id="npStation">Select a station</div>
     <div class="np-meta" id="npMeta">&nbsp;</div>
     <div class="np-controls">
-      <button class="btn-stop" onclick="stopPlay()">&#9632; STOP</button>
+      <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
       <div class="vol-wrap">
         <span class="vol-icon">&#128264;</span>
         <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
@@ -322,7 +322,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.15</span>
+        <span style="color:var(--accent)">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -339,7 +339,36 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.15</div>
+      <div style="color:var(--accent);margin-top:4px">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Version/date larger in header<br>
+        STOP/RESUME works for streams AND MP3<br>
+        Background heartbeat: auto-restarts if iOS kills audio<br>
+        Drive: fixed greyed-out files<br>
+        Playlist memory: last Drive tracks restored on next visit
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.18 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Big 80s Station replaced with 181.FM Awesome 80s (server was down)<br>
+        iOS background audio fix: visibilitychange + pageshow handlers<br>
+        Version date shown in header and INFO tab
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.17 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 STOP button now pauses &amp; resumes (keeps position)<br>
+        Button changes to ▶ RESUME when paused
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.16 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 background playback fix for iOS Safari<br>
+        Full Media Session API (lock screen controls, prev/next/seek)<br>
+        playsinline attribute added to audio element
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.15 <span style="color:var(--muted);font-size:0.85em">2026-03-22</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
       </div>
@@ -386,11 +415,24 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.15  (2026-03-23)
+//  Version : v2.19  (2026-03-23)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.19 - Version/date larger and clearer in header
+//          STOP/RESUME now works for both streams AND MP3
+//          Background audio heartbeat: auto-restarts if iOS kills audio
+//          Drive: fixed greyed-out files (acknowledgeAbuse + supportsAllDrives)
+//          Playlist memory: last Drive selection restored on next visit
+//  v2.18 - Big 80s Station → 181.FM Awesome 80s (old server was down)
+//          iOS background audio: visibilitychange + pageshow handlers
+//          Version date shown next to version number in header + INFO tab
+//  v2.17 - MP3 STOP button now pauses/resumes keeping position
+//          Button label toggles: STOP ↔ RESUME
+//  v2.16 - MP3 background playback fix for iOS Safari
+//          Full Media Session API: lock screen controls, prev/next/seek for MP3
+//          playsinline attribute on audio element
 //  v2.15 - Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
 //  v2.14 - Added Plus One Flyers + ScheduleMaster link buttons (ATC section)
 //  v2.13 - Music section replaced with 80s Rock & Pop stations:
@@ -419,8 +461,8 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 // ============================================================
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
-  {n:1,  name:"Big 80s Station",      url:"http://thebig80sstation.servemp3.com",                                    cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3",                                  cat:"music"},
+  {n:1,  name:"181.FM Awesome 80s",    url:"http://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3",                                   cat:"music"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
   {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
@@ -573,6 +615,42 @@ function buildUI() {
 
   setInterval(tickClock, 1000); tickClock();
   startVUMeter();
+
+  // Show build date/time in header
+  const verDate = document.getElementById('verDate');
+  if (verDate) verDate.textContent = '2026-03-23';
+
+  // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
+  const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
+  if (savedPlaylist) {
+    try {
+      const pl = JSON.parse(savedPlaylist);
+      if (pl.length) {
+        setGStatus('Last playlist: ' + pl.length + ' tracks — tap OPEN GOOGLE DRIVE to reload', 'var(--muted)');
+        // Show track names immediately so user knows what was there
+        mp3Tracks = pl.map((t,i) => ({ idx:i, name:t.name.replace(/\.[^.]+$/,''), url:'', driveId:t.id }));
+        buildMp3List();
+        document.getElementById('mp3TrackList').style.display = '';
+        // Grey out tracks until re-fetched
+        document.querySelectorAll('#mp3Tracks .stn-btn').forEach(b => {
+          b.style.opacity = '0.4';
+          b.title = 'Sign in to Google Drive to reload';
+        });
+      }
+    } catch(e) {}
+  }
+
+  // Background audio heartbeat — detects if iOS killed audio and restarts it
+  // Fires every 5 seconds; only acts if audio should be playing but isn't
+  setInterval(() => {
+    const shouldBePlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+    const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
+    const userPaused = btnLabel.includes('RESUME');
+    if (shouldBePlaying && !userPaused && audio.paused && audio.src) {
+      console.log('[Heartbeat] Audio interrupted — restarting');
+      audio.play().catch(() => {});
+    }
+  }, 5000);
 }
 
 // ============================================================
@@ -634,6 +712,34 @@ function play(station) {
   });
 }
 
+function toggleStop() {
+  // Both MP3 and streams: pause/resume
+  // Streams resume from same position (live = reconnects), MP3 keeps exact position
+  if (!audio.paused && (curIdx >= 0 || mp3CurIdx >= 0)) {
+    // Currently playing — pause
+    audio.pause();
+    document.getElementById('sigbars').classList.remove('active');
+    document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+  } else if (audio.paused && audio.src) {
+    // Currently paused — resume
+    audio.play().then(() => {
+      document.getElementById('sigbars').classList.add('active');
+      document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    }).catch(() => {
+      // Stream may have gone stale — reload it
+      if (curIdx >= 0) {
+        audio.src = STATIONS[curIdx].url;
+        audio.load();
+        audio.play().catch(()=>{});
+      }
+    });
+  } else {
+    stopPlay();
+  }
+}
+
 function stopPlay() {
   // NOTE: never disconnect waSource - createMediaElementSource is permanent
   // Just pause and clear src; Web Audio graph stays intact for next station
@@ -645,7 +751,8 @@ function stopPlay() {
   document.getElementById('npStation').classList.add('idle');
   document.getElementById('npMeta').textContent = '\u00a0';
   document.getElementById('sigbars').classList.remove('active');
-  // liveAudio stays true - Web Audio graph persists across station changes
+  document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
 }
 
 function setVolume(v) {
@@ -1226,11 +1333,48 @@ audio.addEventListener('stalled', () => {
   }, 4000);
 });
 
-function updateMediaSession(name) {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({title:name, artist:'Live Radio'});
-    navigator.mediaSession.setActionHandler('pause', stopPlay);
-    navigator.mediaSession.setActionHandler('play', () => { if(curIdx>=0) audio.play().catch(()=>{}); });
+function updateMediaSession(name, artist) {
+  if (!('mediaSession' in navigator)) return;
+  // Full metadata — artist/album tells iOS this is music, not just a webpage
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title:  name,
+    artist: artist || (mp3CurIdx >= 0 ? 'Local MP3' : 'Live Radio'),
+    album:  'WolfTronix Radio'
+  });
+  // Playback state — required for iOS to show lock screen controls
+  navigator.mediaSession.playbackState = 'playing';
+
+  // Play / Pause
+  navigator.mediaSession.setActionHandler('play', () => {
+    audio.play().catch(()=>{});
+    navigator.mediaSession.playbackState = 'playing';
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    if (mp3CurIdx >= 0) { audio.pause(); navigator.mediaSession.playbackState = 'paused'; }
+    else stopPlay();
+  });
+  navigator.mediaSession.setActionHandler('stop', stopPlay);
+
+  // Prev / Next — only meaningful for MP3, ignored for streams
+  navigator.mediaSession.setActionHandler('previoustrack',
+    mp3CurIdx >= 0 ? mp3Prev : null);
+  navigator.mediaSession.setActionHandler('nexttrack',
+    mp3CurIdx >= 0 ? mp3Next : null);
+
+  // Seek support for MP3 (streams are not seekable)
+  if (mp3CurIdx >= 0 && audio.duration && isFinite(audio.duration)) {
+    navigator.mediaSession.setActionHandler('seekto', (d) => {
+      if (d.seekTime !== undefined) audio.currentTime = d.seekTime;
+    });
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     audio.currentTime
+    });
+  } else {
+    // Clear seek handlers for live streams
+    try { navigator.mediaSession.setActionHandler('seekto', null); } catch(e) {}
+    try { navigator.mediaSession.setPositionState({}); } catch(e) {}
   }
 }
 
@@ -1313,12 +1457,27 @@ function playMp3(i) {
   audio.load();
   audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
+    document.getElementById('btnStop').innerHTML = '&#9632; STOP';
     updateMediaSession(t.name);
     tryLiveAudio();
   }).catch(() => {
     document.getElementById('npMeta').textContent = 'Tap again to play';
   });
 }
+
+// Keep iOS lock screen position state in sync during MP3 playback
+audio.addEventListener('timeupdate', () => {
+  if (mp3CurIdx < 0) return;
+  if (!('mediaSession' in navigator)) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     Math.min(audio.currentTime, audio.duration)
+    });
+  } catch(e) {}
+});
 
 function mp3Next() {
   if (!mp3Tracks.length) return;
@@ -1370,7 +1529,7 @@ audio.addEventListener('ended', () => {
 // Only Client ID needed — no API key in public code
 // Get yours: console.cloud.google.com → Credentials → OAuth Client ID (Web app)
 // Authorized JS origins: https://wolftronixsd.github.io
-const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+const GDRIVE_CLIENT_ID = '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com';
 const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly';
 
 let gAccessToken = null;
@@ -1382,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function openGDrivePicker() {
-  if (GDRIVE_CLIENT_ID === '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com') {
+  if (GDRIVE_CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
     setGStatus('⚠ Paste your OAuth Client ID into the HTML first', 'var(--amber)');
     return;
   }
@@ -1393,11 +1552,25 @@ function openGDrivePicker() {
     callback: (resp) => {
       if (resp.error) { setGStatus('Sign-in failed: ' + resp.error, 'var(--red)'); return; }
       gAccessToken = resp.access_token;
-      setGStatus('Signed in. Opening Drive...', 'var(--green)');
-      if (!gapiReady) {
-        gapi.load('picker', () => { gapiReady = true; buildPicker(); });
+      // Check if we have a saved playlist that needs re-fetching (greyed out tracks)
+      const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
+      const needsReload = savedPlaylist && mp3Tracks.length > 0 && !mp3Tracks[0].url;
+      if (needsReload) {
+        setGStatus('Reloading saved playlist...', 'var(--accent)');
+        const pl = JSON.parse(savedPlaylist);
+        stopPlay();
+        mp3Tracks = [];
+        mp3CurIdx = -1;
+        // Remove grey styling
+        document.querySelectorAll('#mp3Tracks .stn-btn').forEach(b => b.style.opacity = '');
+        fetchDriveTracks(pl).then(() => {});
       } else {
-        buildPicker();
+        setGStatus('Signed in. Opening Drive...', 'var(--green)');
+        if (!gapiReady) {
+          gapi.load('picker', () => { gapiReady = true; buildPicker(); });
+        } else {
+          buildPicker();
+        }
       }
     }
   });
@@ -1433,20 +1606,31 @@ async function pickerCallback(data) {
   mp3Tracks = [];
   mp3CurIdx = -1;
 
+  // Save playlist metadata to localStorage so we can reload next session
+  const playlist = docs.map(d => ({ id: d.id, name: d.name }));
+  localStorage.setItem('wradio_gdrive_playlist', JSON.stringify(playlist));
+
+  await fetchDriveTracks(docs.map(d => ({ id: d.id, name: d.name })));
+}
+
+// Fetch tracks from Drive — used both by picker and on page load restore
+async function fetchDriveTracks(items) {
   let loaded = 0;
-  for (const doc of docs) {
+  for (const item of items) {
     try {
-      setGStatus('Fetching ' + (loaded+1) + '/' + docs.length + ': ' + doc.name, 'var(--accent)');
+      setGStatus('Fetching ' + (loaded+1) + '/' + items.length + ': ' + item.name, 'var(--accent)');
+      // acknowledgeAbuse=true allows fetching files flagged by Drive safety scanner
       const resp = await fetch(
-        'https://www.googleapis.com/drive/v3/files/' + doc.id + '?alt=media',
+        'https://www.googleapis.com/drive/v3/files/' + item.id
+        + '?alt=media&acknowledgeAbuse=true&supportsAllDrives=true',
         { headers: { Authorization: 'Bearer ' + gAccessToken } }
       );
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const blob = await resp.blob();
-      mp3Tracks.push({ idx: loaded, name: doc.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(blob) });
+      mp3Tracks.push({ idx: loaded, name: item.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(blob), driveId: item.id });
       loaded++;
     } catch(e) {
-      console.warn('Drive fetch failed:', doc.name, e);
+      console.warn('Drive fetch failed:', item.name, e.message);
     }
   }
 
@@ -1457,7 +1641,8 @@ async function pickerCallback(data) {
   buildMp3List();
   document.getElementById('mp3TrackList').style.display = '';
   setGStatus('✓ ' + loaded + ' track' + (loaded>1?'s':'') + ' loaded from Drive', 'var(--green)');
-  document.getElementById('gdrivePicker').textContent = '✓ ' + loaded + ' tracks — tap to change';
+  const btn = document.getElementById('gdrivePicker');
+  if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 3l5.72 9.9L6.28 3zm-3.1 13.5l2.86-4.95 2.86 4.95H3.18zm8.1 0h5.72l-5.72-9.9-2.86 4.95 2.86 4.95zm2.86-4.95L17 21H7l3.14-9.45z"/></svg> ✓ ' + loaded + ' tracks — tap to change';
 }
 
 function setGStatus(msg, color) {
@@ -1465,6 +1650,33 @@ function setGStatus(msg, color) {
   el.textContent = msg;
   el.style.color = color || 'var(--muted)';
 }
+
+// ============================================================
+//  iOS BACKGROUND AUDIO — keep playing when screen locks / app switches
+//  iOS Safari suspends AudioContext and can interrupt playback when
+//  the page becomes hidden. These handlers resume it automatically.
+// ============================================================
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') return; // going to background — nothing to do
+  // Page became visible again — resume AudioContext if suspended
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  // If audio was playing before and got interrupted, restart it
+  const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+  if (wasPlaying && audio.paused && audio.src) {
+    audio.play().catch(() => {});
+  }
+});
+
+// pageshow fires when returning from bfcache (back/forward navigation on iOS)
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return; // normal load, not from cache
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  if ((curIdx >= 0 || mp3CurIdx >= 0) && audio.paused && audio.src) {
+    audio.play().catch(() => {});
+  }
+});
 
 window.addEventListener('load', buildUI);
 </script>
