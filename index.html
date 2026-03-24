@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.22</title>
+<title>Radio v2.23</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -33,6 +33,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
 .sigbars span:nth-child(1){height:4px}.sigbars span:nth-child(2){height:7px}
 .sigbars span:nth-child(3){height:10px}.sigbars span:nth-child(4){height:14px}
 .sigbars.active span{background:var(--green);box-shadow:0 0 4px var(--green)}
+
 .now-playing{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px}
 .np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-station.idle{color:var(--muted);font-weight:300}
@@ -53,6 +54,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .panel{display:none;padding:10px 12px 80px}
 .panel.active{display:block}
 
+/* VISUALIZER */
+#vizCanvas{width:100%;height:180px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:block}
+.viz-controls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.viz-btn{font-family:var(--mono);font-size:0.65em;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
+.viz-btn.active{border-color:var(--accent);color:var(--accent)}
+
 /* STATIONS */
 .section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px;display:flex;align-items:center;gap:8px}
 .stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:left;gap:10px}
@@ -66,7 +73,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 .atc-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
 
-/* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;transition:transform 0.3s;z-index:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
@@ -78,7 +84,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 <header>
   <div class="header-top">
-    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.22</span></div>
+    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.23</span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -100,6 +106,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="tabs">
   <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
   <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
+  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
   <div class="tab" onclick="switchTab('info',this)">INFO</div>
 </div>
 
@@ -119,12 +126,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </div>
 
+<div class="panel" id="panel-viz">
+  <canvas id="vizCanvas"></canvas>
+  <div class="viz-controls">
+    <button class="viz-btn active" onclick="setVizMode('fft',this)">FFT</button>
+    <button class="viz-btn" onclick="setVizMode('radar',this)">RADAR</button>
+    <button class="viz-btn" onclick="setVizMode('scope',this)">SCOPE</button>
+  </div>
+</div>
+
 <div class="panel" id="panel-info">
   <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px">
     <div style="font-family:var(--mono);font-size:0.7em;line-height:1.8em">
-      <span style="color:var(--accent)">WolfTronix v2.22</span><br>
-      • All Music, German, & ATC Stations Restored<br>
-      • KSMO Added<br>
+      <span style="color:var(--accent)">WolfTronix v2.23</span><br>
+      • Synthetic Visualizer (iOS safe)<br>
+      • Full ATC Stations restored (KMYF, KSAN, KSDM, KRNM, KSMO)<br>
       • iOS Background MP3 Support Active
     </div>
   </div>
@@ -133,92 +149,57 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <script>
 const audio = document.getElementById('audio');
 const STATIONS = [
-  /* MUSIC */
-  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3", cat:"music"},
-  /* GERMAN */
-  {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3", cat:"german"},
-  {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
-  {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
-  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
-  /* ATC SAN DIEGO */
-  {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
-  {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
-  {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
-  {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
-  {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"},
-  {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
-  {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
-  {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del", cat:"atc"},
-  {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east", cat:"atc"},
-  {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west", cat:"atc"},
-  {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all", cat:"atc"},
-  {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
-  {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd", cat:"atc"},
-  {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr", cat:"atc"},
-  {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
-  /* ATC SANTA MONICA */
-  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo2_atis", cat:"atc"},
-  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo2_s", cat:"atc"},
-  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo2_gnd", cat:"atc"}
+  {n:1, name:"181.FM Awesome 80s", url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
+  {n:2, name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3", cat:"music"},
+  {n:3, name:"Antenne Bayern", url:"http://stream.antenne.de/antenne/stream/mp3", cat:"german"},
+  {n:4, name:"1LIVE WDR", url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
+  {n:5, name:"SWR3", url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
+  {n:6, name:"Bayern 3", url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
+  {n:7, name:"SWR1", url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
+  {n:8, name:"KMYF ATIS", url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
+  {n:9, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
+  {n:10, name:"KMYF Ground", url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
+  {n:11, name:"KMYF All (Twr)", url:"http://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar", url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"},
+  {n:13, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
+  {n:14, name:"KSAN Ground", url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
+  {n:15, name:"KSDM Ground/Tower", url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
+  {n:16, name:"KRNM Tower", url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
+  {n:17, name:"KSMO ATIS", url:"http://d.liveatc.net/ksmo2_atis", cat:"atc"},
+  {n:18, name:"KSMO Tower", url:"http://d.liveatc.net/ksmo2_s", cat:"atc"},
+  {n:19, name:"KSMO Ground", url:"http://d.liveatc.net/ksmo2_gnd", cat:"atc"}
 ];
 
 let curIdx = -1, mp3Tracks = [], mp3CurIdx = -1;
+let vizMode = 'fft', vizRAF = null, synthPhase = 0;
 
 function buildUI() {
     const list = document.getElementById('stationList');
-    const categories = [
-        {key:'german', label:'GERMAN RADIO'},
-        {key:'music', label:'MUSIC'},
-        {key:'atc', label:'ATC — SAN DIEGO & KSMO'}
-    ];
-
+    const categories = [{key:'german', label:'GERMAN RADIO'},{key:'music', label:'MUSIC'},{key:'atc', label:'ATC — SD & KSMO'}];
     categories.forEach(cat => {
         const stns = STATIONS.filter(s => s.cat === cat.key);
         if(!stns.length) return;
-        const lbl = document.createElement('div');
-        lbl.className = 'section-label'; lbl.textContent = cat.label;
-        list.appendChild(lbl);
-
+        const lbl = document.createElement('div'); lbl.className = 'section-label'; lbl.textContent = cat.label; list.appendChild(lbl);
         stns.forEach(s => {
-            const b = document.createElement('button');
-            b.className = 'stn-btn'; b.id = 'stn-'+s.n;
+            const b = document.createElement('button'); b.className = 'stn-btn'; b.id = 'stn-'+s.n;
             b.onclick = () => playStation(s);
             b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span><span class="stn-live"><span class="live-dot"></span>LIVE</span>`;
             list.appendChild(b);
         });
-
-        if(cat.key === 'atc') {
-            const row = document.createElement('div');
-            row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginTop = '8px';
-            const links = [
-                {h:'https://skyvector.com/', c:'#2a6496', b:'rgba(42,100,150,0.1)', l:'SKYVECTOR'},
-                {h:'https://www.liveatc.net/', c:'#2a7a3a', b:'rgba(42,122,58,0.1)', l:'LIVEATC'},
-                {h:'https://flightaware.com/', c:'#7a3a8a', b:'rgba(122,58,138,0.1)', l:'FLIGHTAWARE'}
-            ];
-            links.forEach(link => {
-                const a = document.createElement('a'); a.href = link.h; a.target = '_blank';
-                a.className = 'atc-link'; a.style.color = link.c; a.style.borderColor = link.c; a.style.background = link.b;
-                a.textContent = link.l; row.appendChild(a);
-            });
-            list.appendChild(row);
-            
-            const row2 = document.createElement('div');
-            row2.style.display = 'flex'; row2.style.gap = '6px'; row2.style.marginTop = '6px';
-            const links2 = [
-                {h:'https://www.plusoneflyers.org/', c:'#b07a20', b:'rgba(176,122,32,0.1)', l:'PLUS ONE'},
-                {h:'https://my.schedulemaster.com/', c:'#206060', b:'rgba(32,96,96,0.1)', l:'SCHEDULE'}
-            ];
-            links2.forEach(link => {
-                const a = document.createElement('a'); a.href = link.h; a.target = '_blank';
-                a.className = 'atc-link'; a.style.color = link.c; a.style.borderColor = link.c; a.style.background = link.b;
-                a.textContent = link.l; row2.appendChild(a);
-            });
-            list.appendChild(row2);
-        }
+        if(cat.key === 'atc') buildAviationLinks(list);
     });
     setInterval(tickClock, 1000);
+    startSynthViz();
+}
+
+function buildAviationLinks(container) {
+    const row = document.createElement('div'); row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginTop = '8px';
+    const links = [{h:'https://skyvector.com/', c:'#2a6496', l:'SKYVECTOR'},{h:'https://www.liveatc.net/', c:'#2a7a3a', l:'LIVEATC'},{h:'https://flightaware.com/', c:'#7a3a8a', l:'FLIGHTAWARE'}];
+    links.forEach(link => {
+        const a = document.createElement('a'); a.href = link.h; a.target = '_blank'; a.className = 'atc-link'; a.style.color = a.style.borderColor = link.c; a.style.background = 'rgba(255,255,255,0.03)';
+        a.textContent = link.l; row.appendChild(a);
+    });
+    container.appendChild(row);
 }
 
 function playStation(station) {
@@ -262,8 +243,41 @@ function setVolume(v) { audio.volume = v; }
 function updateMediaSession(title, artist) {
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album: "WolfTronix Radio" });
-    navigator.mediaSession.setActionHandler('play', () => audio.play());
-    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+}
+
+function startSynthViz() {
+    const canvas = document.getElementById('vizCanvas');
+    const ctx = canvas.getContext('2d');
+    function draw() {
+        vizRAF = requestAnimationFrame(draw);
+        const w = canvas.width = canvas.offsetWidth; const h = canvas.height = canvas.offsetHeight;
+        ctx.fillStyle = '#12121a'; ctx.fillRect(0,0,w,h);
+        const active = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
+        synthPhase += active ? 0.1 : 0.02;
+        
+        if (vizMode === 'fft') {
+            for(let i=0; i<32; i++) {
+                const bH = active ? Math.abs(Math.sin(synthPhase + i*0.2)) * h * 0.7 : 2;
+                ctx.fillStyle = active ? 'var(--accent)' : 'var(--muted)';
+                ctx.fillRect(i*(w/32), h-bH, (w/32)-2, bH);
+            }
+        } else if (vizMode === 'radar') {
+            ctx.strokeStyle = active ? 'var(--green)' : 'var(--muted)';
+            ctx.beginPath(); ctx.arc(w/2, h/2, active ? Math.abs(Math.sin(synthPhase)*40)+20 : 30, 0, Math.PI*2); ctx.stroke();
+            ctx.moveTo(w/2, h/2); ctx.lineTo(w/2 + Math.cos(synthPhase)*50, h/2 + Math.sin(synthPhase)*50); ctx.stroke();
+        } else {
+            ctx.strokeStyle = 'var(--accent)'; ctx.beginPath();
+            for(let x=0; x<w; x++) ctx.lineTo(x, h/2 + Math.sin(x*0.05 + synthPhase)* (active?20:2));
+            ctx.stroke();
+        }
+    }
+    if(!vizRAF) draw();
+}
+
+function setVizMode(m, btn) {
+    vizMode = m;
+    document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 }
 
 function tickClock() {
@@ -281,8 +295,7 @@ function switchTab(id, el) {
 
 function loadMp3Files(files) {
     mp3Tracks = Array.from(files).map((f, i) => ({ idx: i, name: f.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(f) }));
-    const container = document.getElementById('mp3Tracks');
-    container.innerHTML = '';
+    const container = document.getElementById('mp3Tracks'); container.innerHTML = '';
     mp3Tracks.forEach((t, i) => {
         const b = document.createElement('button'); b.className = 'stn-btn'; b.id = 'mp3-' + i;
         b.onclick = () => playMp3(i);
