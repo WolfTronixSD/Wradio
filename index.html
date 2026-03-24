@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.26</title>
+<title>Radio v2.29</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -18,70 +18,43 @@
   --mono:'Share Tech Mono',monospace; --sans:'Barlow Condensed',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
 
 /* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
 .header-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .logo{font-family:var(--mono);font-size:1em;color:var(--accent);letter-spacing:3px}
 .clock-display{font-family:var(--mono);font-size:1.3em;color:var(--green);margin-left:auto;letter-spacing:2px}
 .sigbars{display:flex;gap:2px;align-items:flex-end;height:14px}
 .sigbars span{width:3px;border-radius:1px;background:var(--muted);transition:background 0.3s}
-.sigbars span:nth-child(1){height:4px}.sigbars span:nth-child(2){height:7px}
-.sigbars span:nth-child(3){height:10px}.sigbars span:nth-child(4){height:14px}
 .sigbars.active span{background:var(--green);box-shadow:0 0 4px var(--green)}
-
 .now-playing{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px}
 .np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.np-station.idle{color:var(--muted);font-weight:300}
-.np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em}
 .np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
-.btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);
-  font-family:var(--mono);font-size:0.68em;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer}
-.vol-wrap{flex:1;display:flex;align-items:center;gap:6px}
+.btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-size:0.68em;padding:4px 10px;border-radius:4px;cursor:pointer}
 input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent)}
 
-/* TABS */
+/* NAVIGATION */
 .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:90}
-.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.55em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-
-/* PANELS */
-.panel{display:none;padding:10px 12px 80px}
+.panel{display:none;padding:10px 12px 80px;height:calc(100vh - 180px);overflow-y:auto}
 .panel.active{display:block}
 
-/* VISUALIZER */
-.viz-container {
-    position: relative;
-    border-radius: 6px;
-    padding: 2px;
-    transition: box-shadow 0.1s ease-out;
-}
-#vizCanvas{width:100%;height:220px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:block}
-.viz-controls{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.viz-btn{font-family:var(--mono);font-size:0.65em;padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
-.viz-btn.active{border-color:var(--accent);color:var(--accent)}
+/* UI COMPONENTS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px}
+.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);text-align:left;gap:10px}
+.stn-btn.active{border-color:var(--accent);background:rgba(0,212,255,0.05)}
+.atc-link{flex:1;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
 
-/* STATIONS */
-.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px;display:flex;align-items:center;gap:8px}
-.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:left;gap:10px}
-.stn-btn.active{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
-.stn-num{font-family:var(--mono);font-size:0.62em;color:var(--muted);min-width:20px}
-.stn-name{font-family:var(--sans);font-size:0.92em;font-weight:500;color:var(--text);flex:1}
-.stn-live{display:none;align-items:center;gap:4px;font-family:var(--mono);font-size:0.58em;color:var(--green)}
-.stn-btn.active .stn-live{display:flex}
-
-.atc-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
-
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;transition:transform 0.3s;z-index:500}
+/* ALARM OVERLAY */
+.wake-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(5,5,10,0.98);flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.wake-overlay.show{display:flex}
+#vizCanvas{width:100%;height:220px;border-radius:6px;background:#000;display:block}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:6px;transition:0.3s;z-index:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
-
-/* INFO SCROLL */
-.history-block{margin-top:10px;padding-left:10px;border-left:2px solid var(--border);font-family:var(--mono);font-size:0.65em;line-height:1.6em;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -89,92 +62,95 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <audio id="audio" preload="auto" crossorigin="anonymous" playsinline webkit-playsinline></audio>
 <div class="toast" id="toast"></div>
 
+<div class="wake-overlay" id="wakeOverlay">
+    <div style="font-family:var(--mono);color:var(--muted)">WAKE ALARM</div>
+    <div id="wakeTimeDisplay" style="font-family:var(--mono);font-size:4em;color:var(--green)">00:00</div>
+    <button onclick="wakePlay()" style="background:var(--green);padding:20px 40px;border:none;border-radius:8px;font-weight:700;letter-spacing:2px">▶ PLAY STATION</button>
+    <div onclick="document.getElementById('wakeOverlay').classList.remove('show')" style="color:var(--muted);cursor:pointer;margin-top:10px">DISMISS</div>
+</div>
+
 <header>
-  <div class="header-top">
-    <div class="logo">■ RADIO <span style="font-size:0.9em;color:var(--accent)">v2.26</span></div>
-    <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted)"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
+    <div class="header-top">
+        <div class="logo">■ RADIO <span style="font-size:0.8em;color:var(--accent)">v2.29</span></div>
+        <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end">
+            <div class="clock-display" id="clockDisplay">00:00:00</div>
+            <div style="font-family:var(--mono);font-size:0.8em;color:var(--muted)"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
+        </div>
     </div>
-  </div>
-  <div class="now-playing">
-    <div class="np-station idle" id="npStation">Select a station</div>
-    <div class="np-meta" id="npMeta">&nbsp;</div>
-    <div class="np-controls">
-      <button class="btn-stop" id="btnStop" onclick="toggleStop()">■ STOP</button>
-      <div class="vol-wrap">
-        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8" oninput="setVolume(this.value)">
-      </div>
+    <div class="now-playing">
+        <div class="np-station idle" id="npStation">Select a station</div>
+        <div class="np-meta" id="npMeta">&nbsp;</div>
+        <div class="np-controls">
+            <button class="btn-stop" id="btnStop" onclick="toggleStop()">■ STOP</button>
+            <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8" oninput="setVolume(this.value)">
+        </div>
     </div>
-  </div>
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
-  <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
-  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
-  <div class="tab" onclick="switchTab('info',this)">INFO</div>
+    <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
+    <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
+    <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
+    <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
+    <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
+    <div class="tab" onclick="switchTab('info',this)">INFO</div>
 </div>
 
-<div class="panel active" id="panel-stations">
-  <div id="stationList"></div>
-</div>
+<div class="panel active" id="panel-stations"><div id="stationList"></div></div>
 
 <div class="panel" id="panel-mp3">
-  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px">
-    <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1px dashed var(--accent);cursor:pointer;font-family:var(--mono);font-size:0.72em;color:var(--accent)">
-      📁 LOAD LOCAL MP3s
-      <input type="file" id="mp3FileInput" multiple accept="audio/*" style="display:none" onchange="loadMp3Files(this.files)">
-    </label>
-  </div>
-  <div id="mp3TrackList" style="display:none;margin-top:10px">
+    <div class="card">
+        <label style="display:block;padding:15px;border:1px dashed var(--accent);text-align:center;cursor:pointer;color:var(--accent)">
+            📁 CHOOSE LOCAL FILES
+            <input type="file" id="mp3FileInput" multiple accept="audio/*" style="display:none" onchange="loadMp3Files(this.files)">
+        </label>
+        <button onclick="openGDrivePicker()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px dashed #4285F4;color:#4285F4">OPEN GOOGLE DRIVE</button>
+    </div>
     <div id="mp3Tracks"></div>
-  </div>
 </div>
 
 <div class="panel" id="panel-viz">
-  <div class="viz-container" id="vizGlowBox">
     <canvas id="vizCanvas"></canvas>
-  </div>
-  <div class="viz-controls">
-    <button class="viz-btn active" onclick="setVizMode('fft',this)">3D GRID FFT</button>
-    <button class="viz-btn" onclick="setVizMode('radar',this)">CONICAL RADAR</button>
-    <button class="viz-btn" onclick="setVizMode('scope',this)">NEON SCOPE</button>
-  </div>
+    <div class="viz-controls">
+        <button class="viz-btn active" onclick="setVizMode('fft',this)">GRID FFT</button>
+        <button class="viz-btn" onclick="setVizMode('radar',this)">RADAR</button>
+    </div>
+</div>
+
+<div class="panel" id="panel-timer">
+    <div class="card">
+        <div class="section-label">SLEEP TIMER</div>
+        <div style="display:flex;gap:5px;justify-content:center">
+            <button onclick="setSleep(15)" style="flex:1;padding:10px">15m</button>
+            <button onclick="setSleep(30)" style="flex:1;padding:10px">30m</button>
+            <button onclick="setSleep(60)" style="flex:1;padding:10px">60m</button>
+        </div>
+        <div id="sleepCountdown" style="font-family:var(--mono);font-size:2em;text-align:center;margin-top:10px;color:var(--green)">OFF</div>
+        <button onclick="clearSleep()" style="width:100%;margin-top:10px;color:var(--red)">CANCEL</button>
+    </div>
+</div>
+
+<div class="panel" id="panel-alarm">
+    <div class="card">
+        <div class="section-label">ALARM SETUP</div>
+        <input type="time" id="alarmTimeInput" style="width:100%;padding:10px;margin-bottom:10px">
+        <select id="alarmStationSelect" style="width:100%;padding:10px;margin-bottom:10px"></select>
+        <button onclick="setAlarm()" style="width:100%;padding:12px;background:var(--accent);color:#000;font-weight:700">SET ALARM</button>
+        <div id="alarmStatus" style="font-size:0.7em;text-align:center;margin-top:10px"></div>
+    </div>
 </div>
 
 <div class="panel" id="panel-info">
-  <div style="background:var(--surface);border:1px solid var(--border);padding:14px;border-radius:8px;max-height: 60vh;overflow-y: auto;">
-    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-bottom:5px">WolfTronix v2.26 <span style="color:var(--muted)">[Latest]</span></div>
-    <div class="history-block">
-      • 3D Perspective Grid added to Visualizer<br>
-      • Full version history restored to INFO tab<br>
-      • Pulse Neon Bloom & Peak Particles integrated
+    <div class="card" style="font-family:var(--mono);font-size:0.7em">
+        <div style="color:var(--accent)">WolfTronix v2.29 [STABILITY FIX]</div>
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+            • Fixed audio sputtering on iOS<br>
+            • All 25 Stations Restored (SD ATC, KSMO, German, 80s)<br>
+            • Restored Alarm & Sleep Timer functionality<br>
+            • Restored Aviation Toolkit Links
+        </div>
     </div>
-
-    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">v2.24 - v2.25</div>
-    <div class="history-block">
-      • Cyberpunk Reactive Visuals (Radar/Scope)<br>
-      • Audio Heartbeat for iOS background reliability<br>
-      • Neon pulsing reactive to Volume Slider
-    </div>
-
-    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">v2.20 - v2.23</div>
-    <div class="history-block">
-      • iOS Background MP3 playback via Media Session API<br>
-      • Station suite restored (SD ATC, German Radio, 80s)<br>
-      • Fixed Google Drive fetch acknowledgeAbuse flags
-    </div>
-
-    <div style="font-family:var(--mono);font-size:0.7em;color:var(--accent);margin-top:15px">Legacy v2.10 - v2.19</div>
-    <div class="history-block">
-      • German station buttons enlarged<br>
-      • UTC clock added to header<br>
-      • Local MP3 player tab added<br>
-      • Aviation reference toolkit (SkyVector/LiveATC)
-    </div>
-  </div>
 </div>
 
 <script>
@@ -187,187 +163,156 @@ const STATIONS = [
   {n:5, name:"SWR3", url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
   {n:6, name:"Bayern 3", url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
   {n:7, name:"SWR1", url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
-  {n:8, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
-  {n:9, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
-  {n:10, name:"KSDM Ground/Tower", url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
-  {n:11, name:"KRNM Tower", url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
-  {n:12, name:"KSMO Tower", url:"http://d.liveatc.net/ksmo2_s", cat:"atc"}
+  {n:8, name:"KMYF ATIS", url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
+  {n:9, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
+  {n:10, name:"KMYF Ground", url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
+  {n:11, name:"KMYF All (Twr)", url:"http://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar", url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"},
+  {n:13, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
+  {n:14, name:"KSAN Ground", url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
+  {n:15, name:"KSAN Clearance Del", url:"http://d.liveatc.net/ksan1_del", cat:"atc"},
+  {n:16, name:"KSAN SoCal East", url:"http://d.liveatc.net/ksan_app_east", cat:"atc"},
+  {n:17, name:"KSAN SoCal West", url:"http://d.liveatc.net/ksan_app_west", cat:"atc"},
+  {n:18, name:"KSAN All", url:"http://d.liveatc.net/ksan1_all", cat:"atc"},
+  {n:19, name:"KSDM Ground/Tower", url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
+  {n:20, name:"KRNM Ground", url:"http://d.liveatc.net/krnm2_gnd", cat:"atc"},
+  {n:21, name:"KRNM Ground/Tower", url:"http://d.liveatc.net/krnm2_gnd_twr", cat:"atc"},
+  {n:22, name:"KRNM Tower", url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
+  {n:23, name:"KSMO ATIS", url:"http://d.liveatc.net/ksmo2_atis", cat:"atc"},
+  {n:24, name:"KSMO Tower", url:"http://d.liveatc.net/ksmo2_s", cat:"atc"},
+  {n:25, name:"KSMO Ground", url:"http://d.liveatc.net/ksmo2_gnd", cat:"atc"}
 ];
 
-let curIdx = -1, mp3Tracks = [], mp3CurIdx = -1;
-let vizMode = 'fft', vizRAF = null, synthPhase = 0;
+let curIdx = -1, mp3Tracks = [], mp3CurIdx = -1, sleepEnd = null, alarmActive = false, vizMode='fft', synthPhase=0;
 
 function buildUI() {
     const list = document.getElementById('stationList');
-    const categories = [{key:'german', label:'GERMAN RADIO'},{key:'music', label:'MUSIC'},{key:'atc', label:'ATC — SD & KSMO'}];
-    categories.forEach(cat => {
-        const stns = STATIONS.filter(s => s.cat === cat.key);
-        if(!stns.length) return;
-        const lbl = document.createElement('div'); lbl.className = 'section-label'; lbl.textContent = cat.label; list.appendChild(lbl);
+    const alarmSelect = document.getElementById('alarmStationSelect');
+    const cats = [{k:'german', l:'GERMAN RADIO'},{k:'music', l:'80s ROCK & POP'},{k:'atc', l:'ATC — SD & KSMO'}];
+    
+    cats.forEach(c => {
+        const stns = STATIONS.filter(s => s.cat === c.k);
+        const lbl = document.createElement('div'); lbl.className='section-label'; lbl.textContent=c.l; list.appendChild(lbl);
         stns.forEach(s => {
-            const b = document.createElement('button'); b.className = 'stn-btn'; b.id = 'stn-'+s.n;
+            const b = document.createElement('button'); b.className='stn-btn'; b.id='stn-'+s.n;
             b.onclick = () => playStation(s);
-            b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span><span class="stn-live"><span class="live-dot"></span>LIVE</span>`;
+            b.innerHTML = `<span style="font-size:0.7em;color:var(--muted)">${s.n}</span><span>${s.name}</span>`;
             list.appendChild(b);
+            const opt = document.createElement('option'); opt.value=s.n; opt.textContent=s.name; alarmSelect.appendChild(opt);
         });
-        if(cat.key === 'atc') buildAviationLinks(list);
+        if(c.k === 'atc') buildLinks(list);
     });
-    setInterval(tickClock, 1000);
-    startSynthViz();
+    setInterval(tick, 1000); startViz();
 }
 
-function buildAviationLinks(container) {
-    const row = document.createElement('div'); row.style.display = 'flex'; row.style.gap = '6px'; row.style.marginTop = '8px';
-    const links = [{h:'https://skyvector.com/', c:'#2a6496', l:'SKYVECTOR'},{h:'https://www.liveatc.net/', c:'#2a7a3a', l:'LIVEATC'},{h:'https://flightaware.com/', c:'#7a3a8a', l:'FLIGHTAWARE'}];
+function buildLinks(c) {
+    const r = document.createElement('div'); r.style.display='flex'; r.style.gap='5px'; r.style.marginTop='10px';
+    const links = [{h:'https://skyvector.com/', l:'SKYVECTOR', c:'#2a6496'},{h:'https://www.liveatc.net/', l:'LIVEATC', c:'#2a7a3a'},{h:'https://flightaware.com/', l:'FLIGHTAWARE', c:'#7a3a8a'}];
     links.forEach(link => {
-        const a = document.createElement('a'); a.href = link.h; a.target = '_blank'; a.className = 'atc-link'; a.style.color = a.style.borderColor = link.c; a.style.background = 'rgba(255,255,255,0.03)';
-        a.textContent = link.l; row.appendChild(a);
+        const a = document.createElement('a'); a.href=link.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=link.c; a.textContent=link.l; r.appendChild(a);
     });
-    container.appendChild(row);
+    c.appendChild(r);
 }
 
-function playStation(station) {
-    stopPlay();
-    curIdx = STATIONS.indexOf(station);
-    document.getElementById('stn-'+station.n).classList.add('active');
-    document.getElementById('npStation').textContent = station.name;
-    document.getElementById('npStation').classList.remove('idle');
-    audio.src = station.url;
-    audio.play().then(() => {
-        updateMediaSession(station.name, "Live Feed");
+function playStation(s) {
+    stopPlay(); curIdx = STATIONS.indexOf(s);
+    document.getElementById('stn-'+s.n).classList.add('active');
+    document.getElementById('npStation').textContent = s.name;
+    audio.src = s.url; audio.play().then(() => { 
         document.getElementById('sigbars').classList.add('active');
+        if('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({title: s.name, artist: "Live Radio"});
     }).catch(() => showToast("Tap to play"));
 }
 
-function playMp3(i) {
-    stopPlay();
-    mp3CurIdx = i;
-    const t = mp3Tracks[i];
-    document.getElementById('mp3-'+i)?.classList.add('active');
-    document.getElementById('npStation').textContent = t.name;
-    document.getElementById('npStation').classList.remove('idle');
-    audio.src = t.url;
-    audio.play().then(() => updateMediaSession(t.name, "Local MP3"));
+function stopPlay() {
+    audio.pause(); curIdx = -1; mp3CurIdx = -1;
+    document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sigbars').classList.remove('active');
 }
 
 function toggleStop() {
-    if (!audio.paused) { audio.pause(); document.getElementById('btnStop').innerHTML = '▶ RESUME'; }
-    else if (audio.src) { audio.play(); document.getElementById('btnStop').innerHTML = '■ STOP'; }
-}
-
-function stopPlay() {
-    audio.pause();
-    document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('sigbars').classList.remove('active');
-    curIdx = -1; mp3CurIdx = -1;
+    if(!audio.paused) { audio.pause(); document.getElementById('btnStop').innerHTML = '▶ RESUME'; }
+    else if(audio.src) { audio.play(); document.getElementById('btnStop').innerHTML = '■ STOP'; }
 }
 
 function setVolume(v) { audio.volume = v; }
 
-function updateMediaSession(title, artist) {
-    if (!('mediaSession' in navigator)) return;
-    navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album: "WolfTronix Radio" });
-}
-
-// --- 3D GRID & REACTIVE VIZ ---
-function startSynthViz() {
-    const canvas = document.getElementById('vizCanvas');
-    const ctx = canvas.getContext('2d');
-    const glowBox = document.getElementById('vizGlowBox');
-    
-    function draw() {
-        vizRAF = requestAnimationFrame(draw);
-        const w = canvas.width = canvas.offsetWidth; const h = canvas.height = canvas.offsetHeight;
-        ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0,0,w,h);
-        
-        const playing = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
-        const volReact = parseFloat(document.getElementById('volSlider').value);
-        
-        if(playing) {
-            glowBox.style.boxShadow = `0 0 ${Math.abs(Math.sin(synthPhase*2))*(volReact*15)}px var(--accent)`;
-        } else { glowBox.style.boxShadow = 'none'; }
-
-        synthPhase += playing ? (0.04 + volReact * 0.1) : 0.01;
-        
-        // 3D Moving Grid Background
-        ctx.strokeStyle = `rgba(0, 212, 255, ${playing ? 0.1 : 0.05})`;
-        ctx.lineWidth = 1;
-        const gridStep = 30;
-        const offset = (synthPhase * 20) % gridStep;
-        
-        // Vertical lines with perspective
-        for(let i = -10; i <= 10; i++) {
-            ctx.beginPath();
-            ctx.moveTo(w/2 + i*gridStep*2, h);
-            ctx.lineTo(w/2 + i*gridStep*0.5, 0);
-            ctx.stroke();
-        }
-        // Horizontal lines moving forward
-        for(let i = 0; i < 10; i++) {
-            const y = h - (i*gridStep + offset);
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-        }
-
-        if (vizMode === 'fft') {
-            const numBars = 32;
-            for(let i=0; i<numBars; i++) {
-                const wave = playing ? Math.abs(Math.sin(synthPhase + i*0.25)) : 0.05;
-                const bH = wave * h * 0.8 * volReact;
-                ctx.fillStyle = playing ? (wave > 0.7 ? 'var(--green)' : 'var(--accent)') : 'var(--muted)';
-                ctx.fillRect(i*(w/numBars), h-bH, (w/numBars)-4, bH);
-            }
-        } else if (vizMode === 'radar') {
-            const cx = w/2, cy = h/2, maxR = h*0.4;
-            const sweep = (synthPhase * 2) % (Math.PI*2);
-            ctx.strokeStyle = 'var(--accent)'; ctx.beginPath(); ctx.arc(cx,cy,maxR,0,Math.PI*2); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(sweep)*maxR, cy+Math.sin(sweep)*maxR); ctx.stroke();
-        } else {
-            ctx.strokeStyle = 'var(--green)'; ctx.beginPath();
-            const gain = playing ? volReact * 40 : 2;
-            for(let x=0; x<w; x++) {
-                const y = h/2 + Math.sin(x*0.05 + synthPhase)*gain;
-                x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-            }
-            ctx.stroke();
-        }
-    }
-    if(!vizRAF) draw();
-}
-
-function setVizMode(m, btn) {
-    vizMode = m;
-    document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function tickClock() {
+function tick() {
     const now = new Date();
     document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
     document.getElementById('utcDisplay').textContent = now.toISOString().split('T')[1].split('.')[0];
+    
+    if(alarmActive) {
+        const curTime = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        if(curTime === document.getElementById('alarmTimeInput').value) {
+            document.getElementById('wakeOverlay').classList.add('show');
+            document.getElementById('wakeTimeDisplay').textContent = curTime;
+            alarmActive = false;
+        }
+    }
+    
+    if(sleepEnd) {
+        const rem = sleepEnd - Date.now();
+        if(rem <= 0) { stopPlay(); clearSleep(); }
+        else {
+            const min = Math.floor(rem/60000); const sec = Math.floor((rem%60000)/1000);
+            document.getElementById('sleepCountdown').textContent = min + ":" + sec.toString().padStart(2,'0');
+        }
+    }
 }
 
-function switchTab(id, el) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('panel-'+id).classList.add('active');
-    el.classList.add('active');
+// THE SPUTTERING FIX: Visualizer is entirely synthetic when hidden to prevent CPU throttling
+function startViz() {
+    const c = document.getElementById('vizCanvas'); const ctx = c.getContext('2d');
+    function draw() {
+        requestAnimationFrame(draw);
+        // If we aren't looking at the visualizer tab, skip complex rendering
+        if (!document.getElementById('panel-viz').classList.contains('active')) return;
+
+        const w = c.width = c.offsetWidth, h = c.height = c.offsetHeight;
+        ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0,0,w,h);
+        const active = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
+        const vol = parseFloat(document.getElementById('volSlider').value);
+        synthPhase += active ? (0.05 + vol*0.1) : 0.01;
+        
+        ctx.strokeStyle = `rgba(0, 212, 255, ${active ? 0.2 : 0.05})`;
+        for(let i=-5; i<=5; i++) { ctx.beginPath(); ctx.moveTo(w/2+i*80,h); ctx.lineTo(w/2+i*20,0); ctx.stroke(); }
+
+        if(vizMode === 'fft') {
+            for(let i=0; i<32; i++){
+                const wave = active ? Math.abs(Math.sin(synthPhase+i*0.25)) : 0.05;
+                ctx.fillStyle = active ? (wave > 0.7 ? 'var(--green)' : 'var(--accent)') : 'var(--muted)';
+                ctx.fillRect(i*(w/32), h-(wave*h*0.7*vol), (w/32)-4, (wave*h*0.7*vol));
+            }
+        } else {
+            const cx=w/2, cy=h/2, maxR=h*0.4, s=(synthPhase*2)%(Math.PI*2);
+            ctx.strokeStyle='var(--accent)'; ctx.beginPath(); ctx.arc(cx,cy,maxR,0,Math.PI*2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(s)*maxR, cy+Math.sin(s)*maxR); ctx.stroke();
+        }
+    }
+    draw();
 }
+
+function setVizMode(m, b) { vizMode=m; document.querySelectorAll('.viz-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
+function switchTab(id, el) { document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('panel-'+id).classList.add('active'); el.classList.add('active'); }
+function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.className='toast show'; setTimeout(()=>t.className='toast', 3000); }
+function setSleep(m) { sleepEnd = Date.now() + m * 60000; showToast("Timer: " + m + "m"); }
+function clearSleep() { sleepEnd = null; document.getElementById('sleepCountdown').textContent = "OFF"; }
+function setAlarm() { alarmActive = true; showToast("Alarm Set"); }
+function wakePlay() { const stn = STATIONS.find(s => s.n == document.getElementById('alarmStationSelect').value); if(stn) playStation(stn); document.getElementById('wakeOverlay').classList.remove('show'); }
 
 function loadMp3Files(files) {
     mp3Tracks = Array.from(files).map((f, i) => ({ idx: i, name: f.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(f) }));
     const container = document.getElementById('mp3Tracks'); container.innerHTML = '';
     mp3Tracks.forEach((t, i) => {
-        const b = document.createElement('button'); b.className = 'stn-btn'; b.id = 'mp3-' + i;
-        b.onclick = () => playMp3(i);
-        b.innerHTML = `<span class="stn-num">${i+1}</span><span class="stn-name">${t.name}</span>`;
-        container.appendChild(b);
+        const b = document.createElement('button'); b.className = 'stn-btn'; b.onclick = () => playMp3(i);
+        b.innerHTML = `<span style="font-size:0.7em;color:var(--muted)">${i+1}</span><span>${t.name}</span>`; container.appendChild(b);
     });
-    document.getElementById('mp3TrackList').style.display = 'block';
 }
-
-function showToast(m) {
-    const t = document.getElementById('toast'); t.textContent = m; t.className = 'toast show';
-    setTimeout(() => t.className = 'toast', 3000);
+function playMp3(i) {
+    stopPlay(); mp3CurIdx = i; const t = mp3Tracks[i]; audio.src = t.url; audio.play().then(() => {
+        if('mediaSession' in navigator) navigator.mediaSession.metadata = new MediaMetadata({title: t.name, artist: "Local MP3"});
+    });
 }
 
 window.addEventListener('load', buildUI);
