@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.16</title>
+<title>Radio v2.17</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -173,7 +173,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.75em;color:var(--muted);letter-spacing:1px">v2.16</span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.75em;color:var(--muted);letter-spacing:1px">v2.17</span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -322,7 +322,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.16</span>
+        <span style="color:var(--accent)">v2.17</span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -339,7 +339,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.16</div>
+      <div style="color:var(--accent);margin-top:4px">v2.17</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 STOP button now pauses &amp; resumes (keeps position)<br>
+        Button changes to ▶ RESUME when paused
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.16</div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         MP3 background playback fix for iOS Safari<br>
         Full Media Session API (lock screen controls, prev/next/seek)<br>
@@ -393,11 +399,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.16  (2026-03-23)
+//  Version : v2.17  (2026-03-23)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.17 - MP3 STOP button now pauses/resumes keeping position
+//          Button label toggles: STOP ↔ RESUME
 //  v2.16 - MP3 background playback fix for iOS Safari
 //          Full Media Session API: lock screen controls, prev/next/seek for MP3
 //          playsinline attribute on audio element
@@ -1384,6 +1392,7 @@ function playMp3(i) {
   audio.load();
   audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
+    document.getElementById('btnStop').innerHTML = '&#9632; STOP';
     updateMediaSession(t.name);
     tryLiveAudio();
   }).catch(() => {
@@ -1455,7 +1464,7 @@ audio.addEventListener('ended', () => {
 // Only Client ID needed — no API key in public code
 // Get yours: console.cloud.google.com → Credentials → OAuth Client ID (Web app)
 // Authorized JS origins: https://wolftronixsd.github.io
-const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+const GDRIVE_CLIENT_ID = '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com';
 const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly';
 
 let gAccessToken = null;
