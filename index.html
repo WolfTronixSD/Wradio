@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio</title>
+<title>Radio v2.16</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -159,7 +159,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 </head>
 <body>
 
-<audio id="audio" preload="none" crossorigin="anonymous"></audio>
+<audio id="audio" preload="none" crossorigin="anonymous" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- ALARM WAKE OVERLAY -->
@@ -173,7 +173,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO</div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.75em;color:var(--muted);letter-spacing:1px">v2.16</span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -184,7 +184,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="np-station idle" id="npStation">Select a station</div>
     <div class="np-meta" id="npMeta">&nbsp;</div>
     <div class="np-controls">
-      <button class="btn-stop" onclick="stopPlay()">&#9632; STOP</button>
+      <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
       <div class="vol-wrap">
         <span class="vol-icon">&#128264;</span>
         <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
@@ -202,6 +202,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
   <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
   <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
+  <div class="tab" onclick="switchTab('info',this)">INFO</div>
 </div>
 
 <!-- STATIONS -->
@@ -314,60 +315,176 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   </div>
 </div>
 
+<!-- INFO -->
+<div class="panel" id="panel-info">
+  <div class="card">
+    <div class="card-title">ABOUT</div>
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
+        <span style="color:var(--muted)">VERSION</span>
+        <span style="color:var(--accent)">v2.16</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
+        <span style="color:var(--muted)">AUTHOR</span>
+        <span>WolfTronixSD</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--muted)">HOSTED</span>
+        <a href="https://wolftronixsd.github.io/Wradio/" target="_blank"
+          style="color:var(--accent);text-decoration:none;font-size:0.9em">GitHub Pages</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">CHANGELOG</div>
+    <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.16</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 background playback fix for iOS Safari<br>
+        Full Media Session API (lock screen controls, prev/next/seek)<br>
+        playsinline attribute added to audio element
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.15</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.14</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Added Plus One Flyers + ScheduleMaster link buttons
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.13</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Music replaced with 80s Rock &amp; Pop (Big 80s Station, SomaFM Underground 80s)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.12</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        LiveATC + FlightAware buttons added<br>
+        Google Drive picker: search all audio files<br>
+        KSMO Santa Monica added<br>
+        Version number in header + code comments
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.11</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Google Drive picker (OAuth, no API key)<br>
+        Visualizer fixed for MP3<br>
+        German radio moved to top
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.10</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Local MP3 player tab added<br>
+        SkyVector button added<br>
+        German station buttons enlarged<br>
+        UTC clock in header<br>
+        Removed KEXP / Capital FM / Radio Paradise<br>
+        Deutschlandfunk Nova → SWR1
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 // ============================================================
+//  WolfTronix Radio Player
+//  Version : v2.16  (2026-03-23)
+//  Author  : WolfTronixSD
+//  Hosted  : https://wolftronixsd.github.io/Wradio/
+//
+//  Changelog:
+//  v2.16 - MP3 background playback fix for iOS Safari
+//          Full Media Session API: lock screen controls, prev/next/seek for MP3
+//          playsinline attribute on audio element
+//  v2.15 - Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
+//  v2.14 - Added Plus One Flyers + ScheduleMaster link buttons (ATC section)
+//  v2.13 - Music section replaced with 80s Rock & Pop stations:
+//          Big 80s Station (128k, ad-free, ex-radio programmers)
+//          SomaFM Underground 80s (synthpop/new wave, ad-free)
+//  v2.12 - Added LiveATC + FlightAware link buttons
+//          Google Drive picker now shows ALL audio files (search view)
+//          KSMO (Santa Monica) ATIS/Tower/Ground added
+//          Version number displayed in header
+//          Code comments added throughout
+//  v2.11 - Google Drive picker added (OAuth only, no API key)
+//          Visualizer fixed for MP3 playback
+//          German radio moved to top of station list
+//  v2.10 - Local MP3 player tab added (file picker + shuffle/repeat)
+//          SkyVector aviation chart button added
+//          German station buttons made larger
+//          UTC clock added to header
+//          Music: removed KEXP/CapitalFM/RadioParadise
+//          Deutschlandfunk Nova replaced with SWR1
+// ============================================================
+
+// ============================================================
 //  STATIONS
+//  cat: "german" | "music" | "atc"
+//  Add new stations here — UI is built automatically from this array
 // ============================================================
 const STATIONS = [
-  {n:1,  name:"SomaFM Indie Pop",     url:"http://ice1.somafm.com/indiepop-64-mp3",                                 cat:"music"},
-  {n:2,  name:"SomaFM Groovesalad",   url:"http://ice1.somafm.com/groovesalad-64-mp3",                              cat:"music"},
+  // --- Music: 80s Rock & Pop (all ad-free) ---
+  {n:1,  name:"Big 80s Station",      url:"http://thebig80sstation.servemp3.com",                                    cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3",                                  cat:"music"},
+  // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
   {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
   {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
   {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
-  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                       cat:"german"},
+  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
+  // --- ATC San Diego (KMYF = Montgomery Field) ---
   {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
   {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
   {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
   {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
+  // --- ATC San Diego (KSAN = Lindbergh Field) ---
   {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
   {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
   {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                         cat:"atc"},
   {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
   {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
   {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                         cat:"atc"},
+  // --- ATC San Diego (KSDM = Brown Field, KRNM = Ramona) ---
   {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
   {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
   {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
   {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
-  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo_atis",                                          cat:"atc"},
-  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo_twr",                                           cat:"atc"},
-  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo_gnd",                                           cat:"atc"},
+  // --- ATC Santa Monica (KSMO) ---
+  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo2_atis",                                         cat:"atc"},
+  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo2_s",                                            cat:"atc"},
+  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo2_gnd",                                          cat:"atc"},
 ];
 
 // ============================================================
 //  STATE
+//  All runtime variables — reset on page reload
 // ============================================================
 const audio = document.getElementById('audio');
-let curIdx   = -1;
+let curIdx   = -1;   // index into STATIONS array (-1 = nothing playing)
 let vizMode  = 'fft';
-let vizRAF   = null;
-let vuRAF    = null;
+let vizRAF   = null; // requestAnimationFrame handle for visualizer
+let vuRAF    = null; // requestAnimationFrame handle for VU meter
 
-// Web Audio (desktop only)
+// Web Audio API — connected once on first play, never disconnected
+// createMediaElementSource() can only be called ONCE per audio element
 let audioCtx = null, analyser = null, waSource = null;
-let liveAudio = false;
+let liveAudio = false; // true once Web Audio graph is built
 
-// sleep
-let sleepEnd    = null;
-let fadeEnabled = true;
+// Sleep timer
+let sleepEnd    = null;  // timestamp (ms) when audio should stop
+let fadeEnabled = true;  // if true, fade out volume before stopping
 
-// alarm
+// Alarm
 let alarmActive  = false;
-let alarmPending = null; // {time, station} to play on tap
+let alarmPending = null; // station to play when user taps PLAY on wake overlay
 
-// synthetic viz state
+// Synthetic visualizer state (used when live Web Audio not available, e.g. iOS)
 let synthPhase = 0;
 let synthLevel = 0;
 
@@ -396,6 +513,7 @@ function buildUI() {
     });
     // Aviation link buttons after ATC section
     if (cat.key === 'atc') {
+      // Row 1: aviation reference sites
       const links = [
         { href:'https://skyvector.com/',         color:'#2a6496', bg:'rgba(42,100,150,0.1)',   icon:'✈', label:'SKYVECTOR' },
         { href:'https://www.liveatc.net/',        color:'#2a7a3a', bg:'rgba(42,122,58,0.1)',    icon:'📡', label:'LIVEATC' },
@@ -414,6 +532,24 @@ function buildUI() {
         row.appendChild(a);
       });
       sec.appendChild(row);
+      // Row 2: flying club / schedule sites
+      const links2 = [
+        { href:'https://www.plusoneflyers.org/',        color:'#b07a20', bg:'rgba(176,122,32,0.1)',  icon:'🏅', label:'PLUS ONE FLYERS' },
+        { href:'https://my.schedulemaster.com/',        color:'#206060', bg:'rgba(32,96,96,0.1)',    icon:'📅', label:'SCHEDULEMASTER' },
+      ];
+      const row2 = document.createElement('div');
+      row2.style.cssText = 'display:flex;gap:6px;margin-top:6px';
+      links2.forEach(l => {
+        const a = document.createElement('a');
+        a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
+        a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+          +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
+          +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
+          +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+        a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
+        row2.appendChild(a);
+      });
+      sec.appendChild(row2);
     }
     list.appendChild(sec);
   });
@@ -508,6 +644,29 @@ function play(station) {
   });
 }
 
+function toggleStop() {
+  // For MP3: pause/resume keeping position
+  // For streams: full stop (they are live, no position to keep)
+  if (mp3CurIdx >= 0) {
+    if (audio.paused) {
+      // Resume from where we left off
+      audio.play().then(() => {
+        document.getElementById('sigbars').classList.add('active');
+        document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+        navigator.mediaSession && (navigator.mediaSession.playbackState = 'playing');
+      }).catch(()=>{});
+    } else {
+      // Pause — keep src and position intact
+      audio.pause();
+      document.getElementById('sigbars').classList.remove('active');
+      document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
+      navigator.mediaSession && (navigator.mediaSession.playbackState = 'paused');
+    }
+  } else {
+    stopPlay();
+  }
+}
+
 function stopPlay() {
   // NOTE: never disconnect waSource - createMediaElementSource is permanent
   // Just pause and clear src; Web Audio graph stays intact for next station
@@ -519,7 +678,8 @@ function stopPlay() {
   document.getElementById('npStation').classList.add('idle');
   document.getElementById('npMeta').textContent = '\u00a0';
   document.getElementById('sigbars').classList.remove('active');
-  // liveAudio stays true - Web Audio graph persists across station changes
+  document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
 }
 
 function setVolume(v) {
@@ -1100,11 +1260,48 @@ audio.addEventListener('stalled', () => {
   }, 4000);
 });
 
-function updateMediaSession(name) {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({title:name, artist:'Live Radio'});
-    navigator.mediaSession.setActionHandler('pause', stopPlay);
-    navigator.mediaSession.setActionHandler('play', () => { if(curIdx>=0) audio.play().catch(()=>{}); });
+function updateMediaSession(name, artist) {
+  if (!('mediaSession' in navigator)) return;
+  // Full metadata — artist/album tells iOS this is music, not just a webpage
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title:  name,
+    artist: artist || (mp3CurIdx >= 0 ? 'Local MP3' : 'Live Radio'),
+    album:  'WolfTronix Radio'
+  });
+  // Playback state — required for iOS to show lock screen controls
+  navigator.mediaSession.playbackState = 'playing';
+
+  // Play / Pause
+  navigator.mediaSession.setActionHandler('play', () => {
+    audio.play().catch(()=>{});
+    navigator.mediaSession.playbackState = 'playing';
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    if (mp3CurIdx >= 0) { audio.pause(); navigator.mediaSession.playbackState = 'paused'; }
+    else stopPlay();
+  });
+  navigator.mediaSession.setActionHandler('stop', stopPlay);
+
+  // Prev / Next — only meaningful for MP3, ignored for streams
+  navigator.mediaSession.setActionHandler('previoustrack',
+    mp3CurIdx >= 0 ? mp3Prev : null);
+  navigator.mediaSession.setActionHandler('nexttrack',
+    mp3CurIdx >= 0 ? mp3Next : null);
+
+  // Seek support for MP3 (streams are not seekable)
+  if (mp3CurIdx >= 0 && audio.duration && isFinite(audio.duration)) {
+    navigator.mediaSession.setActionHandler('seekto', (d) => {
+      if (d.seekTime !== undefined) audio.currentTime = d.seekTime;
+    });
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     audio.currentTime
+    });
+  } else {
+    // Clear seek handlers for live streams
+    try { navigator.mediaSession.setActionHandler('seekto', null); } catch(e) {}
+    try { navigator.mediaSession.setPositionState({}); } catch(e) {}
   }
 }
 
@@ -1193,6 +1390,20 @@ function playMp3(i) {
     document.getElementById('npMeta').textContent = 'Tap again to play';
   });
 }
+
+// Keep iOS lock screen position state in sync during MP3 playback
+audio.addEventListener('timeupdate', () => {
+  if (mp3CurIdx < 0) return;
+  if (!('mediaSession' in navigator)) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     Math.min(audio.currentTime, audio.duration)
+    });
+  } catch(e) {}
+});
 
 function mp3Next() {
   if (!mp3Tracks.length) return;
