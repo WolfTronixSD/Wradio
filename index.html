@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.22</title>
+<title>Radio v2.23</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -177,7 +177,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.22</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.23</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -336,7 +336,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.22 <span style="color:var(--muted);font-size:0.85em">2026-03-24 06:15</span></span>
+        <span style="color:var(--accent)">v2.23 <span style="color:var(--muted);font-size:0.85em">2026-03-24 07:00</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -353,7 +353,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.22 <span style="color:var(--muted);font-size:0.85em">2026-03-24 06:15</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.23 <span style="color:var(--muted);font-size:0.85em">2026-03-24 07:00</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Viz canvas sizing rewritten for iOS<br>
+        Uses parent/window width fallback when offsetWidth=0<br>
+        Multiple resize attempts on tab switch (100/300/600ms)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.22 <span style="color:var(--muted);font-size:0.85em">2026-03-24 06:15</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Viz works for radio on iOS (synthetic viz energized)<br>
         Volume floor prevents flat viz at low volume<br>
@@ -450,16 +457,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.22  (2026-03-24)
+//  Version : v2.23  (2026-03-24)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.22 - Viz now works for radio on iOS: synthetic viz made much more energetic
-//          Minimum volume floor so viz never goes flat even at low volume
-//          Faster synthPhase + extra harmonic for richer motion
-//          Boost multiplier active only when playing (drops to idle when stopped)
-//  v2.21 - Viz fixed for radio: crossorigin set dynamically per source type
+//  v2.23 - Viz canvas sizing completely rewritten for iOS
+//          Uses parent/window width as fallback when offsetWidth=0
+//          Sets explicit style px size to override CSS percentage
+//          switchTab fires startSynthViz immediately + at 100/300/600ms
+//  v2.22 - Synthetic viz energized for iOS radio playback
 //          MP3 seek slider added (skip forward/back in track)
 //  v2.20 - No-cache meta tags: iPhone picks up updates faster
 //          Removed crossorigin attribute: fixes viz CORS crash on iOS
@@ -666,7 +673,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-24 06:15';
+  if (verDate) verDate.textContent = '2026-03-24 07:00';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -733,11 +740,14 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  // Resize and restart viz when tab becomes visible
+  // Restart viz every time the tab becomes visible
   if (id === 'viz') {
     if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
-    // Use longer delay on iOS — layout takes more time after display:block
-    setTimeout(startSynthViz, 120);
+    // Try immediately, then retry with increasing delays for iOS
+    startSynthViz();
+    setTimeout(startSynthViz, 100);
+    setTimeout(startSynthViz, 300);
+    setTimeout(startSynthViz, 600);
   }
 }
 
@@ -885,22 +895,22 @@ function setVizMode(mode, btn) {
 function startSynthViz() {
   if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
   const canvas = document.getElementById('vizCanvas');
+  const panel  = document.getElementById('panel-viz');
 
   function resize() {
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
-    if (w === 0 || h === 0) return; // panel still hidden — draw() will retry
-    canvas.width  = w * dpr;
-    canvas.height = h * dpr;
+    // Try canvas own offsetWidth first, fall back to parent panel width
+    let w = canvas.offsetWidth;
+    if (w === 0) w = panel.offsetWidth - 24; // 24 = panel padding
+    if (w <= 0) w = window.innerWidth - 24;  // last resort
+    const h = 150; // fixed height matches CSS
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    // Also set explicit style size so CSS doesn't override
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
   }
   resize();
-  // On iOS the panel may not have laid out yet — retry a few times
-  let retries = 0;
-  const retryResize = setInterval(() => {
-    if (canvas.offsetWidth > 0) { resize(); clearInterval(retryResize); }
-    else if (++retries > 10) clearInterval(retryResize);
-  }, 100);
   window.addEventListener('resize', resize);
 
   const ctx = canvas.getContext('2d');
@@ -914,15 +924,8 @@ function startSynthViz() {
   function draw() {
     vizRAF = requestAnimationFrame(draw);
     const dpr = window.devicePixelRatio || 1;
-
-    // Recover if canvas was sized while panel was hidden (iOS)
-    if (canvas.width === 0 && canvas.offsetWidth > 0) {
-      canvas.width  = canvas.offsetWidth  * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-    }
-    if (canvas.width === 0) return; // still not ready
-
     const W = canvas.width / dpr, H = canvas.height / dpr;
+    if (W < 10 || H < 10) return; // safety check
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     // clear
