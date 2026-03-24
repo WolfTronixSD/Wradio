@@ -6,7 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.19</title>
+<!-- Cache control: forces Safari to recheck on every visit -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Radio v2.20</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -159,7 +163,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 </head>
 <body>
 
-<audio id="audio" preload="none" crossorigin="anonymous" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
+<audio id="audio" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- ALARM WAKE OVERLAY -->
@@ -173,7 +177,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.19</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.20</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -322,7 +326,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></span>
+        <span style="color:var(--accent)">v2.20 <span style="color:var(--muted);font-size:0.85em">2026-03-24 04:03</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -339,7 +343,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.20 <span style="color:var(--muted);font-size:0.85em">2026-03-24 04:03</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        No-cache meta tags: iPhone sees updates faster<br>
+        Removed crossorigin: fixes visualizer crash on iOS Safari<br>
+        Viz canvas: retry resize + in-draw recovery for iOS<br>
+        Tab switch delay tuned for iOS layout timing
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Version/date larger in header<br>
         STOP/RESUME works for streams AND MP3<br>
@@ -415,11 +427,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.19  (2026-03-23)
+//  Version : v2.20  (2026-03-24)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.20 - No-cache meta tags: iPhone picks up updates faster
+//          Removed crossorigin attribute: fixes viz CORS crash on iOS
+//          Viz canvas: retry resize loop + in-draw recovery for iOS
+//          switchTab delay increased for iOS layout timing
 //  v2.19 - Version/date larger and clearer in header
 //          STOP/RESUME now works for both streams AND MP3
 //          Background audio heartbeat: auto-restarts if iOS kills audio
@@ -618,7 +634,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-23 21:03';
+  if (verDate) verDate.textContent = '2026-03-24 04:03';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -681,7 +697,8 @@ function switchTab(id, el) {
   // Resize and restart viz when tab becomes visible
   if (id === 'viz') {
     if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
-    setTimeout(startSynthViz, 50); // short delay so panel is visible and has size
+    // Use longer delay on iOS — layout takes more time after display:block
+    setTimeout(startSynthViz, 120);
   }
 }
 
@@ -814,11 +831,19 @@ function startSynthViz() {
 
   function resize() {
     const dpr = window.devicePixelRatio || 1;
-    if (canvas.offsetWidth === 0) return; // panel still hidden
-    canvas.width  = canvas.offsetWidth  * dpr;
-    canvas.height = canvas.offsetHeight * dpr;
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    if (w === 0 || h === 0) return; // panel still hidden — draw() will retry
+    canvas.width  = w * dpr;
+    canvas.height = h * dpr;
   }
   resize();
+  // On iOS the panel may not have laid out yet — retry a few times
+  let retries = 0;
+  const retryResize = setInterval(() => {
+    if (canvas.offsetWidth > 0) { resize(); clearInterval(retryResize); }
+    else if (++retries > 10) clearInterval(retryResize);
+  }, 100);
   window.addEventListener('resize', resize);
 
   const ctx = canvas.getContext('2d');
@@ -832,6 +857,14 @@ function startSynthViz() {
   function draw() {
     vizRAF = requestAnimationFrame(draw);
     const dpr = window.devicePixelRatio || 1;
+
+    // Recover if canvas was sized while panel was hidden (iOS)
+    if (canvas.width === 0 && canvas.offsetWidth > 0) {
+      canvas.width  = canvas.offsetWidth  * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+    }
+    if (canvas.width === 0) return; // still not ready
+
     const W = canvas.width / dpr, H = canvas.height / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
