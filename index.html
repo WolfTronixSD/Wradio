@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.37</title>
+<title>Radio v2.19</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -23,497 +23,1660 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
 
 /* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
 .header-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .logo{font-family:var(--mono);font-size:1em;color:var(--accent);letter-spacing:3px}
 .clock-display{font-family:var(--mono);font-size:1.3em;color:var(--green);margin-left:auto;letter-spacing:2px}
 .sigbars{display:flex;gap:2px;align-items:flex-end;height:14px}
 .sigbars span{width:3px;border-radius:1px;background:var(--muted);transition:background 0.3s}
+.sigbars span:nth-child(1){height:4px}.sigbars span:nth-child(2){height:7px}
+.sigbars span:nth-child(3){height:10px}.sigbars span:nth-child(4){height:14px}
 .sigbars.active span{background:var(--green);box-shadow:0 0 4px var(--green)}
 .now-playing{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px}
 .np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-station.idle{color:var(--muted);font-weight:300}
+.np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
-.btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-size:0.68em;padding:4px 10px;border-radius:4px;cursor:pointer}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);outline:none;border-radius:2px}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer}
+.btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);
+  font-family:var(--mono);font-size:0.68em;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer}
+.btn-stop:active{background:rgba(255,68,102,0.3)}
+.vol-wrap{flex:1;display:flex;align-items:center;gap:6px}
+.vol-icon{font-size:0.85em;color:var(--muted)}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 8px var(--accent);cursor:pointer}
+.vol-val{font-family:var(--mono);font-size:0.68em;color:var(--muted);width:28px;text-align:right}
+.vu-wrap{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
+.vu-bar{flex:1;border-radius:1px;background:var(--border);transition:height 0.08s;min-height:2px}
 
 /* TABS */
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:90}
-.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.65em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:0.2s}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);
+  position:sticky;top:0;z-index:90}
+.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;letter-spacing:1px;
+  text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.panel{display:none;padding:12px 14px 80px}
+
+/* PANELS */
+.panel{display:none;padding:10px 12px 80px}
 .panel.active{display:block}
 
-/* UI ELEMENTS: CARDS & PILLS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
-.card-title{font-family:var(--mono);font-size:0.7em;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center}
-.pill-row{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
-.pill{font-family:var(--mono);font-size:0.75em;padding:8px 16px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--muted);cursor:pointer;flex:1;text-align:center;transition:0.2s}
-.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
-
-/* TIMER & ALARM SPECIFICS */
-.countdown{font-family:var(--mono);font-size:2.8em;color:var(--green);text-align:center;padding:15px 0;letter-spacing:4px}
-.countdown.off{color:var(--muted);font-size:1.2em;letter-spacing:2px;padding:25px 0}
-.form-input{width:100%;padding:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;font-family:var(--sans);font-size:1em;margin-bottom:12px;outline:none}
-.form-input:focus{border-color:var(--accent)}
-.btn-primary{width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:14px;font-family:var(--mono);font-size:0.8em;font-weight:700;letter-spacing:1px;cursor:pointer}
-
-/* STATIONS LIST */
-.section-label{font-family:var(--mono);font-size:0.65em;letter-spacing:3px;color:var(--muted);padding:14px 4px 6px;border-bottom:1px solid var(--border);margin-bottom:8px}
-.stn-btn{display:flex;align-items:center;width:100%;padding:12px;margin-bottom:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:left;gap:12px;transition:0.2s}
-.stn-btn.active{border-color:var(--accent);background:rgba(0,212,255,0.05)}
-.stn-num{font-family:var(--mono);font-size:0.65em;color:var(--muted);min-width:24px}
-.stn-name{font-size:1em;font-weight:500;color:var(--text);flex:1}
-
-/* AVIATION LINKS */
-.atc-link{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center;background:rgba(255,255,255,0.03)}
-
 /* VISUALIZER */
-#vizCanvas{width:100%;height:180px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:block;margin-bottom:12px}
+#vizCanvas{width:100%;height:150px;border-radius:6px;background:var(--surface);
+  border:1px solid var(--border);display:block;cursor:pointer}
+.viz-controls{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.viz-btn{font-family:var(--mono);font-size:0.65em;letter-spacing:1px;padding:5px 10px;
+  border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
+.viz-btn.active{border-color:var(--accent);color:var(--accent)}
+.viz-note{font-family:var(--mono);font-size:0.62em;color:var(--muted);margin-top:8px;line-height:1.7em}
 
-/* OVERLAYS */
-.wake-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(10,10,15,0.98);flex-direction:column;align-items:center;justify-content:center;gap:20px}
+/* STATIONS */
+.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);
+  padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px;
+  display:flex;align-items:center;gap:8px}
+.section-label::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%}
+.sec-music .section-label::before{background:var(--green);box-shadow:0 0 5px var(--green)}
+.sec-german .section-label::before{background:var(--amber);box-shadow:0 0 5px var(--amber)}
+.sec-atc .section-label::before{background:var(--accent);box-shadow:0 0 5px var(--accent)}
+.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  cursor:pointer;text-align:left;gap:10px;position:relative;overflow:hidden}
+.stn-btn::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;opacity:0;transition:opacity 0.2s}
+.sec-music .stn-btn::after{background:var(--green)}
+.sec-german .stn-btn::after{background:var(--amber)}
+.sec-atc .stn-btn::after{background:var(--accent)}
+.sec-music .stn-btn.active{border-color:rgba(57,255,130,0.3);background:rgba(57,255,130,0.05)}
+.sec-german .stn-btn{padding:14px 16px;margin-bottom:6px}
+.sec-german .stn-name{font-size:1.12em;font-weight:700}
+.sec-german .stn-num{font-size:0.75em}
+.sec-german .stn-btn.active{border-color:rgba(255,179,71,0.3);background:rgba(255,179,71,0.05)}
+.sec-atc .stn-btn.active{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
+.stn-btn.active::after{opacity:1}
+.stn-btn:active{opacity:0.65}
+.stn-num{font-family:var(--mono);font-size:0.62em;color:var(--muted);min-width:20px}
+.stn-name{font-family:var(--sans);font-size:0.92em;font-weight:500;color:var(--text);flex:1}
+.stn-btn.active .stn-name{color:#fff}
+.stn-live{display:none;align-items:center;gap:4px;font-family:var(--mono);font-size:0.58em;color:var(--green)}
+.stn-btn.active .stn-live{display:flex}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.card-title{font-family:var(--mono);font-size:0.65em;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pill{font-family:var(--mono);font-size:0.7em;padding:6px 12px;border:1px solid var(--border);
+  border-radius:20px;background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s}
+.pill:active{transform:scale(0.95)}
+.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
+.pill.danger{border-color:var(--red);color:var(--red)}
+.pill.ok{border-color:var(--green);color:var(--green)}
+.countdown{font-family:var(--mono);font-size:2em;color:var(--green);text-align:center;
+  padding:10px 0;letter-spacing:4px}
+.countdown.off{color:var(--muted);font-size:1em;padding:6px 0}
+.lbl{font-family:var(--mono);font-size:0.65em;color:var(--muted);margin-bottom:6px;display:block}
+input[type=time]{background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  color:var(--accent);font-family:var(--mono);font-size:1em;padding:6px 10px;outline:none;width:100%}
+input[type=time]::-webkit-calendar-picker-indicator{filter:invert(0.5)}
+select{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);
+  font-family:var(--mono);font-size:0.75em;padding:6px 8px;outline:none;width:100%;margin-top:6px}
+.btn-full{width:100%;padding:10px;border:1px solid;border-radius:6px;font-family:var(--mono);
+  font-size:0.75em;letter-spacing:1px;cursor:pointer;margin-top:6px;text-align:center;transition:background 0.15s}
+.btn-set{border-color:var(--amber);color:var(--amber);background:rgba(255,179,71,0.08)}
+.btn-set:active{background:rgba(255,179,71,0.2)}
+.btn-clear{border-color:var(--muted);color:var(--muted);background:transparent}
+.alarm-status{font-family:var(--mono);font-size:0.7em;color:var(--green);text-align:center;min-height:1.2em;margin-top:8px}
+.alarm-status.off{color:var(--muted)}
+
+/* ALARM WAKE OVERLAY */
+.wake-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(5,5,10,0.97);
+  flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  animation:fadeIn 0.5s}
 .wake-overlay.show{display:flex}
-.wake-time{font-family:var(--mono);font-size:5em;color:var(--green);text-shadow:0 0 20px rgba(57,255,130,0.4)}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);padding:10px 20px;border-radius:6px;transition:0.3s;z-index:500;font-family:var(--mono);font-size:0.7em}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wake-time{font-family:var(--mono);font-size:3.5em;color:var(--green);letter-spacing:6px;
+  text-shadow:0 0 30px var(--green)}
+.wake-label{font-family:var(--mono);font-size:0.75em;color:var(--muted);letter-spacing:3px}
+.wake-station{font-family:var(--sans);font-size:1.3em;font-weight:700;color:#fff;text-align:center;padding:0 20px}
+.wake-btn{background:var(--green);color:#000;font-family:var(--mono);font-size:1em;
+  letter-spacing:2px;border:none;border-radius:8px;padding:18px 40px;cursor:pointer;
+  animation:glow 1.5s ease-in-out infinite;margin-top:10px}
+@keyframes glow{0%,100%{box-shadow:0 0 20px var(--green)}50%{box-shadow:0 0 50px var(--green),0 0 80px rgba(57,255,130,0.4)}}
+.wake-dismiss{font-family:var(--mono);font-size:0.65em;color:var(--muted);cursor:pointer;
+  border:1px solid var(--border);padding:6px 16px;border-radius:4px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);
+  font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;
+  transition:transform 0.3s;z-index:500;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
+.toast.error{border-color:var(--red);color:var(--red)}
+.toast.ok{border-color:var(--green);color:var(--green)}
 </style>
 </head>
-<body id="mainBody">
+<body>
 
-<audio id="audio" preload="none" playsinline webkit-playsinline></audio>
+<audio id="audio" preload="none" crossorigin="anonymous" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 <div class="toast" id="toast"></div>
 
+<!-- ALARM WAKE OVERLAY -->
 <div class="wake-overlay" id="wakeOverlay">
-    <div style="font-family:var(--mono);color:var(--muted);letter-spacing:4px">WAKE ALARM</div>
-    <div class="wake-time" id="wakeTimeDisp">00:00</div>
-    <div id="wakeStnName" style="font-family:var(--sans);font-size:1.2em;color:var(--text);margin-bottom:20px"></div>
-    <button onclick="wakePlay()" style="background:var(--green);color:#000;padding:16px 40px;border:none;border-radius:8px;font-family:var(--mono);font-size:1em;font-weight:700;letter-spacing:2px;cursor:pointer">▶ PLAY STATION</button>
-    <div onclick="dismissAlarm()" style="color:var(--muted);cursor:pointer;margin-top:20px;font-family:var(--mono);font-size:0.7em;letter-spacing:1px">DISMISS</div>
+  <div class="wake-label">GOOD MORNING</div>
+  <div class="wake-time" id="wakeTime">00:00</div>
+  <div class="wake-station" id="wakeStation"></div>
+  <button class="wake-btn" id="wakePlayBtn" onclick="wakePlay()">&#9654; PLAY</button>
+  <div class="wake-dismiss" onclick="wakeDismiss()">DISMISS</div>
 </div>
 
 <header>
-    <div class="header-top">
-        <div class="logo">■ RADIO <span style="font-size:0.8em;color:var(--accent)">v2.37</span></div>
-        <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end">
-            <div class="clock-display" id="clockDisplay">00:00:00</div>
-            <div style="font-family:var(--mono);font-size:0.8em;color:var(--muted)"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
-        </div>
+  <div class="header-top">
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.19</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted);letter-spacing:1px"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
     </div>
-    <div class="now-playing">
-        <div id="npStation" class="np-station idle">Select a station</div>
-        <div class="np-controls">
-            <button class="btn-stop" id="btnStop" onclick="toggleStop()">■ STOP</button>
-            <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8" oninput="setVolume(this.value)">
-        </div>
+  </div>
+  <div class="now-playing">
+    <div class="np-station idle" id="npStation">Select a station</div>
+    <div class="np-meta" id="npMeta">&nbsp;</div>
+    <div class="np-controls">
+      <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
+      <div class="vol-wrap">
+        <span class="vol-icon">&#128264;</span>
+        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
+          oninput="setVolume(this.value)">
+        <span class="vol-val" id="volVal">80</span>
+      </div>
     </div>
+    <div class="vu-wrap" id="vuWrap"></div>
+  </div>
 </header>
 
 <div class="tabs">
-    <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
-    <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
-    <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
-    <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
-    <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
+  <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
+  <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
+  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
+  <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
+  <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
+  <div class="tab" onclick="switchTab('info',this)">INFO</div>
 </div>
 
-<div class="panel active" id="panel-stations"><div id="stationList"></div></div>
+<!-- STATIONS -->
+<div class="panel active" id="panel-stations">
+  <div id="stationList"></div>
+</div>
 
+<!-- MP3 -->
 <div class="panel" id="panel-mp3">
-    <div class="card">
-        <div class="card-title">LOCAL AUDIO</div>
-        <label style="display:block;padding:16px;border:1px dashed var(--accent);border-radius:6px;text-align:center;cursor:pointer;color:var(--accent);font-family:var(--mono);font-size:0.75em;transition:0.2s">
-            📁 CHOOSE LOCAL FILES
-            <input type="file" multiple accept="audio/*" style="display:none" onchange="loadFiles(this.files)">
-        </label>
-        <button onclick="openGDrive()" style="width:100%;margin-top:12px;padding:16px;background:none;border:1px dashed #4285F4;border-radius:6px;color:#4285F4;font-family:var(--mono);font-size:0.75em;cursor:pointer;transition:0.2s">
-            OPEN GOOGLE DRIVE
-        </button>
-        <div id="gDriveStatus" style="font-family:var(--mono);font-size:0.6em;text-align:center;margin-top:10px;color:var(--muted)"></div>
+  <div class="card">
+    <div class="card-title">LOCAL MP3 PLAYER</div>
+    <span class="lbl">Pick files from your device</span>
+    <label id="mp3PickerLabel" style="display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;border:1px dashed var(--accent);border-radius:6px;cursor:pointer;
+      font-family:var(--mono);font-size:0.72em;color:var(--accent);margin-top:4px">
+      &#128194; CHOOSE LOCAL FILES
+      <input type="file" id="mp3FileInput" multiple style="display:none" onchange="loadMp3Files(this.files)">
+    </label>
+    <div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-family:var(--mono);font-size:0.6em;color:var(--muted)">OR</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <span class="lbl">Stream from Google Drive</span>
+    <button id="gdrivePicker" onclick="openGDrivePicker()" style="display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;border:1px dashed #4285F4;border-radius:6px;cursor:pointer;
+      font-family:var(--mono);font-size:0.72em;color:#4285F4;background:transparent;margin-top:4px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 3l5.72 9.9L6.28 3zm-3.1 13.5l2.86-4.95 2.86 4.95H3.18zm8.1 0h5.72l-5.72-9.9-2.86 4.95 2.86 4.95zm2.86-4.95L17 21H7l3.14-9.45z"/></svg>
+      OPEN GOOGLE DRIVE
+    </button>
+    <div id="gdriveStatus" style="font-family:var(--mono);font-size:0.62em;color:var(--muted);text-align:center;margin-top:6px;min-height:1em"></div>
+  </div>
+  <div id="mp3TrackList" style="display:none">
+    <div class="section-label" style="margin-top:4px">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--amber);box-shadow:0 0 5px var(--amber);display:inline-block"></span>
+      &nbsp;TRACKS
     </div>
     <div id="mp3Tracks"></div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <div class="pill" onclick="mp3Prev()">&#9664; PREV</div>
+      <div class="pill" id="mp3ShufPill" onclick="toggleMp3Shuffle()">SHUFFLE: OFF</div>
+      <div class="pill" id="mp3RepPill" onclick="toggleMp3Repeat()">REPEAT: OFF</div>
+    </div>
+  </div>
 </div>
 
+<!-- VISUALIZER -->
 <div class="panel" id="panel-viz">
-    <div class="card" style="padding:12px">
-        <canvas id="vizCanvas"></canvas>
-        <div class="pill-row" style="margin-bottom:0">
-            <div class="pill active" id="vizBtnFFT" onclick="setViz('fft',this)">FFT</div>
-            <div class="pill" id="vizBtnScope" onclick="setViz('scope',this)">SCOPE</div>
-        </div>
-    </div>
-    <div style="font-family:var(--mono);font-size:0.6em;color:var(--muted);text-align:center;padding:0 10px">
-        Note: Real-time visualizer requires local MP3 or Google Drive playback due to iOS stream security.
-    </div>
+  <canvas id="vizCanvas"></canvas>
+  <div class="viz-controls">
+    <button class="viz-btn active" onclick="setVizMode('fft',this)">FFT SPECTRUM</button>
+    <button class="viz-btn" onclick="setVizMode('scope',this)">OSCILLOSCOPE</button>
+    <button class="viz-btn" onclick="setVizMode('bars',this)">BARS</button>
+    <button class="viz-btn" onclick="setVizMode('radar',this)">RADAR</button>
+  </div>
+  <div class="viz-note">
+    Visualization is simulated on iOS (CORS blocks live audio analysis).<br>
+    On desktop Chrome/Firefox, tap the canvas to enable live audio analysis.
+  </div>
 </div>
 
+<!-- SLEEP TIMER -->
 <div class="panel" id="panel-timer">
-    <div class="card">
-        <div class="card-title">SLEEP TIMER</div>
-        <div class="pill-row">
-            <div class="pill" onclick="setSleep(15)">15 MIN</div>
-            <div class="pill" onclick="setSleep(30)">30 MIN</div>
-            <div class="pill" onclick="setSleep(60)">60 MIN</div>
-        </div>
-        <div id="sleepCountdown" class="countdown off">OFF</div>
-        <button onclick="clearSleep()" style="width:100%;background:none;border:1px solid var(--red);color:var(--red);border-radius:6px;padding:12px;font-family:var(--mono);font-size:0.75em;cursor:pointer">CANCEL TIMER</button>
+  <div class="card">
+    <div class="card-title">SLEEP TIMER</div>
+    <div class="pill-row">
+      <div class="pill" onclick="setSleep(5)">5 min</div>
+      <div class="pill" onclick="setSleep(10)">10 min</div>
+      <div class="pill" onclick="setSleep(15)">15 min</div>
+      <div class="pill" onclick="setSleep(30)">30 min</div>
+      <div class="pill" onclick="setSleep(60)">60 min</div>
+      <div class="pill" onclick="setSleep(90)">90 min</div>
     </div>
+    <div class="countdown off" id="sleepCountdown">NO TIMER SET</div>
+    <div class="pill-row" style="justify-content:center;margin-top:6px">
+      <div class="pill danger" onclick="clearSleep()">CANCEL</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">FADE OUT</div>
+    <span class="lbl">Gradually reduce volume before stopping</span>
+    <div class="pill-row">
+      <div class="pill ok active" id="fade-on"  onclick="setFade(true)">ON</div>
+      <div class="pill"           id="fade-off" onclick="setFade(false)">OFF</div>
+    </div>
+  </div>
 </div>
 
+<!-- ALARM -->
 <div class="panel" id="panel-alarm">
-    <div class="card">
-        <div class="card-title">WAKE ALARM</div>
-        <input type="time" id="alarmTime" class="form-input">
-        <select id="alarmStn" class="form-input" style="appearance:none"></select>
-        <button onclick="setAlarm()" class="btn-primary">SET ALARM</button>
-        <div id="alarmStat" style="font-family:var(--mono);font-size:0.7em;text-align:center;margin-top:12px;color:var(--green)"></div>
+  <div class="card">
+    <div class="card-title">WAKE ALARM</div>
+    <span class="lbl">Alarm time</span>
+    <input type="time" id="alarmTimeInput">
+    <span class="lbl" style="margin-top:10px">Play station</span>
+    <select id="alarmStation"></select>
+    <button class="btn-full btn-set" onclick="setAlarm()">SET ALARM</button>
+    <button class="btn-full btn-clear" onclick="clearAlarm()">CLEAR ALARM</button>
+    <div class="alarm-status off" id="alarmStatus">No alarm set</div>
+  </div>
+  <div class="card">
+    <div class="card-title">HOW IT WORKS</div>
+    <div style="font-family:var(--mono);font-size:0.63em;color:var(--muted);line-height:1.9em">
+      At alarm time a fullscreen prompt appears.<br>
+      TAP PLAY to start the station.<br>
+      (iOS requires a tap to start audio - this is intentional.)<br>
+      Keep Safari open with screen lock off, or use<br>
+      Guided Access to keep the screen on overnight.
     </div>
+  </div>
+</div>
+
+<!-- INFO -->
+<div class="panel" id="panel-info">
+  <div class="card">
+    <div class="card-title">ABOUT</div>
+    <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
+        <span style="color:var(--muted)">VERSION</span>
+        <span style="color:var(--accent)">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
+        <span style="color:var(--muted)">AUTHOR</span>
+        <span>WolfTronixSD</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--muted)">HOSTED</span>
+        <a href="https://wolftronixsd.github.io/Wradio/" target="_blank"
+          style="color:var(--accent);text-decoration:none;font-size:0.9em">GitHub Pages</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">CHANGELOG</div>
+    <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.19 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Version/date larger in header<br>
+        STOP/RESUME works for streams AND MP3<br>
+        Background heartbeat: auto-restarts if iOS kills audio<br>
+        Drive: fixed greyed-out files<br>
+        Playlist memory: last Drive tracks restored on next visit
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.18 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Big 80s Station replaced with 181.FM Awesome 80s (server was down)<br>
+        iOS background audio fix: visibilitychange + pageshow handlers<br>
+        Version date shown in header and INFO tab
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.17 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 STOP button now pauses &amp; resumes (keeps position)<br>
+        Button changes to ▶ RESUME when paused
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.16 <span style="color:var(--muted);font-size:0.85em">2026-03-23</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        MP3 background playback fix for iOS Safari<br>
+        Full Media Session API (lock screen controls, prev/next/seek)<br>
+        playsinline attribute added to audio element
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.15 <span style="color:var(--muted);font-size:0.85em">2026-03-22</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.14</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Added Plus One Flyers + ScheduleMaster link buttons
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.13</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Music replaced with 80s Rock &amp; Pop (Big 80s Station, SomaFM Underground 80s)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.12</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        LiveATC + FlightAware buttons added<br>
+        Google Drive picker: search all audio files<br>
+        KSMO Santa Monica added<br>
+        Version number in header + code comments
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.11</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Google Drive picker (OAuth, no API key)<br>
+        Visualizer fixed for MP3<br>
+        German radio moved to top
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.10</div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Local MP3 player tab added<br>
+        SkyVector button added<br>
+        German station buttons enlarged<br>
+        UTC clock in header<br>
+        Removed KEXP / Capital FM / Radio Paradise<br>
+        Deutschlandfunk Nova → SWR1
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script>
-// UPDATE THIS TO YOUR ACTUAL CLIENT ID TO USE GOOGLE DRIVE
-const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+// ============================================================
+//  WolfTronix Radio Player
+//  Version : v2.19  (2026-03-23)
+//  Author  : WolfTronixSD
+//  Hosted  : https://wolftronixsd.github.io/Wradio/
+//
+//  Changelog:
+//  v2.19 - Version/date larger and clearer in header
+//          STOP/RESUME now works for both streams AND MP3
+//          Background audio heartbeat: auto-restarts if iOS kills audio
+//          Drive: fixed greyed-out files (acknowledgeAbuse + supportsAllDrives)
+//          Playlist memory: last Drive selection restored on next visit
+//  v2.18 - Big 80s Station → 181.FM Awesome 80s (old server was down)
+//          iOS background audio: visibilitychange + pageshow handlers
+//          Version date shown next to version number in header + INFO tab
+//  v2.17 - MP3 STOP button now pauses/resumes keeping position
+//          Button label toggles: STOP ↔ RESUME
+//  v2.16 - MP3 background playback fix for iOS Safari
+//          Full Media Session API: lock screen controls, prev/next/seek for MP3
+//          playsinline attribute on audio element
+//  v2.15 - Fixed KSMO stream URLs (ksmo2_atis, ksmo2_s, ksmo2_gnd)
+//  v2.14 - Added Plus One Flyers + ScheduleMaster link buttons (ATC section)
+//  v2.13 - Music section replaced with 80s Rock & Pop stations:
+//          Big 80s Station (128k, ad-free, ex-radio programmers)
+//          SomaFM Underground 80s (synthpop/new wave, ad-free)
+//  v2.12 - Added LiveATC + FlightAware link buttons
+//          Google Drive picker now shows ALL audio files (search view)
+//          KSMO (Santa Monica) ATIS/Tower/Ground added
+//          Version number displayed in header
+//          Code comments added throughout
+//  v2.11 - Google Drive picker added (OAuth only, no API key)
+//          Visualizer fixed for MP3 playback
+//          German radio moved to top of station list
+//  v2.10 - Local MP3 player tab added (file picker + shuffle/repeat)
+//          SkyVector aviation chart button added
+//          German station buttons made larger
+//          UTC clock added to header
+//          Music: removed KEXP/CapitalFM/RadioParadise
+//          Deutschlandfunk Nova replaced with SWR1
+// ============================================================
 
-const audio = document.getElementById('audio');
-let audioCtx = null, analyser = null, source = null;
-
+// ============================================================
+//  STATIONS
+//  cat: "german" | "music" | "atc"
+//  Add new stations here — UI is built automatically from this array
+// ============================================================
 const STATIONS = [
-  {n:1,  name:"181.FM Awesome 80s",   url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3", cat:"music"},
-  {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3", cat:"german"},
-  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
-  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
-  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
-  {n:8,  name:"KMYF ATIS",            url:"https://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
-  {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr", cat:"atc"},
-  {n:10, name:"KMYF Ground",          url:"https://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
-  {n:11, name:"KMYF All (Twr)",       url:"https://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
-  {n:12, name:"KMYF SoCal Del Mar",   url:"https://d.liveatc.net/ksan_app_delmar", cat:"atc"},
-  {n:13, name:"KSAN Tower",           url:"https://d.liveatc.net/ksan1_twr", cat:"atc"},
-  {n:14, name:"KSAN Ground",          url:"https://d.liveatc.net/ksan1_gnd", cat:"atc"},
-  {n:15, name:"KSAN Clearance Del",   url:"https://d.liveatc.net/ksan1_del", cat:"atc"},
-  {n:16, name:"KSAN SoCal East",      url:"https://d.liveatc.net/ksan_app_east", cat:"atc"},
-  {n:17, name:"KSAN SoCal West",      url:"https://d.liveatc.net/ksan_app_west", cat:"atc"},
-  {n:18, name:"KSAN All",             url:"https://d.liveatc.net/ksan1_all", cat:"atc"},
-  {n:19, name:"KSDM Ground/Tower",    url:"https://d.liveatc.net/ksdm_twr", cat:"atc"},
-  {n:20, name:"KRNM Ground",          url:"https://d.liveatc.net/krnm2_gnd", cat:"atc"},
-  {n:21, name:"KRNM Ground/Tower",    url:"https://d.liveatc.net/krnm2_gnd_twr", cat:"atc"},
-  {n:22, name:"KRNM Tower",           url:"https://d.liveatc.net/krnm2_twr", cat:"atc"},
-  {n:23, name:"KSMO ATIS",            url:"https://d.liveatc.net/ksmo2_atis", cat:"atc"},
-  {n:24, name:"KSMO Tower",           url:"https://d.liveatc.net/ksmo2_s", cat:"atc"},
-  {n:25, name:"KSMO Ground",          url:"https://d.liveatc.net/ksmo2_gnd", cat:"atc"}
+  // --- Music: 80s Rock & Pop (all ad-free) ---
+  {n:1,  name:"181.FM Awesome 80s",    url:"http://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  // --- German Radio ---
+  {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
+  {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
+  {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
+  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
+  // --- ATC San Diego (KMYF = Montgomery Field) ---
+  {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
+  {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
+  {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
+  {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
+  // --- ATC San Diego (KSAN = Lindbergh Field) ---
+  {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
+  {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
+  {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                         cat:"atc"},
+  {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
+  {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
+  {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                         cat:"atc"},
+  // --- ATC San Diego (KSDM = Brown Field, KRNM = Ramona) ---
+  {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
+  {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
+  {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
+  {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
+  // --- ATC Santa Monica (KSMO) ---
+  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo2_atis",                                         cat:"atc"},
+  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo2_s",                                            cat:"atc"},
+  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo2_gnd",                                          cat:"atc"},
 ];
 
-let sleepEnd = null, alarmActive = false, vizMode = 'fft', isVizActive = false;
+// ============================================================
+//  STATE
+//  All runtime variables — reset on page reload
+// ============================================================
+const audio = document.getElementById('audio');
+let curIdx   = -1;   // index into STATIONS array (-1 = nothing playing)
+let vizMode  = 'fft';
+let vizRAF   = null; // requestAnimationFrame handle for visualizer
+let vuRAF    = null; // requestAnimationFrame handle for VU meter
 
-// UI INITIALIZATION
+// Web Audio API — connected once on first play, never disconnected
+// createMediaElementSource() can only be called ONCE per audio element
+let audioCtx = null, analyser = null, waSource = null;
+let liveAudio = false; // true once Web Audio graph is built
+
+// Sleep timer
+let sleepEnd    = null;  // timestamp (ms) when audio should stop
+let fadeEnabled = true;  // if true, fade out volume before stopping
+
+// Alarm
+let alarmActive  = false;
+let alarmPending = null; // station to play when user taps PLAY on wake overlay
+
+// Synthetic visualizer state (used when live Web Audio not available, e.g. iOS)
+let synthPhase = 0;
+let synthLevel = 0;
+
+// ============================================================
+//  BUILD UI
+// ============================================================
 function buildUI() {
-    const list = document.getElementById('stationList');
-    const alSel = document.getElementById('alarmStn');
+  // station list
+  const list = document.getElementById('stationList');
+  [{key:'german',label:'German Radio'},{key:'music',label:'Music'},{key:'atc',label:'ATC \u2014 San Diego'}]
+  .forEach(cat => {
+    const stns = STATIONS.filter(s => s.cat === cat.key);
+    if (!stns.length) return;
+    const sec = document.createElement('div');
+    sec.className = 'sec-' + cat.key;
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label'; lbl.textContent = cat.label;
+    sec.appendChild(lbl);
+    stns.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
+      b.innerHTML = '<span class="stn-num">'+s.n+'</span>'
+        +'<span class="stn-name">'+s.name+'</span>'
+        +'<span class="stn-live"><span class="live-dot"></span>LIVE</span>';
+      sec.appendChild(b);
+    });
+    // Aviation link buttons after ATC section
+    if (cat.key === 'atc') {
+      // Row 1: aviation reference sites
+      const links = [
+        { href:'https://skyvector.com/',         color:'#2a6496', bg:'rgba(42,100,150,0.1)',   icon:'✈', label:'SKYVECTOR' },
+        { href:'https://www.liveatc.net/',        color:'#2a7a3a', bg:'rgba(42,122,58,0.1)',    icon:'📡', label:'LIVEATC' },
+        { href:'https://flightaware.com/',        color:'#7a3a8a', bg:'rgba(122,58,138,0.1)',   icon:'🛫', label:'FLIGHTAWARE' },
+      ];
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:6px;margin-top:8px';
+      links.forEach(l => {
+        const a = document.createElement('a');
+        a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
+        a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+          +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
+          +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
+          +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+        a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
+        row.appendChild(a);
+      });
+      sec.appendChild(row);
+      // Row 2: flying club / schedule sites
+      const links2 = [
+        { href:'https://www.plusoneflyers.org/',        color:'#b07a20', bg:'rgba(176,122,32,0.1)',  icon:'🏅', label:'PLUS ONE FLYERS' },
+        { href:'https://my.schedulemaster.com/',        color:'#206060', bg:'rgba(32,96,96,0.1)',    icon:'📅', label:'SCHEDULEMASTER' },
+      ];
+      const row2 = document.createElement('div');
+      row2.style.cssText = 'display:flex;gap:6px;margin-top:6px';
+      links2.forEach(l => {
+        const a = document.createElement('a');
+        a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
+        a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+          +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
+          +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
+          +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+        a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
+        row2.appendChild(a);
+      });
+      sec.appendChild(row2);
+    }
+    list.appendChild(sec);
+  });
 
-    ['german','music','atc'].forEach(c => {
-        const lbl = document.createElement('div'); lbl.className='section-label'; lbl.textContent=c.toUpperCase(); list.appendChild(lbl);
-        STATIONS.filter(s=>s.cat===c).forEach(s => {
-            const b = document.createElement('button'); b.className='stn-btn'; b.id='stn-'+s.n;
-            b.onclick = () => playStn(s);
-            b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span>`;
-            list.appendChild(b);
-            
-            const opt = document.createElement('option'); opt.value=s.n; opt.textContent=s.name; alSel.appendChild(opt);
+  // alarm station select
+  const sel = document.getElementById('alarmStation');
+  STATIONS.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.n; o.textContent = s.n + '  ' + s.name;
+    sel.appendChild(o);
+  });
+
+  // VU bars
+  const vu = document.getElementById('vuWrap');
+  for (let i = 0; i < 20; i++) {
+    const b = document.createElement('div'); b.className = 'vu-bar'; vu.appendChild(b);
+  }
+
+  // canvas tap for live audio (desktop)
+  // restore alarm
+  const saved = localStorage.getItem('radioAlarm');
+  if (saved) {
+    try {
+      const a = JSON.parse(saved);
+      document.getElementById('alarmTimeInput').value = a.time;
+      document.getElementById('alarmStation').value   = a.station;
+      showAlarmStatus(a.time, a.station);
+      alarmActive = true;
+    } catch(e) {}
+  }
+
+  setInterval(tickClock, 1000); tickClock();
+  startVUMeter();
+
+  // Show build date/time in header
+  const verDate = document.getElementById('verDate');
+  if (verDate) verDate.textContent = '2026-03-23 21:03';
+
+  // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
+  const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
+  if (savedPlaylist) {
+    try {
+      const pl = JSON.parse(savedPlaylist);
+      if (pl.length) {
+        setGStatus('Last playlist: ' + pl.length + ' tracks — tap OPEN GOOGLE DRIVE to reload', 'var(--muted)');
+        // Show track names immediately so user knows what was there
+        mp3Tracks = pl.map((t,i) => ({ idx:i, name:t.name.replace(/\.[^.]+$/,''), url:'', driveId:t.id }));
+        buildMp3List();
+        document.getElementById('mp3TrackList').style.display = '';
+        // Grey out tracks until re-fetched
+        document.querySelectorAll('#mp3Tracks .stn-btn').forEach(b => {
+          b.style.opacity = '0.4';
+          b.title = 'Sign in to Google Drive to reload';
         });
-        
-        if(c==='atc') {
-            const r1 = document.createElement('div'); r1.style.display='flex'; r1.style.gap='6px'; r1.style.marginTop='10px';
-            [{h:'https://skyvector.com/', l:'SKYVECTOR', c:'#2a6496'},{h:'https://www.liveatc.net/', l:'LIVEATC', c:'#2a7a3a'},{h:'https://flightaware.com/', l:'FLIGHTAWARE', c:'#7a3a8a'}].forEach(l => {
-                const a = document.createElement('a'); a.href=l.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=l.c; a.textContent=l.l; r1.appendChild(a);
-            });
-            list.appendChild(r1);
+      }
+    } catch(e) {}
+  }
 
-            const r2 = document.createElement('div'); r2.style.display='flex'; r2.style.gap='6px'; r2.style.marginTop='6px';
-            [{h:'https://www.plusoneflyers.org/', l:'PLUS ONE', c:'#b07a20'},{h:'https://my.schedulemaster.com/', l:'SCHEDULE', c:'#206060'}].forEach(l => {
-                const a = document.createElement('a'); a.href=l.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=l.c; a.textContent=l.l; r2.appendChild(a);
-            });
-            list.appendChild(r2);
-        }
-    });
-
-    setInterval(tick, 1000); 
-    startVizEngine();
-}
-
-// WEB AUDIO INIT (Must occur on user gesture)
-function initAudio() {
-    if (audioCtx) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        return;
+  // Background audio heartbeat — detects if iOS killed audio and restarts it
+  // Fires every 5 seconds; only acts if audio should be playing but isn't
+  setInterval(() => {
+    const shouldBePlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+    const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
+    const userPaused = btnLabel.includes('RESUME');
+    if (shouldBePlaying && !userPaused && audio.paused && audio.src) {
+      console.log('[Heartbeat] Audio interrupted — restarting');
+      audio.play().catch(() => {});
     }
-    try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-    } catch (e) { console.log("AudioContext Init Error:", e); }
+  }, 5000);
 }
 
-// PLAYBACK LOGIC
-function playStn(s) {
-    initAudio();
-    audio.src = s.url; 
-    audio.play().then(() => updateState(s.name, s.n)).catch(() => showToast("Tap Play to start stream"));
+// ============================================================
+//  CLOCK
+// ============================================================
+function tickClock() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clockDisplay').textContent = hh+':'+mm+':'+ss;
+  const uh = String(now.getUTCHours()).padStart(2,'0');
+  const um = String(now.getUTCMinutes()).padStart(2,'0');
+  const us = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
+  checkSleepTimer();
+  if (alarmActive) checkAlarmFire(now, hh, mm, ss);
 }
 
-function updateState(name, id) {
-    document.getElementById('npStation').textContent = name;
-    document.getElementById('npStation').classList.remove('idle');
-    document.querySelectorAll('.stn-btn').forEach(b=>b.classList.remove('active'));
-    if(id) {
-        const btn = document.getElementById('stn-'+id);
-        if(btn) btn.classList.add('active');
-    }
+// ============================================================
+//  TABS
+// ============================================================
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+  // Resize and restart viz when tab becomes visible
+  if (id === 'viz') {
+    if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
+    setTimeout(startSynthViz, 50); // short delay so panel is visible and has size
+  }
+}
+
+// ============================================================
+//  PLAYBACK
+// ============================================================
+function play(station) {
+  if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
+  curIdx = STATIONS.indexOf(station);
+  document.getElementById('npStation').textContent = station.name;
+  document.getElementById('npStation').classList.remove('idle');
+  document.getElementById('npMeta').textContent = 'Connecting...';
+  document.getElementById('sigbars').classList.remove('active');
+  document.getElementById('stn-'+station.n)?.classList.add('active');
+
+  audio.pause();
+  audio.src = station.url;
+  audio.volume = parseFloat(document.getElementById('volSlider').value);
+  audio.load();
+  audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
-    document.getElementById('btnStop').innerHTML = '■ STOP';
-    
-    if('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({title: name, album: "WolfTronix Radio"});
-    }
+    document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC feed' : '';
+    updateMediaSession(station.name);
+    // Attempt real Web Audio FFT connection
+    tryLiveAudio();
+  }).catch(() => {
+    document.getElementById('npMeta').textContent = 'Tap again to play';
+  });
 }
 
-function toggleStop() { 
-    if(audio.paused) { 
-        audio.play(); 
-        document.getElementById('btnStop').innerHTML = '■ STOP'; 
-        document.getElementById('sigbars').classList.add('active');
-    } else { 
-        audio.pause(); 
-        document.getElementById('btnStop').innerHTML = '▶ RESUME'; 
-        document.getElementById('sigbars').classList.remove('active');
-    } 
-}
-
-function setVolume(v) { audio.volume = v; }
-
-// CLOCK, TIMER, & ALARM
-function tick() {
-    const now = new Date();
-    document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
-    document.getElementById('utcDisplay').textContent = now.toISOString().split('T')[1].slice(0,8);
-    
-    // Check Alarm
-    if(alarmActive) {
-        const t = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-        if(t === document.getElementById('alarmTime').value) {
-            triggerAlarm(t);
-        }
-    }
-    
-    // Check Sleep Timer
-    if(sleepEnd) {
-        const rem = sleepEnd - Date.now();
-        const disp = document.getElementById('sleepCountdown');
-        if(rem <= 0) { 
-            audio.pause(); 
-            clearSleep(); 
-            document.getElementById('btnStop').innerHTML = '▶ RESUME';
-            document.getElementById('sigbars').classList.remove('active');
-        } else { 
-            disp.textContent = Math.floor(rem/60000) + ":" + Math.floor((rem%60000)/1000).toString().padStart(2,'0'); 
-            disp.classList.remove('off');
-        }
-    }
-}
-
-function setSleep(m) { 
-    sleepEnd = Date.now() + m*60000; 
-    showToast("Timer Set: " + m + " mins");
-}
-function clearSleep() { 
-    sleepEnd = null; 
-    const disp = document.getElementById('sleepCountdown');
-    disp.textContent = "OFF"; 
-    disp.classList.add('off');
-    showToast("Timer Cancelled");
-}
-
-function setAlarm() { 
-    const t = document.getElementById('alarmTime').value;
-    if(!t) return showToast("Select a time first");
-    alarmActive = true; 
-    document.getElementById('alarmStat').textContent = "ACTIVE FOR " + t;
-    showToast("Alarm Set");
-}
-
-function triggerAlarm(timeString) {
-    alarmActive = false;
-    document.getElementById('alarmStat').textContent = "";
-    document.getElementById('wakeOverlay').classList.add('show');
-    document.getElementById('wakeTimeDisp').textContent = timeString;
-    
-    const sid = document.getElementById('alarmStn').value;
-    const stn = STATIONS.find(s => s.n == sid);
-    if(stn) {
-        document.getElementById('wakeStnName').textContent = stn.name;
-    }
-}
-
-function wakePlay() { 
-    const sid = document.getElementById('alarmStn').value;
-    const stn = STATIONS.find(s => s.n == sid);
-    if(stn) playStn(stn);
-    else audio.play();
-    document.getElementById('wakeOverlay').classList.remove('show'); 
-}
-
-function dismissAlarm() {
-    document.getElementById('wakeOverlay').classList.remove('show'); 
-}
-
-// TRUE WEB AUDIO VISUALIZER (Sputter-Proofed for iOS)
-function startVizEngine() {
-    const c = document.getElementById('vizCanvas'); 
-    const ctx = c.getContext('2d');
-    const dataArray = new Uint8Array(256);
-    
-    function draw() {
-        requestAnimationFrame(draw);
-        
-        // Critical iOS Fix: Do absolutely zero work if tab is hidden
-        if (!isVizActive || document.hidden) return;
-        
-        const w = c.width = c.offsetWidth, h = c.height = c.offsetHeight;
-        ctx.fillStyle = '#12121a'; 
-        ctx.fillRect(0, 0, w, h);
-        
-        // If audio isn't hooked up yet, or it's paused, draw flatline
-        if (!analyser || audio.paused) {
-            ctx.strokeStyle = 'var(--muted)'; ctx.lineWidth = 2; ctx.beginPath();
-            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
-            return;
-        }
-
-        if(vizMode === 'fft') {
-            analyser.getByteFrequencyData(dataArray);
-            const barCount = 40;
-            const barW = (w / barCount) - 2;
-            let x = 0;
-            
-            for(let i = 0; i < barCount; i++) {
-                const rawH = dataArray[i]; // 0 to 255
-                const barH = (rawH / 255) * h * 0.9;
-                
-                ctx.fillStyle = rawH > 200 ? 'var(--green)' : 'var(--accent)';
-                if (barH > 0) ctx.fillRect(x, h - barH, barW, barH);
-                x += barW + 2;
-            }
-        } else {
-            analyser.getByteTimeDomainData(dataArray);
-            ctx.strokeStyle = 'var(--green)'; 
-            ctx.lineWidth = 2; 
-            ctx.beginPath();
-            
-            const sliceW = w / dataArray.length;
-            let x = 0;
-            for(let i = 0; i < dataArray.length; i++) {
-                const v = dataArray[i] / 128.0; // 0 to 2.0
-                const y = v * h / 2;
-                if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                x += sliceW;
-            }
-            ctx.stroke();
-        }
-    }
-    draw();
-}
-
-function setViz(m, btn) { 
-    vizMode = m; 
-    document.querySelectorAll('#panel-viz .pill').forEach(p=>p.classList.remove('active')); 
-    btn.classList.add('active'); 
-}
-
-// TAB MANAGEMENT
-function switchTab(id, el) { 
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); 
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); 
-    document.getElementById('panel-'+id).classList.add('active'); 
-    el.classList.add('active'); 
-    
-    // Only allow Viz loop to run when VIZ tab is visible
-    isVizActive = (id === 'viz');
-}
-
-function showToast(m) { 
-    const t = document.getElementById('toast'); 
-    t.textContent = m; t.className = 'toast show'; 
-    setTimeout(() => t.className = 'toast', 3000); 
-}
-
-// LOCAL MP3
-function loadFiles(fs) {
-    const cont = document.getElementById('mp3Tracks'); cont.innerHTML='';
-    Array.from(fs).forEach((f, i) => {
-        const b = document.createElement('button'); b.className='stn-btn';
-        b.onclick = () => { 
-            initAudio(); 
-            audio.src = URL.createObjectURL(f); 
-            audio.play().then(()=> updateState(f.name, null)); 
-        };
-        b.innerHTML = `<span class="stn-num">${i+1}</span><span class="stn-name">${f.name}</span>`; 
-        cont.appendChild(b);
+function toggleStop() {
+  // Both MP3 and streams: pause/resume
+  // Streams resume from same position (live = reconnects), MP3 keeps exact position
+  if (!audio.paused && (curIdx >= 0 || mp3CurIdx >= 0)) {
+    // Currently playing — pause
+    audio.pause();
+    document.getElementById('sigbars').classList.remove('active');
+    document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+  } else if (audio.paused && audio.src) {
+    // Currently paused — resume
+    audio.play().then(() => {
+      document.getElementById('sigbars').classList.add('active');
+      document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    }).catch(() => {
+      // Stream may have gone stale — reload it
+      if (curIdx >= 0) {
+        audio.src = STATIONS[curIdx].url;
+        audio.load();
+        audio.play().catch(()=>{});
+      }
     });
+  } else {
+    stopPlay();
+  }
 }
 
-// GOOGLE DRIVE
-function openGDrive() {
-    if(GDRIVE_CLIENT_ID.includes('YOUR_CLIENT')) {
-        showToast("Configure Client ID in code first");
-        return;
+function stopPlay() {
+  // NOTE: never disconnect waSource - createMediaElementSource is permanent
+  // Just pause and clear src; Web Audio graph stays intact for next station
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  audio.pause(); audio.src = '';
+  if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
+  if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
+  document.getElementById('npStation').textContent = 'Select a station';
+  document.getElementById('npStation').classList.add('idle');
+  document.getElementById('npMeta').textContent = '\u00a0';
+  document.getElementById('sigbars').classList.remove('active');
+  document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+}
+
+function setVolume(v) {
+  audio.volume = parseFloat(v);
+  document.getElementById('volVal').textContent = Math.round(v*100);
+}
+
+// ============================================================
+//  WEB AUDIO (desktop, tap to enable)
+// ============================================================
+function tryLiveAudio() {
+  // createMediaElementSource can only be called ONCE per audio element - ever.
+  // So we create the entire graph once at first play and never tear it down.
+  // Changing station = just change audio.src, the Web Audio graph stays intact.
+  if (liveAudio) return; // already connected, nothing to do
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    google.accounts.oauth2.initTokenClient({
-        client_id: GDRIVE_CLIENT_ID, 
-        scope: 'https://www.googleapis.com/auth/drive.readonly',
-        callback: (r) => { if(r.access_token) buildPicker(r.access_token); }
-    }).requestAccessToken();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    if (!analyser) {
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048; // 1024 bins, ~46ms window at 44100Hz
+      analyser.smoothingTimeConstant = 0.8;
+    }
+
+    // Build graph ONCE: audio element -> analyser -> destination
+    // After this, changing audio.src automatically flows through the same graph
+    waSource = audioCtx.createMediaElementSource(audio);
+    waSource.connect(analyser);
+    waSource.connect(audioCtx.destination);
+    liveAudio = true;
+    console.log('[WebAudio] Live FFT connected, fftSize='+analyser.fftSize);
+    showToast('Live FFT active', 'ok');
+  } catch(e) {
+    console.warn('[WebAudio] Failed:', e.message);
+    liveAudio = false;
+    // audio.src still plays directly through browser - no silence
+  }
 }
 
-function buildPicker(t) {
-    const v = new google.picker.DocsView().setMimeTypes('audio/mpeg,audio/mp3,audio/wav');
-    new google.picker.PickerBuilder().addView(v).setOAuthToken(t).setCallback((d)=>{
-        if(d.action == google.picker.Action.PICKED) fetchDrive(d.docs, t);
-    }).build().setVisible(true);
+function connectWebAudio() {
+  tryLiveAudio();
 }
 
-async function fetchDrive(docs, t) {
-    const stat = document.getElementById('gDriveStatus');
-    const cont = document.getElementById('mp3Tracks'); 
-    cont.innerHTML='';
-    stat.textContent = "Buffering tracks...";
-    
-    try {
-        for(let i=0; i<docs.length; i++) {
-            const doc = docs[i];
-            const r = await fetch(`https://www.googleapis.com/drive/v3/files/${doc.id}?alt=media&acknowledgeAbuse=true`, {headers: {Authorization: `Bearer ${t}`}});
-            const blob = await r.blob();
-            const u = URL.createObjectURL(blob);
-            
-            const b = document.createElement('button'); b.className='stn-btn';
-            b.onclick = () => { 
-                initAudio(); 
-                audio.src = u; 
-                audio.play().then(()=> updateState(doc.name, null)); 
-            };
-            b.innerHTML = `<span class="stn-num">${i+1}</span><span class="stn-name">${doc.name}</span>`; 
-            cont.appendChild(b);
+// ============================================================
+//  SYNTHETIC VISUALIZER (works on iOS, always runs)
+// ============================================================
+function setVizMode(mode, btn) {
+  vizMode = mode;
+  document.querySelectorAll('.viz-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function startSynthViz() {
+  if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
+  const canvas = document.getElementById('vizCanvas');
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    if (canvas.offsetWidth === 0) return; // panel still hidden
+    canvas.width  = canvas.offsetWidth  * dpr;
+    canvas.height = canvas.offsetHeight * dpr;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+
+  // synthetic frequency bands - persist across frames for smooth motion
+  const NUM_BANDS = 48;
+  const bands = new Float32Array(NUM_BANDS).fill(0);
+  const targets = new Float32Array(NUM_BANDS).fill(0);
+  let t = 0;
+
+  function draw() {
+    vizRAF = requestAnimationFrame(draw);
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.width / dpr, H = canvas.height / dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // clear
+    ctx.fillStyle = '#12121a';
+    ctx.fillRect(0, 0, W, H);
+
+    const playing = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
+    t += 0.04;
+
+    if (!playing) {
+      // idle: slow gentle wave
+      ctx.strokeStyle = '#1e1e2e';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x < W; x++) {
+        const y = H/2 + Math.sin(x*0.05 + t) * 8 + Math.sin(x*0.02 + t*0.7) * 4;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#4a5060';
+      ctx.font = "11px 'Share Tech Mono'";
+      ctx.textAlign = 'center';
+      ctx.fillText('START A STATION', W/2, H/2 - 8);
+      ctx.fillStyle = '#2a3040';
+      ctx.font = "9px 'Share Tech Mono'";
+      ctx.fillText('tap canvas on desktop for live audio', W/2, H/2 + 10);
+      return;
+    }
+
+    // REAL FFT: use live analyser data when available
+    if (liveAudio && analyser) {
+      const freqData = new Uint8Array(analyser.frequencyBinCount);
+      const timeData = new Uint8Array(analyser.fftSize);
+      analyser.getByteFrequencyData(freqData);
+      analyser.getByteTimeDomainData(timeData);
+
+      // Map real FFT data into our bands array for unified rendering
+      const binCount = analyser.frequencyBinCount; // fftSize/2
+      for (let i = 0; i < NUM_BANDS; i++) {
+        // map band index to FFT bin (log scale feels more natural)
+        const logStart = Math.pow(binCount, i / NUM_BANDS);
+        const logEnd   = Math.pow(binCount, (i+1) / NUM_BANDS);
+        const start = Math.floor(logStart);
+        const end   = Math.min(Math.ceil(logEnd), binCount - 1);
+        let sum = 0;
+        for (let b = start; b <= end; b++) sum += freqData[b];
+        const avg = sum / (end - start + 1) / 255;
+        // smooth toward real value
+        bands[i] += (avg - bands[i]) * 0.5;
+      }
+      // store time domain for scope mode
+      bands._timeData = timeData;
+      // fall through to unified rendering below
+    } else {
+
+    // SYNTHETIC: generate convincing fake spectrum
+    // update targets with organic motion
+    synthPhase += 0.03;
+    const vol = parseFloat(document.getElementById('volSlider').value);
+
+    for (let i = 0; i < NUM_BANDS; i++) {
+      const freq = i / NUM_BANDS;
+      // music-like envelope: more energy in lows/mids
+      const envelope = freq < 0.15 ? 0.9 : freq < 0.4 ? 0.7 : freq < 0.7 ? 0.4 : 0.15;
+      // rhythmic pulses
+      const pulse = 0.5 + 0.5 * Math.sin(synthPhase * 2.1 + i * 0.3)
+                       * Math.sin(synthPhase * 1.3 + i * 0.7);
+      // noise
+      const noise = (Math.random() - 0.5) * 0.3;
+      targets[i] = Math.max(0, Math.min(1, envelope * pulse * vol * 1.3 + noise * envelope));
+    }
+    // smooth bands toward targets
+    for (let i = 0; i < NUM_BANDS; i++) {
+      bands[i] += (targets[i] - bands[i]) * (bands[i] < targets[i] ? 0.4 : 0.15);
+    }
+    } // end synthetic else
+
+    // pick current station color theme
+    const cat = curIdx >= 0 ? STATIONS[curIdx].cat : 'mp3';
+    const color = cat==='atc' ? [0,212,255] : cat==='german' ? [255,179,71] : cat==='mp3' ? [180,100,255] : [57,255,130];
+
+    if (vizMode === 'fft') {
+      // Mirrored FFT with glow, peaks, and floor reflection
+      const barW = (W / NUM_BANDS) - 1;
+      // draw grid lines
+      for (let g = 1; g < 4; g++) {
+        const gy = H - (g / 4) * H;
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 8]);
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      if (!bands._peaks) bands._peaks = new Float32Array(NUM_BANDS).fill(0);
+      if (!bands._peakTimer) bands._peakTimer = new Float32Array(NUM_BANDS).fill(0);
+
+      for (let i = 0; i < NUM_BANDS; i++) {
+        const v = bands[i];
+        const bH = v * (H - 14);
+        const x = i * (barW + 1);
+
+        // peak tracker
+        if (v > bands._peaks[i]) { bands._peaks[i] = v; bands._peakTimer[i] = 60; }
+        else if (bands._peakTimer[i] > 0) { bands._peakTimer[i]--; }
+        else { bands._peaks[i] = Math.max(0, bands._peaks[i] - 0.008); }
+
+        // gradient bar - full spectrum color shift by position
+        const hue = 180 + (i / NUM_BANDS) * 120;
+        const grad = ctx.createLinearGradient(0, H, 0, H - bH);
+        grad.addColorStop(0, `hsla(${hue},100%,55%,0.9)`);
+        grad.addColorStop(0.5, `hsla(${hue+30},100%,65%,0.7)`);
+        grad.addColorStop(1, `hsla(${hue+60},100%,80%,0.4)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, H - bH, barW, bH);
+
+        // glow effect on tall bars
+        if (v > 0.5) {
+          ctx.shadowColor = `hsl(${hue},100%,60%)`;
+          ctx.shadowBlur = 8 * v;
+          ctx.fillStyle = `hsla(${hue},100%,70%,${v*0.3})`;
+          ctx.fillRect(x, H - bH, barW, 2);
+          ctx.shadowBlur = 0;
         }
-        stat.textContent = `${docs.length} tracks ready.`;
-    } catch(err) {
-        stat.textContent = "Error loading Drive tracks.";
-        console.error(err);
+
+        // mirror reflection below floor
+        const reflGrad = ctx.createLinearGradient(0, H, 0, H + bH * 0.3);
+        reflGrad.addColorStop(0, `hsla(${hue},100%,55%,0.25)`);
+        reflGrad.addColorStop(1, `hsla(${hue},100%,55%,0)`);
+        ctx.fillStyle = reflGrad;
+        ctx.fillRect(x, H, barW, bH * 0.3);
+
+        // peak dot
+        const pH = bands._peaks[i] * (H - 14);
+        ctx.fillStyle = `hsl(${hue},100%,85%)`;
+        ctx.shadowColor = `hsl(${hue},100%,70%)`;
+        ctx.shadowBlur = 4;
+        ctx.fillRect(x, H - pH - 3, barW, 2);
+        ctx.shadowBlur = 0;
+      }
+      // freq labels
+      ctx.fillStyle = '#2a3040';
+      ctx.font = "8px 'Share Tech Mono'";
+      ctx.textAlign = 'left';
+      ['20Hz','200Hz','1kHz','5kHz','20kHz'].forEach((l,i) => ctx.fillText(l, i*(W/5)+2, H-2));
     }
+
+    else if (vizMode === 'scope') {
+      ctx.shadowColor = `rgb(${color[0]},${color[1]},${color[2]})`;
+      ctx.shadowBlur = 6;
+      ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},0.9)`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      if (liveAudio && bands._timeData) {
+        // Real oscilloscope from time domain data
+        const td = bands._timeData;
+        const sliceW = W / td.length;
+        for (let i = 0; i < td.length; i++) {
+          const y = ((td[i] / 128.0) - 1.0) * (H * 0.45) + H/2;
+          i === 0 ? ctx.moveTo(0, y) : ctx.lineTo(i * sliceW, y);
+        }
+      } else {
+        // Synthetic oscilloscope
+        const pts = 200;
+        for (let i = 0; i < pts; i++) {
+          const x = (i / pts) * W;
+          const amp = bands[Math.floor(i / pts * NUM_BANDS)] * H * 0.38;
+          const y = H/2
+            + Math.sin(i*0.12 + synthPhase*3) * amp
+            + Math.sin(i*0.05 + synthPhase*1.7) * amp * 0.4;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // center line
+      ctx.strokeStyle = '#1e1e2e'; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+    }
+
+    else if (vizMode === 'bars') {
+      // Symmetric mirror bars from center + particle sparks
+      if (!bands._sparks) bands._sparks = [];
+      const sparks = bands._sparks;
+
+      const barW = Math.floor(W / NUM_BANDS) - 1;
+      const mid = H / 2;
+
+      // background pulse glow
+      const avgLevel = bands.reduce((a,b) => a+b, 0) / NUM_BANDS;
+      if (avgLevel > 0.3) {
+        const pulse = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.6);
+        pulse.addColorStop(0, `rgba(${color[0]},${color[1]},${color[2]},${avgLevel*0.08})`);
+        pulse.addColorStop(1, 'transparent');
+        ctx.fillStyle = pulse;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      for (let i = 0; i < NUM_BANDS; i++) {
+        const v = bands[i];
+        const halfH = v * mid * 0.95;
+        const x = i * (barW + 1);
+
+        // top half bar
+        const grad = ctx.createLinearGradient(0, mid - halfH, 0, mid);
+        grad.addColorStop(0, `rgba(${color[0]},${color[1]},${color[2]},0.9)`);
+        grad.addColorStop(1, `rgba(${color[0]},${color[1]},${color[2]},0.2)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, mid - halfH, barW, halfH);
+
+        // bottom half bar (mirror)
+        const grad2 = ctx.createLinearGradient(0, mid, 0, mid + halfH);
+        grad2.addColorStop(0, `rgba(${color[0]},${color[1]},${color[2]},0.2)`);
+        grad2.addColorStop(1, `rgba(${color[0]},${color[1]},${color[2]},0.9)`);
+        ctx.fillStyle = grad2;
+        ctx.fillRect(x, mid, barW, halfH);
+
+        // bright center line
+        ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${0.3 + v*0.7})`;
+        ctx.fillRect(x, mid - 1, barW, 2);
+
+        // spawn sparks on high energy bars
+        if (v > 0.75 && Math.random() < 0.15) {
+          sparks.push({
+            x: x + barW/2, y: mid - halfH,
+            vx: (Math.random()-0.5)*2, vy: -Math.random()*2-1,
+            life: 1, color: color
+          });
+        }
+      }
+
+      // center spine
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(0, mid-1, W, 2);
+
+      // update + draw sparks
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx; s.y += s.vy; s.vy += 0.05;
+        s.life -= 0.04;
+        if (s.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.globalAlpha = s.life;
+        ctx.fillStyle = `rgb(${s.color[0]},${s.color[1]},${s.color[2]})`;
+        ctx.shadowColor = `rgb(${s.color[0]},${s.color[1]},${s.color[2]})`;
+        ctx.shadowBlur = 4;
+        ctx.fillRect(s.x, s.y, 2, 2);
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    else if (vizMode === 'radar') {
+      const cx = W/2, cy = H/2, maxR = Math.min(W,H)*0.42;
+      // rings
+      for (let r = 1; r <= 4; r++) {
+        ctx.strokeStyle = '#1e1e2e'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.arc(cx, cy, maxR*r/4, 0, Math.PI*2); ctx.stroke();
+      }
+      // sweep line
+      const sweep = (synthPhase * 0.8) % (Math.PI * 2);
+      const grad2 = ctx.createConicalGradient
+        ? ctx.createConicalGradient(cx, cy, sweep)
+        : null;
+      ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},0.8)`;
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = `rgb(${color[0]},${color[1]},${color[2]})`;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(sweep)*maxR, cy + Math.sin(sweep)*maxR);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // data points from bands
+      ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},0.7)`;
+      for (let i = 0; i < NUM_BANDS; i++) {
+        const angle = (i / NUM_BANDS) * Math.PI * 2;
+        const r = bands[i] * maxR;
+        const px = cx + Math.cos(angle) * r;
+        const py = cy + Math.sin(angle) * r;
+        const age = ((sweep - angle) + Math.PI*2) % (Math.PI*2);
+        const alpha = Math.max(0, 1 - age / (Math.PI*2));
+        ctx.globalAlpha = alpha * 0.8;
+        ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      // center dot
+      ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
+      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  draw();
 }
+
+function drawVizReal(ctx, W, H, freqData, timeData, t) {
+  // same modes but using real analyser data
+  if (vizMode === 'scope') {
+    ctx.strokeStyle = '#39ff82'; ctx.lineWidth = 1.5;
+    ctx.shadowColor = '#39ff82'; ctx.shadowBlur = 5;
+    ctx.beginPath();
+    const sw = W / timeData.length;
+    for (let i = 0; i < timeData.length; i++) {
+      const y = (timeData[i] / 128) * H / 2;
+      i===0 ? ctx.moveTo(0,y) : ctx.lineTo(i*sw,y);
+    }
+    ctx.stroke(); ctx.shadowBlur = 0;
+  } else {
+    const n = freqData.length;
+    const barW = (W - n) / n;
+    for (let i = 0; i < n; i++) {
+      const v = freqData[i] / 255;
+      const bH = v * H;
+      const x = i * (barW+1);
+      ctx.fillStyle = `hsl(${160+v*80},100%,${35+v*35}%)`;
+      ctx.fillRect(x, H-bH, barW, bH);
+    }
+  }
+}
+
+// ============================================================
+//  VU METER
+// ============================================================
+function startVUMeter() {
+  const bars = document.querySelectorAll('.vu-bar');
+  const n = bars.length;
+  let vuPhase = 0;
+
+  function tick() {
+    vuRAF = requestAnimationFrame(tick);
+    const playing = curIdx >= 0 && !audio.paused;
+    vuPhase += 0.05;
+
+    let level = 0;
+    if (playing) {
+      if (liveAudio && analyser) {
+        const d = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(d);
+        let sum = 0; d.forEach(v => sum += v);
+        level = sum / d.length / 255;
+      } else {
+        // synthetic VU
+        level = 0.3 + 0.35 * Math.abs(Math.sin(vuPhase * 1.8))
+                    + 0.15 * Math.abs(Math.sin(vuPhase * 3.1 + 1.2))
+                    + (Math.random() - 0.5) * 0.1;
+        level *= parseFloat(document.getElementById('volSlider').value);
+        level = Math.max(0, Math.min(1, level));
+      }
+    }
+
+    bars.forEach((b, i) => {
+      const thresh = i / n;
+      const active = level > thresh * 0.7;
+      b.style.height = active ? (2 + level * 16) + 'px' : '2px';
+      b.style.background = i < n*0.6 ? (active ? 'var(--green)' : 'var(--border)')
+        : i < n*0.85 ? (active ? 'var(--amber)' : 'var(--border)')
+        : (active ? 'var(--red)' : 'var(--border)');
+    });
+  }
+  tick();
+}
+
+// ============================================================
+//  SLEEP TIMER
+// ============================================================
+function setSleep(minutes) {
+  sleepEnd = Date.now() + minutes * 60000;
+  showToast('Sleep: ' + minutes + ' min', 'ok');
+}
+
+function clearSleep() {
+  sleepEnd = null;
+  document.getElementById('sleepCountdown').textContent = 'NO TIMER SET';
+  document.getElementById('sleepCountdown').className = 'countdown off';
+  document.getElementById('sleepCountdown').style.color = '';
+}
+
+function checkSleepTimer() {
+  if (!sleepEnd) return;
+  const rem = sleepEnd - Date.now();
+  if (rem <= 0) {
+    fadeEnabled ? fadeOut() : stopPlay();
+    clearSleep(); return;
+  }
+  const m = Math.floor(rem / 60000);
+  const s = Math.floor((rem % 60000) / 1000);
+  document.getElementById('sleepCountdown').textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  document.getElementById('sleepCountdown').className = 'countdown';
+  document.getElementById('sleepCountdown').style.color = rem < 60000 ? 'var(--amber)' : '';
+}
+
+function fadeOut() {
+  const startVol = audio.volume;
+  let i = 0;
+  const iv = setInterval(() => {
+    i++;
+    audio.volume = Math.max(0, startVol * (1 - i/60));
+    if (i >= 60) { clearInterval(iv); stopPlay(); audio.volume = startVol; }
+  }, 50);
+}
+
+function setFade(on) {
+  fadeEnabled = on;
+  document.getElementById('fade-on').classList.toggle('active', on);
+  document.getElementById('fade-off').classList.toggle('active', !on);
+}
+
+// ============================================================
+//  ALARM
+// ============================================================
+function setAlarm() {
+  const t = document.getElementById('alarmTimeInput').value;
+  const s = parseInt(document.getElementById('alarmStation').value);
+  if (!t) { showToast('Set a time first', 'error'); return; }
+  localStorage.setItem('radioAlarm', JSON.stringify({time:t, station:s}));
+  showAlarmStatus(t, s);
+  alarmActive = true;
+  showToast('Alarm set: ' + t, 'ok');
+}
+
+function clearAlarm() {
+  localStorage.removeItem('radioAlarm');
+  alarmActive = false;
+  document.getElementById('alarmStatus').textContent = 'No alarm set';
+  document.getElementById('alarmStatus').className = 'alarm-status off';
+  showToast('Alarm cleared');
+}
+
+function showAlarmStatus(time, stationN) {
+  const stn = STATIONS.find(s => s.n === parseInt(stationN));
+  document.getElementById('alarmStatus').textContent =
+    'ALARM ' + time + ' \u2014 ' + (stn ? stn.name : '?');
+  document.getElementById('alarmStatus').className = 'alarm-status';
+}
+
+function checkAlarmFire(now, hh, mm, ss) {
+  const saved = localStorage.getItem('radioAlarm');
+  if (!saved) return;
+  const a = JSON.parse(saved);
+  // fire in first 5 seconds of the alarm minute
+  if ((hh+':'+mm) === a.time && parseInt(ss) < 5) {
+    if (!document.getElementById('wakeOverlay').classList.contains('show')) {
+      showWakeOverlay(a);
+    }
+  }
+}
+
+function showWakeOverlay(a) {
+  const stn = STATIONS.find(s => s.n === parseInt(a.station));
+  document.getElementById('wakeTime').textContent = a.time;
+  document.getElementById('wakeStation').textContent = stn ? stn.name : '';
+  document.getElementById('wakeOverlay').classList.add('show');
+  alarmPending = stn;
+  // vibrate if supported
+  if (navigator.vibrate) navigator.vibrate([500,200,500,200,500]);
+}
+
+function wakePlay() {
+  document.getElementById('wakeOverlay').classList.remove('show');
+  if (alarmPending) {
+    play(alarmPending);
+    setSleep(60); // auto-stop after 60 min
+    alarmPending = null;
+    // switch to stations tab
+    const tabs = document.querySelectorAll('.tab');
+    switchTab('stations', tabs[0]);
+  }
+}
+
+function wakeDismiss() {
+  document.getElementById('wakeOverlay').classList.remove('show');
+  alarmPending = null;
+}
+
+// ============================================================
+//  AUDIO EVENTS
+// ============================================================
+audio.addEventListener('waiting', () => {
+  document.getElementById('npMeta').textContent = 'Buffering...';
+  document.getElementById('sigbars').classList.remove('active');
+});
+audio.addEventListener('playing', () => {
+  document.getElementById('sigbars').classList.add('active');
+  if (curIdx >= 0 && document.getElementById('npMeta').textContent === 'Buffering...')
+    document.getElementById('npMeta').textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC feed' : '';
+});
+audio.addEventListener('error', () => {
+  document.getElementById('npMeta').textContent = 'Stream error';
+  document.getElementById('sigbars').classList.remove('active');
+  showToast('Stream failed', 'error');
+});
+audio.addEventListener('stalled', () => {
+  document.getElementById('npMeta').textContent = 'Reconnecting...';
+  setTimeout(() => {
+    if (curIdx >= 0) {
+      audio.src = STATIONS[curIdx].url;
+      audio.play().catch(()=>{});
+    }
+  }, 4000);
+});
+
+function updateMediaSession(name, artist) {
+  if (!('mediaSession' in navigator)) return;
+  // Full metadata — artist/album tells iOS this is music, not just a webpage
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title:  name,
+    artist: artist || (mp3CurIdx >= 0 ? 'Local MP3' : 'Live Radio'),
+    album:  'WolfTronix Radio'
+  });
+  // Playback state — required for iOS to show lock screen controls
+  navigator.mediaSession.playbackState = 'playing';
+
+  // Play / Pause
+  navigator.mediaSession.setActionHandler('play', () => {
+    audio.play().catch(()=>{});
+    navigator.mediaSession.playbackState = 'playing';
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    if (mp3CurIdx >= 0) { audio.pause(); navigator.mediaSession.playbackState = 'paused'; }
+    else stopPlay();
+  });
+  navigator.mediaSession.setActionHandler('stop', stopPlay);
+
+  // Prev / Next — only meaningful for MP3, ignored for streams
+  navigator.mediaSession.setActionHandler('previoustrack',
+    mp3CurIdx >= 0 ? mp3Prev : null);
+  navigator.mediaSession.setActionHandler('nexttrack',
+    mp3CurIdx >= 0 ? mp3Next : null);
+
+  // Seek support for MP3 (streams are not seekable)
+  if (mp3CurIdx >= 0 && audio.duration && isFinite(audio.duration)) {
+    navigator.mediaSession.setActionHandler('seekto', (d) => {
+      if (d.seekTime !== undefined) audio.currentTime = d.seekTime;
+    });
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     audio.currentTime
+    });
+  } else {
+    // Clear seek handlers for live streams
+    try { navigator.mediaSession.setActionHandler('seekto', null); } catch(e) {}
+    try { navigator.mediaSession.setPositionState({}); } catch(e) {}
+  }
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+//  MP3 PLAYER
+// ============================================================
+let mp3Tracks   = [];
+let mp3CurIdx   = -1;
+let mp3Shuffle  = false;
+let mp3Repeat   = false;
+let mp3Order    = [];
+
+function loadMp3Files(files) {
+  if (!files.length) return;
+  // Stop any stream
+  stopPlay();
+  // Revoke old object URLs
+  mp3Tracks.forEach(t => URL.revokeObjectURL(t.url));
+  mp3Tracks = Array.from(files).map((f,i) => ({
+    idx: i,
+    name: f.name.replace(/\.[^.]+$/, '') || f.name,
+    url:  URL.createObjectURL(new Blob([f], {type: 'audio/mpeg'}))
+  }));
+  mp3CurIdx = -1;
+  mp3Order  = mp3Tracks.map((_,i) => i);
+  buildMp3List();
+  document.getElementById('mp3TrackList').style.display = '';
+  document.getElementById('mp3PickerLabel').textContent = '📂 ' + files.length + ' file' + (files.length>1?'s':'')+' loaded — tap to change';
+  // Re-attach hidden input after textContent wipe
+  const inp = document.createElement('input');
+  inp.type='file'; inp.id='mp3FileInput'; inp.accept='audio/*'; inp.multiple=true;
+  inp.style.display='none'; inp.onchange=function(){loadMp3Files(this.files);};
+  document.getElementById('mp3PickerLabel').appendChild(inp);
+}
+
+function buildMp3List() {
+  const container = document.getElementById('mp3Tracks');
+  container.innerHTML = '';
+  mp3Tracks.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className = 'stn-btn'; b.id = 'mp3-'+i;
+    b.style.cssText = 'padding:11px 12px;margin-bottom:4px';
+    b.onclick = () => playMp3(i);
+    b.innerHTML = '<span class="stn-num" style="font-size:0.65em;color:var(--muted)">'+(i+1)+'</span>'
+      +'<span class="stn-name" style="font-size:0.88em;font-weight:500">'+escHtml(t.name)+'</span>'
+      +'<span class="stn-live"><span class="live-dot"></span>▶</span>';
+    container.appendChild(b);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function playMp3(i) {
+  // deactivate stream station if any
+  if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
+  // deactivate old mp3 track
+  if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
+  mp3CurIdx = i;
+  const t = mp3Tracks[i];
+  document.getElementById('mp3-'+i)?.classList.add('active');
+  document.getElementById('npStation').textContent = t.name;
+  document.getElementById('npStation').classList.remove('idle');
+  document.getElementById('npMeta').textContent = 'Local MP3';
+  document.getElementById('sigbars').classList.remove('active');
+  audio.pause();
+  audio.src = t.url;
+  audio.load();
+  audio.play().then(() => {
+    document.getElementById('sigbars').classList.add('active');
+    document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+    updateMediaSession(t.name);
+    tryLiveAudio();
+  }).catch(() => {
+    document.getElementById('npMeta').textContent = 'Tap again to play';
+  });
+}
+
+// Keep iOS lock screen position state in sync during MP3 playback
+audio.addEventListener('timeupdate', () => {
+  if (mp3CurIdx < 0) return;
+  if (!('mediaSession' in navigator)) return;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  try {
+    navigator.mediaSession.setPositionState({
+      duration:     audio.duration,
+      playbackRate: audio.playbackRate,
+      position:     Math.min(audio.currentTime, audio.duration)
+    });
+  } catch(e) {}
+});
+
+function mp3Next() {
+  if (!mp3Tracks.length) return;
+  let next;
+  if (mp3Shuffle) {
+    next = Math.floor(Math.random() * mp3Tracks.length);
+  } else {
+    next = (mp3CurIdx + 1) % mp3Tracks.length;
+  }
+  playMp3(next);
+}
+
+function mp3Prev() {
+  if (!mp3Tracks.length) return;
+  const prev = mp3CurIdx <= 0 ? mp3Tracks.length - 1 : mp3CurIdx - 1;
+  playMp3(prev);
+}
+
+function toggleMp3Shuffle() {
+  mp3Shuffle = !mp3Shuffle;
+  document.getElementById('mp3ShufPill').textContent = 'SHUFFLE: ' + (mp3Shuffle ? 'ON' : 'OFF');
+  document.getElementById('mp3ShufPill').classList.toggle('active', mp3Shuffle);
+}
+
+function toggleMp3Repeat() {
+  mp3Repeat = !mp3Repeat;
+  document.getElementById('mp3RepPill').textContent = 'REPEAT: ' + (mp3Repeat ? 'ON' : 'OFF');
+  document.getElementById('mp3RepPill').classList.toggle('active', mp3Repeat);
+}
+
+// Auto-advance to next track when MP3 ends
+audio.addEventListener('ended', () => {
+  if (mp3CurIdx < 0) return; // was a stream, ignore
+  if (mp3Repeat) { playMp3(mp3CurIdx); }
+  else if (mp3CurIdx < mp3Tracks.length - 1 || mp3Shuffle) { mp3Next(); }
+  else { // end of list
+    document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
+    mp3CurIdx = -1;
+    document.getElementById('npStation').textContent = 'Select a station';
+    document.getElementById('npStation').classList.add('idle');
+    document.getElementById('npMeta').textContent = '\u00a0';
+    document.getElementById('sigbars').classList.remove('active');
+  }
+});
+
+// ============================================================
+//  GOOGLE DRIVE PICKER
+// ============================================================
+// Only Client ID needed — no API key in public code
+// Get yours: console.cloud.google.com → Credentials → OAuth Client ID (Web app)
+// Authorized JS origins: https://wolftronixsd.github.io
+const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly';
+
+let gAccessToken = null;
+let gapiReady    = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const gapiScript = document.querySelector('script[src*="apis.google.com/js/api"]');
+  if (gapiScript) gapiScript.onload = () => gapi.load('picker', () => { gapiReady = true; });
+});
+
+function openGDrivePicker() {
+  if (GDRIVE_CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
+    setGStatus('⚠ Paste your OAuth Client ID into the HTML first', 'var(--amber)');
+    return;
+  }
+  setGStatus('Signing in to Google...', 'var(--accent)');
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GDRIVE_CLIENT_ID,
+    scope: GDRIVE_SCOPE,
+    callback: (resp) => {
+      if (resp.error) { setGStatus('Sign-in failed: ' + resp.error, 'var(--red)'); return; }
+      gAccessToken = resp.access_token;
+      // Check if we have a saved playlist that needs re-fetching (greyed out tracks)
+      const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
+      const needsReload = savedPlaylist && mp3Tracks.length > 0 && !mp3Tracks[0].url;
+      if (needsReload) {
+        setGStatus('Reloading saved playlist...', 'var(--accent)');
+        const pl = JSON.parse(savedPlaylist);
+        stopPlay();
+        mp3Tracks = [];
+        mp3CurIdx = -1;
+        // Remove grey styling
+        document.querySelectorAll('#mp3Tracks .stn-btn').forEach(b => b.style.opacity = '');
+        fetchDriveTracks(pl).then(() => {});
+      } else {
+        setGStatus('Signed in. Opening Drive...', 'var(--green)');
+        if (!gapiReady) {
+          gapi.load('picker', () => { gapiReady = true; buildPicker(); });
+        } else {
+          buildPicker();
+        }
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+function buildPicker() {
+  // Search view — finds ALL audio files across entire Drive, not just current folder
+  const searchView = new google.picker.DocsView()
+    .setMimeTypes('audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/aac,audio/flac,audio/x-m4a,audio/mp4')
+    .setMode(google.picker.DocsViewMode.LIST)
+    .setIncludeFolders(false)
+    .setQuery('mimeType contains "audio"');
+
+  // No setDeveloperKey() call — API key not needed
+  const picker = new google.picker.PickerBuilder()
+    .addView(searchView)
+    .setOAuthToken(gAccessToken)
+    .setTitle('All audio files in your Drive')
+    .setCallback(pickerCallback)
+    .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+    .build();
+  picker.setVisible(true);
+}
+
+async function pickerCallback(data) {
+  if (data.action !== google.picker.Action.PICKED) return;
+  const docs = data.docs;
+  setGStatus('Loading ' + docs.length + ' file(s) from Drive...', 'var(--accent)');
+
+  stopPlay();
+  mp3Tracks.forEach(t => { if (t.url && t.url.startsWith('blob:')) URL.revokeObjectURL(t.url); });
+  mp3Tracks = [];
+  mp3CurIdx = -1;
+
+  // Save playlist metadata to localStorage so we can reload next session
+  const playlist = docs.map(d => ({ id: d.id, name: d.name }));
+  localStorage.setItem('wradio_gdrive_playlist', JSON.stringify(playlist));
+
+  await fetchDriveTracks(docs.map(d => ({ id: d.id, name: d.name })));
+}
+
+// Fetch tracks from Drive — used both by picker and on page load restore
+async function fetchDriveTracks(items) {
+  let loaded = 0;
+  for (const item of items) {
+    try {
+      setGStatus('Fetching ' + (loaded+1) + '/' + items.length + ': ' + item.name, 'var(--accent)');
+      // acknowledgeAbuse=true allows fetching files flagged by Drive safety scanner
+      const resp = await fetch(
+        'https://www.googleapis.com/drive/v3/files/' + item.id
+        + '?alt=media&acknowledgeAbuse=true&supportsAllDrives=true',
+        { headers: { Authorization: 'Bearer ' + gAccessToken } }
+      );
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      mp3Tracks.push({ idx: loaded, name: item.name.replace(/\.[^.]+$/, ''), url: URL.createObjectURL(blob), driveId: item.id });
+      loaded++;
+    } catch(e) {
+      console.warn('Drive fetch failed:', item.name, e.message);
+    }
+  }
+
+  if (!mp3Tracks.length) {
+    setGStatus('Failed to load. Check file permissions.', 'var(--red)'); return;
+  }
+  mp3Order = mp3Tracks.map((_,i) => i);
+  buildMp3List();
+  document.getElementById('mp3TrackList').style.display = '';
+  setGStatus('✓ ' + loaded + ' track' + (loaded>1?'s':'') + ' loaded from Drive', 'var(--green)');
+  const btn = document.getElementById('gdrivePicker');
+  if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.28 3l5.72 9.9L6.28 3zm-3.1 13.5l2.86-4.95 2.86 4.95H3.18zm8.1 0h5.72l-5.72-9.9-2.86 4.95 2.86 4.95zm2.86-4.95L17 21H7l3.14-9.45z"/></svg> ✓ ' + loaded + ' tracks — tap to change';
+}
+
+function setGStatus(msg, color) {
+  const el = document.getElementById('gdriveStatus');
+  el.textContent = msg;
+  el.style.color = color || 'var(--muted)';
+}
+
+// ============================================================
+//  iOS BACKGROUND AUDIO — keep playing when screen locks / app switches
+//  iOS Safari suspends AudioContext and can interrupt playback when
+//  the page becomes hidden. These handlers resume it automatically.
+// ============================================================
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') return; // going to background — nothing to do
+  // Page became visible again — resume AudioContext if suspended
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  // If audio was playing before and got interrupted, restart it
+  const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+  if (wasPlaying && audio.paused && audio.src) {
+    audio.play().catch(() => {});
+  }
+});
+
+// pageshow fires when returning from bfcache (back/forward navigation on iOS)
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return; // normal load, not from cache
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  if ((curIdx >= 0 || mp3CurIdx >= 0) && audio.paused && audio.src) {
+    audio.play().catch(() => {});
+  }
+});
 
 window.addEventListener('load', buildUI);
 </script>
