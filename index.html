@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0f">
-<title>Radio v2.33</title>
+<title>Radio v2.34</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -19,7 +19,10 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
 
+/* HEADER */
 header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
 .header-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .logo{font-family:var(--mono);font-size:1em;color:var(--accent);letter-spacing:3px}
@@ -31,28 +34,43 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop
 .np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
 .btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-size:0.68em;padding:4px 10px;border-radius:4px;cursor:pointer}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent)}
 
-/* CSS VIZ (SPUTTER-PROOF) */
+/* VU METER */
 .vu-wrap{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
-.vu-bar{flex:1;border-radius:1px;background:var(--border);height:2px}
-.playing .vu-bar{animation: vupulse 0.5s infinite alternate ease-in-out;}
-@keyframes vupulse { from { height: 2px; } to { height: 18px; background: var(--green); } }
+.vu-bar{flex:1;border-radius:1px;background:var(--border);transition:height 0.1s;min-height:2px}
 
+/* TABS */
 .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:90}
 .tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .panel{display:none;padding:10px 12px 80px}
 .panel.active{display:block}
 
-.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px}
-.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);text-align:left;gap:10px}
-.stn-btn.active{border-color:var(--accent);background:rgba(0,212,255,0.05)}
+/* CARDS & PILLS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.card-title{font-family:var(--mono);font-size:0.65em;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pill{font-family:var(--mono);font-size:0.7em;padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--muted);cursor:pointer}
+.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
+.countdown{font-family:var(--mono);font-size:2em;color:var(--green);text-align:center;padding:10px 0;letter-spacing:4px}
+.countdown.off{color:var(--muted);font-size:1em}
 
+/* STATIONS */
+.section-label{font-family:var(--mono);font-size:0.6em;letter-spacing:3px;color:var(--muted);padding:12px 4px 5px;border-bottom:1px solid var(--border);margin-bottom:5px}
+.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;text-align:left;gap:10px}
+.stn-btn.active{border-color:var(--accent);background:rgba(0,212,255,0.05)}
+.stn-num{font-family:var(--mono);font-size:0.62em;color:var(--muted);min-width:20px}
 .atc-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;border:1px solid;border-radius:6px;font-family:var(--mono);font-size:0.65em;text-decoration:none;text-align:center}
 
-.wake-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(5,5,10,0.98);flex-direction:column;align-items:center;justify-content:center;gap:20px}
+/* VIZ */
+#vizCanvas{width:100%;height:150px;border-radius:6px;background:var(--surface);border:1px solid var(--border);display:block}
+
+/* ALARM OVERLAY */
+.wake-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(5,5,10,0.97);flex-direction:column;align-items:center;justify-content:center;gap:20px}
 .wake-overlay.show{display:flex}
-.wake-time{font-family:var(--mono);font-size:4em;color:var(--green)}
+.wake-time{font-family:var(--mono);font-size:3.5em;color:var(--green);letter-spacing:6px}
 </style>
 </head>
 <body id="mainBody">
@@ -61,13 +79,13 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop
 
 <div class="wake-overlay" id="wakeOverlay">
     <div style="font-family:var(--mono);color:var(--muted)">GOOD MORNING</div>
-    <div class="wake-time" id="wakeTimeDisplay">00:00</div>
-    <button onclick="wakePlay()" style="background:var(--green);padding:20px 40px;border:none;border-radius:8px;font-weight:700">▶ PLAY</button>
+    <div class="wake-time" id="wakeTimeDisp">00:00</div>
+    <button onclick="wakePlay()" style="background:var(--green);padding:18px 40px;border:none;border-radius:8px;font-weight:700;letter-spacing:2px">▶ PLAY</button>
 </div>
 
 <header>
     <div class="header-top">
-        <div class="logo">■ RADIO <span style="font-size:0.8em;color:var(--accent)">v2.33</span></div>
+        <div class="logo">■ RADIO <span style="font-size:0.8em;color:var(--accent)">v2.34</span></div>
         <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end">
             <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -77,7 +95,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop
     <div class="now-playing">
         <div id="npStation" class="np-station">Select a station</div>
         <div class="np-controls">
-            <button class="btn-stop" onclick="toggleStop()">■ STOP</button>
+            <button class="btn-stop" id="btnStop" onclick="toggleStop()">■ STOP</button>
             <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.8" oninput="audio.volume = this.value">
         </div>
         <div class="vu-wrap" id="vuWrap"></div>
@@ -87,6 +105,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop
 <div class="tabs">
     <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
     <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
+    <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
     <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
     <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
 </div>
@@ -94,34 +113,50 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);backdrop
 <div class="panel active" id="panel-stations"><div id="stationList"></div></div>
 
 <div class="panel" id="panel-mp3">
-    <div style="background:var(--surface); padding:15px; border-radius:8px; border:1px solid var(--border)">
-        <label style="display:block; padding:12px; border:1px dashed var(--accent); text-align:center; cursor:pointer; color:var(--accent); font-size:0.8em">
-            📁 LOAD LOCAL FILES
+    <div class="card">
+        <div class="card-title">MP3 PLAYER</div>
+        <label style="display:block;padding:12px;border:1px dashed var(--accent);text-align:center;cursor:pointer;color:var(--accent);font-family:var(--mono);font-size:0.7em">
+            📁 CHOOSE LOCAL FILES
             <input type="file" multiple accept="audio/*" style="display:none" onchange="loadFiles(this.files)">
         </label>
-        <button onclick="openGDrive()" style="width:100%; margin-top:10px; padding:12px; background:none; border:1px dashed #4285F4; color:#4285F4; font-family:var(--mono); font-size:0.75em">
-            OPEN GOOGLE DRIVE
-        </button>
-        <div id="gDriveStatus" style="font-size:0.6em; text-align:center; margin-top:8px; color:var(--muted)"></div>
+        <button onclick="openGDrive()" style="width:100%;margin-top:10px;padding:10px;background:none;border:1px dashed #4285F4;color:#4285F4;font-family:var(--mono);font-size:0.7em">OPEN GOOGLE DRIVE</button>
     </div>
-    <div id="mp3Tracks" style="margin-top:10px"></div>
+    <div id="mp3Tracks"></div>
+</div>
+
+<div class="panel" id="panel-viz">
+    <canvas id="vizCanvas"></canvas>
+    <div class="pill-row" style="margin-top:10px">
+        <div class="pill active" onclick="setViz('fft',this)">FFT</div>
+        <div class="pill" onclick="setViz('radar',this)">RADAR</div>
+    </div>
 </div>
 
 <div class="panel" id="panel-timer">
-    <div style="text-align:center">
-        <button onclick="setSleep(15)">15m</button> <button onclick="setSleep(30)">30m</button> <button onclick="setSleep(60)">60m</button>
-        <div id="sleepDisp" style="font-size:2em;margin-top:10px;font-family:var(--mono)">OFF</div>
+    <div class="card">
+        <div class="card-title">SLEEP TIMER</div>
+        <div class="pill-row">
+            <div class="pill" onclick="setSleep(15)">15 min</div>
+            <div class="pill" onclick="setSleep(30)">30 min</div>
+            <div class="pill" onclick="setSleep(60)">60 min</div>
+        </div>
+        <div id="sleepDisp" class="countdown off">NO TIMER SET</div>
+        <div class="pill-row" style="justify-content:center"><div class="pill" style="color:var(--red);border-color:var(--red)" onclick="clearSleep()">CANCEL</div></div>
     </div>
 </div>
 
 <div class="panel" id="panel-alarm">
-    <input type="time" id="alarmTime" style="width:100%;padding:10px;background:var(--surface);color:var(--accent);border:1px solid var(--border)">
-    <button onclick="setAlarm()" style="width:100%;margin-top:10px;background:var(--accent);color:#000;padding:12px;font-weight:700">SET ALARM</button>
+    <div class="card">
+        <div class="card-title">WAKE ALARM</div>
+        <input type="time" id="alarmTime" style="width:100%;padding:10px;background:var(--bg);color:var(--accent);border:1px solid var(--border)">
+        <select id="alarmStn" style="width:100%;margin-top:10px;padding:10px;background:var(--bg);color:var(--text);border:1px solid var(--border)"></select>
+        <button onclick="setAlarm()" style="width:100%;margin-top:10px;background:var(--accent);color:#000;padding:12px;font-weight:700">SET ALARM</button>
+        <div id="alarmStat" style="font-size:0.7em;text-align:center;margin-top:10px;color:var(--green)"></div>
+    </div>
 </div>
 
 <script>
-const GDRIVE_CLIENT_ID = '842819304240-aralchba22l15l0r70kc9m6d53ffns54.apps.googleusercontent.com';
-
+const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
 const audio = document.getElementById('audio');
 const STATIONS = [
   {n:1, name:"181.FM Awesome 80s", url:"https://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
@@ -131,115 +166,128 @@ const STATIONS = [
   {n:5, name:"SWR3", url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
   {n:6, name:"Bayern 3", url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low", cat:"german"},
   {n:7, name:"SWR1", url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3", cat:"german"},
-  {n:8, name:"KMYF ATIS", url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
-  {n:9, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
-  {n:10, name:"KMYF Ground", url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
-  {n:11, name:"KMYF All (Twr)", url:"http://d.liveatc.net/ksan_kmyf_twr_both", cat:"atc"},
-  {n:12, name:"KMYF SoCal Del Mar", url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"},
-  {n:13, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
-  {n:14, name:"KSAN Ground", url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
-  {n:15, name:"KSAN Clearance Del", url:"http://d.liveatc.net/ksan1_del", cat:"atc"},
-  {n:16, name:"KSAN SoCal East", url:"http://d.liveatc.net/ksan_app_east", cat:"atc"},
-  {n:17, name:"KSAN SoCal West", url:"http://d.liveatc.net/ksan_app_west", cat:"atc"},
-  {n:18, name:"KSAN All", url:"http://d.liveatc.net/ksan1_all", cat:"atc"},
-  {n:19, name:"KSDM Ground/Tower", url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
-  {n:20, name:"KRNM Ground", url:"http://d.liveatc.net/krnm2_gnd", cat:"atc"},
-  {n:21, name:"KRNM Ground/Tower", url:"http://d.liveatc.net/krnm2_gnd_twr", cat:"atc"},
-  {n:22, name:"KRNM Tower", url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
-  {n:23, name:"KSMO ATIS", url:"http://d.liveatc.net/ksmo2_atis", cat:"atc"},
-  {n:24, name:"KSMO Tower", url:"http://d.liveatc.net/ksmo2_s", cat:"atc"},
-  {n:25, name:"KSMO Ground", url:"http://d.liveatc.net/ksmo2_gnd", cat:"atc"}
+  {n:8, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
+  {n:9, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
+  {n:10, name:"KSDM Ground/Tower", url:"http://d.liveatc.net/ksdm_twr", cat:"atc"},
+  {n:11, name:"KRNM Tower", url:"http://d.liveatc.net/krnm2_twr", cat:"atc"},
+  {n:12, name:"KSMO Tower", url:"http://d.liveatc.net/ksmo2_s", cat:"atc"}
 ];
 
-let sleepEnd = null, alarmActive = false;
+let sleepEnd=null, alarmActive=false, vizMode='fft', phase=0;
 
 function buildUI() {
     const list = document.getElementById('stationList');
+    const alSel = document.getElementById('alarmStn');
     const vu = document.getElementById('vuWrap');
     for(let i=0; i<20; i++) vu.appendChild(document.createElement('div')).className='vu-bar';
-    
+
     ['german','music','atc'].forEach(c => {
         const lbl = document.createElement('div'); lbl.className='section-label'; lbl.textContent=c.toUpperCase(); list.appendChild(lbl);
         STATIONS.filter(s=>s.cat===c).forEach(s => {
             const b = document.createElement('button'); b.className='stn-btn'; b.id='stn-'+s.n;
-            b.onclick = () => { audio.src=s.url; audio.play(); document.getElementById('npStation').textContent=s.name; document.getElementById('mainBody').classList.add('playing'); document.getElementById('sigbars').classList.add('active'); };
-            b.innerHTML = `<span>${s.n}</span><span>${s.name}</span>`;
+            b.onclick = () => playStn(s);
+            b.innerHTML = `<span class="stn-num">${s.n}</span><span>${s.name}</span>`;
             list.appendChild(b);
+            const opt = document.createElement('option'); opt.value=s.n; opt.textContent=s.name; alSel.appendChild(opt);
         });
-        
-        if(c==='atc') {
-            const row1 = document.createElement('div'); row1.style.display='flex'; row1.style.gap='6px'; row1.style.marginTop='10px';
-            const lks1 = [{h:'https://skyvector.com/', l:'SKYVECTOR', c:'#2a6496'},{h:'https://www.liveatc.net/', l:'LIVEATC', c:'#2a7a3a'},{h:'https://flightaware.com/', l:'FLIGHTAWARE', c:'#7a3a8a'}];
-            lks1.forEach(l => {
-                const a = document.createElement('a'); a.href=l.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=l.c; a.style.background='rgba(255,255,255,0.03)'; a.textContent=l.l; row1.appendChild(a);
-            });
-            list.appendChild(row1);
-            const row2 = document.createElement('div'); row2.style.display='flex'; row2.style.gap='6px'; row2.style.marginTop='6px';
-            const lks2 = [{h:'https://www.plusoneflyers.org/', l:'PLUS ONE', c:'#b07a20'},{h:'https://my.schedulemaster.com/', l:'SCHEDULE', c:'#206060'}];
-            lks2.forEach(l => {
-                const a = document.createElement('a'); a.href=l.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=l.c; a.style.background='rgba(255,255,255,0.03)'; a.textContent=l.l; row2.appendChild(a);
-            });
-            list.appendChild(row2);
-        }
+        if(c==='atc') buildLinks(list);
     });
-    setInterval(tick, 1000);
+    setInterval(tick, 1000); startViz();
 }
+
+function buildLinks(list) {
+    const r1 = document.createElement('div'); r1.style.display='flex'; r1.style.gap='6px'; r1.style.marginTop='10px';
+    [{h:'https://skyvector.com/', l:'SKYVECTOR', c:'#2a6496'},{h:'https://www.liveatc.net/', l:'LIVEATC', c:'#2a7a3a'},{h:'https://flightaware.com/', l:'FLIGHTAWARE', c:'#7a3a8a'}].forEach(l => {
+        const a = document.createElement('a'); a.href=l.h; a.target='_blank'; a.className='atc-link'; a.style.color=a.style.borderColor=l.c; a.textContent=l.l; r1.appendChild(a);
+    });
+    list.appendChild(r1);
+}
+
+function playStn(s) {
+    stopPlay(); audio.src=s.url; audio.play(); document.getElementById('npStation').textContent=s.name;
+    document.getElementById('stn-'+s.n).classList.add('active'); document.getElementById('sigbars').classList.add('active');
+    document.getElementById('mainBody').classList.add('playing');
+}
+
+function stopPlay() { audio.pause(); document.querySelectorAll('.stn-btn').forEach(b=>b.classList.remove('active')); document.getElementById('sigbars').classList.remove('active'); document.getElementById('mainBody').classList.remove('playing'); }
+function toggleStop() { audio.paused ? audio.play() : audio.pause(); document.getElementById('mainBody').classList.toggle('playing', !audio.paused); document.getElementById('btnStop').innerHTML = audio.paused ? '▶ RESUME' : '■ STOP'; }
 
 function tick() {
     const now = new Date();
     document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
-    document.getElementById('utcDisplay').textContent = now.toISOString().split('T')[1].split('.')[0];
+    document.getElementById('utcDisplay').textContent = now.toISOString().split('T')[1].slice(0,8);
     if(alarmActive && now.toTimeString().slice(0,5) === document.getElementById('alarmTime').value) {
         document.getElementById('wakeOverlay').classList.add('show');
-        document.getElementById('wakeTimeDisplay').textContent = now.toTimeString().slice(0,5);
+        document.getElementById('wakeTimeDisp').textContent = now.toTimeString().slice(0,5);
     }
     if(sleepEnd) {
         const rem = sleepEnd - Date.now();
-        if(rem <= 0) { audio.pause(); sleepEnd = null; document.getElementById('mainBody').classList.remove('playing'); }
-        else document.getElementById('sleepDisp').textContent = Math.floor(rem/60000) + ":" + Math.floor((rem%60000)/1000).toString().padStart(2,'0');
+        if(rem <= 0) { stopPlay(); sleepEnd=null; document.getElementById('sleepDisp').textContent="OFF"; document.getElementById('sleepDisp').classList.add('off'); }
+        else { document.getElementById('sleepDisp').textContent = Math.floor(rem/60000) + ":" + Math.floor((rem%60000)/1000).toString().padStart(2,'0'); document.getElementById('sleepDisp').classList.remove('off'); }
     }
 }
 
-function setSleep(m) { sleepEnd = Date.now() + m*60000; }
-function setAlarm() { alarmActive = true; }
-function wakePlay() { audio.play(); document.getElementById('wakeOverlay').classList.remove('show'); }
-function toggleStop() { if(audio.paused) { audio.play(); document.getElementById('mainBody').classList.add('playing'); } else { audio.pause(); document.getElementById('mainBody').classList.remove('playing'); } }
+function startViz() {
+    const c = document.getElementById('vizCanvas'); const ctx = c.getContext('2d');
+    function draw() {
+        requestAnimationFrame(draw);
+        if(!document.getElementById('panel-viz').classList.contains('active')) return;
+        const w=c.width=c.offsetWidth, h=c.height=c.offsetHeight;
+        ctx.fillStyle='#12121a'; ctx.fillRect(0,0,w,h);
+        const active = !audio.paused; const vol = audio.volume;
+        phase += active ? (0.05 + vol*0.1) : 0.01;
+        if(vizMode==='fft'){
+            for(let i=0; i<32; i++){
+                const v = active ? Math.abs(Math.sin(phase+i*0.2))*h*0.7*vol : 2;
+                ctx.fillStyle = active ? 'var(--accent)' : 'var(--muted)';
+                ctx.fillRect(i*(w/32), h-v, (w/32)-2, v);
+            }
+        } else {
+            ctx.strokeStyle='var(--green)'; ctx.beginPath();
+            for(let x=0; x<w; x++) ctx.lineTo(x, h/2+Math.sin(x*0.05+phase)*(active?30*vol:2));
+            ctx.stroke();
+        }
+    }
+    draw();
+}
+
 function switchTab(id, el) { document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('panel-'+id).classList.add('active'); el.classList.add('active'); }
+function setViz(m, b) { vizMode=m; document.querySelectorAll('#panel-viz .pill').forEach(p=>p.classList.remove('active')); b.classList.add('active'); }
+function setSleep(m) { sleepEnd = Date.now() + m*60000; }
+function clearSleep() { sleepEnd=null; document.getElementById('sleepDisp').textContent="OFF"; }
+function setAlarm() { alarmActive=true; document.getElementById('alarmStat').textContent="SET FOR "+document.getElementById('alarmTime').value; }
+function wakePlay() { audio.play(); document.getElementById('wakeOverlay').classList.remove('show'); }
 
 function loadFiles(fs) {
     const cont = document.getElementById('mp3Tracks'); cont.innerHTML='';
-    Array.from(fs).forEach(f => {
+    Array.from(fs).forEach((f,i) => {
         const b = document.createElement('button'); b.className='stn-btn';
         b.onclick = () => { audio.src=URL.createObjectURL(f); audio.play(); document.getElementById('npStation').textContent=f.name; document.getElementById('mainBody').classList.add('playing'); };
-        b.innerHTML = `<span>${f.name}</span>`; cont.appendChild(b);
+        b.innerHTML = `<span>${i+1}</span><span>${f.name}</span>`; cont.appendChild(b);
     });
 }
 
-// DRIVE LOGIC
 function openGDrive() {
     google.accounts.oauth2.initTokenClient({
         client_id: GDRIVE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.readonly',
-        callback: (resp) => { if(resp.access_token) buildPicker(resp.access_token); }
+        callback: (r) => { if(r.access_token) buildPicker(r.access_token); }
     }).requestAccessToken();
 }
-function buildPicker(token) {
-    const view = new google.picker.DocsView().setMimeTypes('audio/mpeg,audio/mp3').setQuery('mimeType contains "audio"');
-    new google.picker.PickerBuilder().addView(view).setOAuthToken(token).setCallback((d) => {
-        if(d.action == google.picker.Action.PICKED) fetchDrive(d.docs, token);
+function buildPicker(t) {
+    const v = new google.picker.DocsView().setMimeTypes('audio/mpeg,audio/mp3');
+    new google.picker.PickerBuilder().addView(v).setOAuthToken(t).setCallback((d)=>{
+        if(d.action==google.picker.Action.PICKED) fetchDrive(d.docs, t);
     }).build().setVisible(true);
 }
-async function fetchDrive(docs, token) {
-    document.getElementById('gDriveStatus').textContent = "Downloading tracks to local memory...";
-    const cont = document.getElementById('mp3Tracks'); cont.innerHTML = '';
+async function fetchDrive(docs, t) {
+    const cont = document.getElementById('mp3Tracks'); cont.innerHTML='';
     for(const doc of docs) {
-        const r = await fetch(`https://www.googleapis.com/drive/v3/files/${doc.id}?alt=media&acknowledgeAbuse=true`, {headers: {Authorization: `Bearer ${token}`}});
-        const b = await r.blob();
-        const url = URL.createObjectURL(b);
-        const btn = document.createElement('button'); btn.className='stn-btn';
-        btn.onclick = () => { audio.src=url; audio.play(); document.getElementById('npStation').textContent=doc.name; document.getElementById('mainBody').classList.add('playing'); };
-        btn.innerHTML = `<span>${doc.name}</span>`; cont.appendChild(btn);
+        const r = await fetch(`https://www.googleapis.com/drive/v3/files/${doc.id}?alt=media`, {headers: {Authorization: `Bearer ${t}`}});
+        const u = URL.createObjectURL(await r.blob());
+        const b = document.createElement('button'); b.className='stn-btn';
+        b.onclick = () => { audio.src=u; audio.play(); document.getElementById('npStation').textContent=doc.name; document.getElementById('mainBody').classList.add('playing'); };
+        b.innerHTML = `<span>#</span><span>${doc.name}</span>`; cont.appendChild(b);
     }
-    document.getElementById('gDriveStatus').textContent = docs.length + " Drive tracks ready.";
 }
 
 window.addEventListener('load', buildUI);
