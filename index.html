@@ -10,7 +10,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.23</title>
+<title>Radio v2.24</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -177,7 +177,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.23</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.24</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -336,7 +336,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.23 <span style="color:var(--muted);font-size:0.85em">2026-03-24 07:00</span></span>
+        <span style="color:var(--accent)">v2.24 <span style="color:var(--muted);font-size:0.85em">2026-03-24 08:00</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -353,7 +353,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.23 <span style="color:var(--muted);font-size:0.85em">2026-03-24 07:00</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.24 <span style="color:var(--muted);font-size:0.85em">2026-03-24 08:00</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Lock screen audio fix: silent oscillator keeps iOS audio session alive<br>
+        MP3 plays through screen lock (fall asleep use case)<br>
+        Viz debug info shown on canvas for diagnostics<br>
+        Improved playing state detection
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.23 <span style="color:var(--muted);font-size:0.85em">2026-03-24 07:00</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Viz canvas sizing rewritten for iOS<br>
         Uses parent/window width fallback when offsetWidth=0<br>
@@ -457,12 +465,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.23  (2026-03-24)
+//  Version : v2.24  (2026-03-24)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.23 - Viz canvas sizing completely rewritten for iOS
+//  v2.24 - iOS lock screen audio fix: silent 1Hz oscillator keeps audio session alive
+//          MP3 now continues playing when screen locks (sleep timer use case)
+//          Viz debug line added to canvas to diagnose iOS issues
+//          playing detection uses hasSrc instead of !audio.paused (more reliable)
+//  v2.23 - Viz canvas sizing rewritten for iOS
 //          Uses parent/window width as fallback when offsetWidth=0
 //          Sets explicit style px size to override CSS percentage
 //          switchTab fires startSynthViz immediately + at 100/300/600ms
@@ -673,7 +685,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-24 07:00';
+  if (verDate) verDate.textContent = '2026-03-24 08:00';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -773,6 +785,7 @@ function play(station) {
     document.getElementById('sigbars').classList.add('active');
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC feed' : '';
     document.getElementById('seekRow').style.display = 'none'; // no seek for live streams
+    ensureKeepAlive(); // keep iOS audio session alive when screen locks
     updateMediaSession(station.name);
     tryLiveAudio();
   }).catch(() => {
@@ -932,7 +945,16 @@ function startSynthViz() {
     ctx.fillStyle = '#12121a';
     ctx.fillRect(0, 0, W, H);
 
-    const playing = (curIdx >= 0 || mp3CurIdx >= 0) && !audio.paused;
+    // DEBUG line — shows state on canvas so we can diagnose on iPhone
+    ctx.fillStyle = '#4a5060';
+    ctx.font = "9px 'Share Tech Mono'";
+    ctx.textAlign = 'left';
+    ctx.fillText('cur:'+curIdx+' mp3:'+mp3CurIdx+' paused:'+audio.paused+' src:'+(audio.src?'yes':'no'), 4, 10);
+
+    // Consider playing if audio has a src and is not explicitly stopped
+    // Don't rely solely on audio.paused — iOS may briefly show paused while buffering
+    const hasSrc = !!audio.src && audio.src !== window.location.href;
+    const playing = (curIdx >= 0 || mp3CurIdx >= 0) && hasSrc;
     t += 0.04;
 
     if (!playing) {
@@ -1563,6 +1585,7 @@ function playMp3(i) {
     document.getElementById('seekSlider').value = 0;
     document.getElementById('seekCur').textContent = '0:00';
     document.getElementById('seekDur').textContent = '0:00';
+    ensureKeepAlive(); // keep iOS audio session alive when screen locks
     updateMediaSession(t.name);
     tryLiveAudio();
   }).catch(() => {
@@ -1757,30 +1780,62 @@ function setGStatus(msg, color) {
 }
 
 // ============================================================
-//  iOS BACKGROUND AUDIO — keep playing when screen locks / app switches
-//  iOS Safari suspends AudioContext and can interrupt playback when
-//  the page becomes hidden. These handlers resume it automatically.
+//  iOS BACKGROUND AUDIO KEEP-ALIVE
+//  iOS kills audio when screen locks UNLESS the Web Audio session
+//  is kept alive with a continuously running (silent) node.
+//  We create a silent oscillator that runs forever once started.
+//  This tricks iOS into treating the page as an active audio app.
 // ============================================================
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') return; // going to background — nothing to do
-  // Page became visible again — resume AudioContext if suspended
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
+let keepAliveNode = null;
+
+function startKeepAlive() {
+  if (keepAliveNode) return; // already running
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    // Silent gain node — volume 0 so user never hears it
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0.001; // near-zero but not exactly 0 (iOS may optimise out)
+    gainNode.connect(audioCtx.destination);
+
+    // Oscillator at inaudible frequency, runs forever
+    const osc = audioCtx.createOscillator();
+    osc.frequency.value = 1; // 1Hz — completely inaudible
+    osc.connect(gainNode);
+    osc.start();
+    keepAliveNode = osc;
+    console.log('[KeepAlive] Silent oscillator started');
+  } catch(e) {
+    console.warn('[KeepAlive] Failed:', e.message);
   }
-  // If audio was playing before and got interrupted, restart it
+}
+
+// Start keep-alive as soon as user taps play (requires user gesture)
+function ensureKeepAlive() {
+  if (!keepAliveNode) startKeepAlive();
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') return;
+  // Page visible again — resume everything
+  ensureKeepAlive();
   const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
-  if (wasPlaying && audio.paused && audio.src) {
+  const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
+  const userPaused = btnLabel.includes('RESUME');
+  if (wasPlaying && !userPaused && audio.paused && audio.src) {
     audio.play().catch(() => {});
   }
 });
 
-// pageshow fires when returning from bfcache (back/forward navigation on iOS)
 window.addEventListener('pageshow', (e) => {
-  if (!e.persisted) return; // normal load, not from cache
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-  if ((curIdx >= 0 || mp3CurIdx >= 0) && audio.paused && audio.src) {
-    audio.play().catch(() => {});
-  }
+  if (!e.persisted) return;
+  ensureKeepAlive();
+  const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+  if (wasPlaying && audio.paused && audio.src) audio.play().catch(() => {});
 });
 
 window.addEventListener('load', buildUI);
