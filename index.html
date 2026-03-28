@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WolfRadio">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0f">
 <!-- Cache control: forces Safari to recheck on every visit -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.26</title>
+<title>Radio v2.27</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -166,6 +168,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <audio id="audio" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 <div class="toast" id="toast"></div>
 
+<!-- iOS install prompt — only shows in Safari, not when running as PWA -->
+<div id="installBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;
+  background:rgba(18,18,26,0.97);border-top:1px solid var(--amber);padding:10px 14px;
+  font-family:var(--mono);font-size:0.65em;color:var(--amber);align-items:center;gap:10px">
+  <span style="flex:1">📱 Add to Home Screen for background audio (Safari → Share → Add to Home Screen)</span>
+  <span onclick="document.getElementById('installBanner').style.display='none'"
+    style="color:var(--muted);cursor:pointer;font-size:1.2em">✕</span>
+</div>
+
 <!-- ALARM WAKE OVERLAY -->
 <div class="wake-overlay" id="wakeOverlay">
   <div class="wake-label">GOOD MORNING</div>
@@ -177,7 +188,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.26</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.27</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -338,7 +349,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.26 <span style="color:var(--muted);font-size:0.85em">2026-03-27 11:30</span></span>
+        <span style="color:var(--accent)">v2.27 <span style="color:var(--muted);font-size:0.85em">2026-03-27 12:30</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -355,7 +366,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.26 <span style="color:var(--muted);font-size:0.85em">2026-03-27 11:30</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.27 <span style="color:var(--muted);font-size:0.85em">2026-03-27 12:30</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        PWA support: Add to Home Screen = background audio works<br>
+        Install banner shown in Safari with instructions<br>
+        Enhanced viz debug for diagnostics
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.26 <span style="color:var(--muted);font-size:0.85em">2026-03-27 11:30</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Radio viz FIXED: zero-signal detection forces synthetic mode<br>
         MP3 lock screen: silent AudioBuffer loop keeps iOS session alive<br>
@@ -481,12 +499,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.26  (2026-03-27)
+//  Version : v2.27  (2026-03-27)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.26 - Viz radio FIXED: detect zero-signal analyser, fall back to synthetic
+//  v2.27 - PWA: apple-mobile-web-app-title + mobile-web-app-capable added
+//          Install banner: shown in Safari, guides user to Add to Home Screen
+//          Background audio works reliably when installed as PWA (standalone mode)
+//          Viz: added liveAudio + synth/avg debug line for better diagnostics
+//  v2.26 - Radio viz FIXED: zero-signal detection, silent AudioBuffer keep-alive
 //          liveAudio=true no longer blocks synthetic viz on iOS
 //          MP3 lock screen: replaced oscillator with silent AudioBuffer loop
 //          Silent buffer loop counts as media playback — iOS keeps session alive
@@ -707,9 +729,18 @@ function buildUI() {
   setInterval(tickClock, 1000); tickClock();
   startVUMeter();
 
+  // Show "Add to Home Screen" banner if running in Safari (not as installed PWA)
+  // When installed as PWA, navigator.standalone = true and audio survives lock screen
+  const isStandalone = window.navigator.standalone === true;
+  const isSafari = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (isSafari && !isStandalone) {
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'flex';
+  }
+
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-27 11:30';
+  if (verDate) verDate.textContent = '2026-03-27 12:30';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -973,7 +1004,7 @@ function startSynthViz() {
     ctx.fillStyle = '#4a5060';
     ctx.font = "9px 'Share Tech Mono'";
     ctx.textAlign = 'left';
-    ctx.fillText('cur:'+curIdx+' mp3:'+mp3CurIdx+' paused:'+audio.paused+' src:'+(audio.src?'yes':'no'), 4, 10);
+    ctx.fillText('cur:'+curIdx+' mp3:'+mp3CurIdx+' paused:'+audio.paused+' live:'+liveAudio+' src:'+(audio.src?'yes':'no'), 4, 10);
 
     // Consider playing if we have a station/track selected with a source loaded
     // Don't use audio.paused alone — streams show paused=true while buffering
@@ -1047,6 +1078,13 @@ function startSynthViz() {
       bands[i] += (targets[i] - bands[i]) * (bands[i] < targets[i] ? 0.5 : 0.18);
     }
     } // end synthetic
+
+    // Second debug line — shows which mode is active and signal level
+    const avgBand = (bands.reduce((a,b)=>a+b,0)/NUM_BANDS).toFixed(2);
+    ctx.fillStyle = '#4a5060';
+    ctx.font = "9px 'Share Tech Mono'";
+    ctx.textAlign = 'left';
+    ctx.fillText('synth:'+usingSynth+' avg:'+avgBand+' play:'+playing, 4, 20);
 
     // pick current station color theme
     const cat = curIdx >= 0 ? STATIONS[curIdx].cat : 'mp3';
