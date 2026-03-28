@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.27</title>
+<title>Radio v2.28</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -188,7 +188,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.27</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.28</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -349,7 +349,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.27 <span style="color:var(--muted);font-size:0.85em">2026-03-27 12:30</span></span>
+        <span style="color:var(--accent)">v2.28 <span style="color:var(--muted);font-size:0.85em">2026-03-27 14:00</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -366,7 +366,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.27 <span style="color:var(--muted);font-size:0.85em">2026-03-27 12:30</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.28 <span style="color:var(--muted);font-size:0.85em">2026-03-27 14:00</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Keep-alive on separate AudioContext<br>
+        Main audio plays direct through browser<br>
+        Prevents iOS suspending main audio with keep-alive
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.27 <span style="color:var(--muted);font-size:0.85em">2026-03-27 12:30</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         PWA support: Add to Home Screen = background audio works<br>
         Install banner shown in Safari with instructions<br>
@@ -499,12 +506,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.27  (2026-03-27)
+//  Version : v2.28  (2026-03-27)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.27 - PWA: apple-mobile-web-app-title + mobile-web-app-capable added
+//  v2.28 - Keep-alive uses SEPARATE AudioContext from main audio
+//          Main audio element plays direct through browser (not Web Audio graph)
+//          This prevents iOS from suspending main audio when AudioContext suspends
+//          PWA (Add to Home Screen) still required for lock screen audio
+//  v2.27 - PWA install banner + apple-mobile-web-app meta tags
 //          Install banner: shown in Safari, guides user to Add to Home Screen
 //          Background audio works reliably when installed as PWA (standalone mode)
 //          Viz: added liveAudio + synth/avg debug line for better diagnostics
@@ -740,7 +751,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-27 12:30';
+  if (verDate) verDate.textContent = '2026-03-27 14:00';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -1944,46 +1955,53 @@ function setGStatus(msg, color) {
 
 // ============================================================
 //  iOS BACKGROUND AUDIO KEEP-ALIVE
-//  iOS suspends Safari when screen locks unless there is active
-//  media playback. A silent AudioBuffer looping through Web Audio
-//  counts as active media and keeps the session alive.
-//  This allows MP3s to continue playing through screen lock.
+//  IMPORTANT: We use a SEPARATE AudioContext for keep-alive.
+//  The main audio element plays DIRECTLY through the browser
+//  (NOT through Web Audio graph) — this is the most reliable
+//  way to survive screen lock on iOS PWA.
+//  The keep-alive AudioContext runs a silent buffer loop which
+//  keeps the iOS audio session active between track changes.
 // ============================================================
+let keepAliveCtx  = null;
 let keepAliveNode = null;
 let keepAliveBuffer = null;
 
 function startKeepAlive() {
   if (keepAliveNode) return;
   try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    // Dedicated context — NEVER used for main audio playback
+    keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // Create a 2-second silent audio buffer
-    const bufLen = audioCtx.sampleRate * 2;
-    keepAliveBuffer = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
-    // Leave buffer data as zeros = silence
+    const bufLen = keepAliveCtx.sampleRate * 2; // 2-second silent buffer
+    keepAliveBuffer = keepAliveCtx.createBuffer(1, bufLen, keepAliveCtx.sampleRate);
+    // Buffer is all zeros = silence
 
-    const gain = audioCtx.createGain();
-    gain.gain.value = 0.001; // near-zero, inaudible
-    gain.connect(audioCtx.destination);
+    const gain = keepAliveCtx.createGain();
+    gain.gain.value = 0.001;
+    gain.connect(keepAliveCtx.destination);
 
     function loopSilence() {
-      const src = audioCtx.createBufferSource();
+      const src = keepAliveCtx.createBufferSource();
       src.buffer = keepAliveBuffer;
       src.connect(gain);
-      src.onended = loopSilence; // restart when done
+      src.onended = loopSilence;
       src.start();
       keepAliveNode = src;
     }
     loopSilence();
-    console.log('[KeepAlive] Silent buffer loop started');
+    console.log('[KeepAlive] Dedicated silent buffer loop started');
   } catch(e) {
     console.warn('[KeepAlive] Failed:', e.message);
   }
 }
 
 function ensureKeepAlive() {
-  if (!keepAliveNode) startKeepAlive();
+  if (!keepAliveCtx) {
+    startKeepAlive();
+  } else if (keepAliveCtx.state === 'suspended') {
+    keepAliveCtx.resume().catch(()=>{});
+  }
+  // Also resume main audioCtx if it exists
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
 }
 
