@@ -6,15 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WolfRadio">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0f">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Radio v2.29</title>
+<title>Radio v2.30</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js" async defer></script>
 <style>
 :root {
   --bg:#0a0a0f; --surface:#12121a; --border:#1e1e2e;
@@ -23,189 +17,111 @@
   --mono:'Share Tech Mono',monospace; --sans:'Barlow Condensed',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
 
-/* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
-.header-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.logo{font-family:var(--mono);font-size:1em;color:var(--accent);letter-spacing:3px}
-.clock-display{font-family:var(--mono);font-size:1.3em;color:var(--green);margin-left:auto;letter-spacing:2px}
-.sigbars{display:flex;gap:2px;align-items:flex-end;height:14px}
-.sigbars span{width:3px;border-radius:1px;background:var(--muted);transition:background 0.3s}
-.sigbars span:nth-child(1){height:4px}.sigbars span:nth-child(2){height:7px}
-.sigbars span:nth-child(3){height:10px}.sigbars span:nth-child(4){height:14px}
-.sigbars.active span{background:var(--green);box-shadow:0 0 4px var(--green)}
-.now-playing{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px}
-.np-station{font-weight:700;font-size:1em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.np-station.idle{color:var(--muted);font-weight:300}
-.np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
-.btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);
-  font-family:var(--mono);font-size:0.68em;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer}
-.btn-stop:active{background:rgba(255,68,102,0.3)}
-.vol-wrap{flex:1;display:flex;align-items:center;gap:6px}
-.vol-icon{font-size:0.85em;color:var(--muted)}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-  background:var(--accent);box-shadow:0 0 8px var(--accent);cursor:pointer}
-.vol-val{font-family:var(--mono);font-size:0.68em;color:var(--muted);width:28px;text-align:right}
-.vu-wrap{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
-.vu-bar{flex:1;border-radius:1px;background:var(--border);transition:height 0.08s;min-height:2px}
+/* HEADER & NAV */
+header{background:rgba(10,10,15,0.96); border-bottom:1px solid var(--border); padding:10px 14px}
+.header-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+.logo{font-family:var(--mono); font-size:1em; color:var(--accent); letter-spacing:2px}
+.clock-display{font-family:var(--mono); font-size:1.2em; color:var(--green)}
+.now-playing{background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 12px}
+.np-station{font-weight:700; font-size:1em; color:#fff}
+.np-controls{display:flex; align-items:center; gap:10px; margin-top:8px}
+.btn-stop{background:rgba(255,68,102,0.15); border:1px solid var(--red); color:var(--red); padding:4px 12px; border-radius:4px; font-family:var(--mono); font-size:0.7em}
 
-/* TABS */
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg);
-  position:sticky;top:0;z-index:90}
-.tab{flex:1;padding:10px 4px;font-family:var(--mono);font-size:0.6em;letter-spacing:1px;
-  text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs{display:flex; border-bottom:1px solid var(--border)}
+.tab{flex:1; padding:12px; text-align:center; font-family:var(--mono); font-size:0.7em; color:var(--muted); cursor:pointer}
+.tab.active{color:var(--accent); border-bottom:2px solid var(--accent)}
 
 /* PANELS */
-.panel{display:none;padding:10px 12px 80px}
+.panel{display:none; height:calc(100vh - 180px); overflow-y:auto; padding:12px}
 .panel.active{display:block}
 
-/* VISUALIZER */
-#vizCanvas{width:100%;height:150px;border-radius:6px;background:var(--surface);
-  border:1px solid var(--border);display:block;cursor:pointer}
-.viz-controls{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.viz-btn{font-family:var(--mono);font-size:0.65em;letter-spacing:1px;padding:5px 10px;
-  border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
-.viz-btn.active{border-color:var(--accent);color:var(--accent)}
+/* STATIONS */
+.section-label{font-family:var(--mono); font-size:0.65em; color:var(--muted); padding:10px 0 5px; border-bottom:1px solid var(--border); margin-bottom:8px; letter-spacing:2px}
+.stn-btn{display:flex; align-items:center; width:100%; padding:12px; margin-bottom:6px; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--text); text-align:left}
+.stn-btn.active{border-color:var(--accent); background:rgba(0,212,255,0.05)}
+.stn-num{font-family:var(--mono); font-size:0.7em; color:var(--muted); width:25px}
 
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
-.card-title{font-family:var(--mono);font-size:0.65em;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
-.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.pill{font-family:var(--mono);font-size:0.7em;padding:6px 12px;border:1px solid var(--border);
-  border-radius:20px;background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s}
-.pill:active{transform:scale(0.95)}
-.pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
-.pill.danger{border-color:var(--red);color:var(--red)}
-.pill.ok{border-color:var(--green);color:var(--green)}
-.countdown{font-family:var(--mono);font-size:2em;color:var(--green);text-align:center;
-  padding:10px 0;letter-spacing:4px}
-.countdown.off{color:var(--muted);font-size:1em;padding:6px 0}
+/* CARDS & PILLS */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px}
+.card-title{font-family:var(--mono); font-size:0.65em; color:var(--muted); margin-bottom:10px; letter-spacing:1px}
+.pill-row{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
+.pill{font-family:var(--mono); font-size:0.75em; padding:8px 16px; border:1px solid var(--border); border-radius:20px; background:var(--bg); color:var(--muted); cursor:pointer}
+.pill.active{border-color:var(--amber); color:var(--amber)}
+.countdown{font-family:var(--mono); font-size:2.5em; color:var(--green); text-align:center; padding:10px 0}
 
-/* STATIONS & LISTS */
-.stn-btn{display:flex;align-items:center;width:100%;padding:10px 12px;margin-bottom:4px;
-  background:var(--surface);border:1px solid var(--border);border-radius:6px;
-  cursor:pointer;text-align:left;gap:10px;position:relative;overflow:hidden}
-.stn-btn.active{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)}
-.stn-name{font-family:var(--sans);font-size:0.92em;font-weight:500;color:var(--text);flex:1}
-.stn-num{font-family:var(--mono);font-size:0.62em;color:var(--muted);min-width:20px}
+/* AVIATION LINKS */
+.link-grid{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px}
+.av-link{display:flex; flex-direction:column; align-items:center; padding:8px; border-radius:6px; border:1px solid #333; text-decoration:none; color:var(--text); font-size:0.6em; font-family:var(--mono); background:rgba(255,255,255,0.02)}
 
-/* ALARM WAKE OVERLAY */
-.wake-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(5,5,10,0.97);
-  flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  animation:fadeIn 0.5s}
-.wake-overlay.show{display:flex}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.wake-time{font-family:var(--mono);font-size:3.5em;color:var(--green);letter-spacing:6px;
-  text-shadow:0 0 30px var(--green)}
-.wake-btn{background:var(--green);color:#000;font-family:var(--mono);font-size:1em;
-  letter-spacing:2px;border:none;border-radius:8px;padding:18px 40px;cursor:pointer;
-  animation:glow 1.5s ease-in-out infinite}
-@keyframes glow{0%,100%{box-shadow:0 0 20px var(--green)}50%{box-shadow:0 0 50px var(--green)}}
-
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:rgba(30,30,46,0.95);border:1px solid var(--border);color:var(--text);
-  font-family:var(--mono);font-size:0.72em;padding:8px 16px;border-radius:6px;
-  transition:transform 0.3s;z-index:500}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:var(--green);color:var(--green)}
+canvas{width:100%; height:150px; background:var(--surface); border-radius:6px; border:1px solid var(--border)}
 </style>
 </head>
 <body>
 
-<audio id="audio" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
-<div class="toast" id="toast"></div>
-
-<div class="wake-overlay" id="wakeOverlay">
-  <div class="wake-time" id="wakeTime">00:00</div>
-  <div class="wake-station" id="wakeStation" style="color:var(--muted);font-family:var(--mono)">ALARM</div>
-  <button class="wake-btn" onclick="wakePlay()">&#9654; PLAY</button>
-  <div onclick="wakeDismiss()" style="margin-top:20px;color:var(--muted);font-family:var(--mono);cursor:pointer">DISMISS</div>
-</div>
+<audio id="audio" playsinline></audio>
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="color:var(--accent)">v2.29</span></div>
-    <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end">
-      <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted)"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
-    </div>
+    <div class="logo">WOLF-RADIO <span style="font-size:0.7em; color:var(--muted)">v2.30</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
   </div>
   <div class="now-playing">
-    <div class="np-station idle" id="npStation">Select a station</div>
-    <div class="np-meta" id="npMeta">&nbsp;</div>
+    <div class="np-station" id="npStation">Idle</div>
     <div class="np-controls">
-      <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
-      <div class="vol-wrap">
-        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8" oninput="setVolume(this.value)">
-        <span class="vol-val" id="volVal">80</span>
-      </div>
+      <button class="btn-stop" onclick="toggleStop()">STOP / PLAY</button>
+      <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.7" style="flex:1" oninput="setVolume(this.value)">
     </div>
-    <div class="vu-wrap" id="vuWrap"></div>
   </div>
 </header>
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
-  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
   <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
-  <div class="tab" onclick="switchTab('info',this)">INFO</div>
+  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
 </div>
 
 <div class="panel active" id="panel-stations">
-  <div id="stationList"></div>
-</div>
-
-<div class="panel" id="panel-viz">
-  <canvas id="vizCanvas"></canvas>
-  <div class="viz-controls">
-    <button class="viz-btn active" onclick="setVizMode('fft',this)">FFT</button>
-    <button class="viz-btn" onclick="setVizMode('scope',this)">SCOPE</button>
-    <button class="viz-btn" onclick="setVizMode('aurora',this)">AURORA</button>
+  <div class="section-label">GERMAN RADIO</div>
+  <div id="list-german"></div>
+  
+  <div class="section-label">MUSIC</div>
+  <div id="list-music"></div>
+  
+  <div class="section-label">ATC - SAN DIEGO AREA</div>
+  <div id="list-atc"></div>
+  
+  <div class="section-label">PILOT TOOLS</div>
+  <div class="link-grid">
+    <a href="https://skyvector.com/" target="_blank" class="av-link">🗺️ SKYVECTOR</a>
+    <a href="https://www.liveatc.net/" target="_blank" class="av-link">📡 LIVEATC</a>
+    <a href="https://flightaware.com/" target="_blank" class="av-link">🛫 F-AWARE</a>
+    <a href="https://www.plusoneflyers.org/" target="_blank" class="av-link">🏅 PLUS ONE</a>
+    <a href="https://my.schedulemaster.com/" target="_blank" class="av-link">📅 SCHED-M</a>
   </div>
 </div>
 
 <div class="panel" id="panel-timer">
   <div class="card">
     <div class="card-title">EGG TIMER</div>
-    <div class="pill-row" style="justify-content:center">
-      <div class="pill active" onclick="setEggTimer(6)" style="border-color:var(--amber); color:var(--amber); padding:10px 20px;">🥚 START 6 MIN EGG</div>
-    </div>
-    <div class="countdown off" id="eggCountdown">00:00</div>
-    <div class="pill-row" style="justify-content:center; margin-top:6px">
-      <div class="pill danger" id="stopEggBtn" onclick="stopEggTimer()" style="display:none">STOP ALARM</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">SLEEP TIMER</div>
     <div class="pill-row">
-      <div class="pill" onclick="setSleep(15)">15 min</div>
-      <div class="pill" onclick="setSleep(30)">30 min</div>
-      <div class="pill" onclick="setSleep(60)">60 min</div>
+      <div class="pill active" onclick="setEggTimer(6)">🥚 START 6 MIN EGG</div>
     </div>
-    <div class="countdown off" id="sleepCountdown">NO TIMER SET</div>
-    <div class="pill-row" style="justify-content:center;margin-top:6px">
-      <div class="pill danger" onclick="clearSleep()">CANCEL</div>
+    <div class="countdown" id="eggCountdown">00:00</div>
+    <div class="pill-row">
+      <div class="pill" id="stopEggBtn" style="display:none; border-color:var(--red); color:var(--red)" onclick="stopEggTimer()">STOP ALARM</div>
     </div>
   </div>
 </div>
 
-<div class="panel" id="panel-info">
-  <div class="card">
-    <div class="card-title">CHANGELOG</div>
-    <div style="font-family:var(--mono);font-size:0.7em;line-height:1.8em">
-      <span style="color:var(--accent)">v2.29</span>: Added 6min Egg Timer with audio beeper.<br>
-      <span style="color:var(--accent)">v2.28</span>: Keep-alive iOS background audio fix.
-    </div>
+<div class="panel" id="panel-viz">
+  <canvas id="vizCanvas"></canvas>
+  <div class="section-label">MODES</div>
+  <div class="pill-row">
+    <div class="pill active" onclick="setViz('fft')">FFT</div>
+    <div class="pill" onclick="setViz('scope')">SCOPE</div>
+    <div class="pill" onclick="setViz('aurora')">AURORA</div>
   </div>
 </div>
 
@@ -213,135 +129,84 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 const STATIONS = [
   {n:1, name:"181.FM Awesome 80s", url:"http://listen.181fm.com/181-awesome80s_128k.mp3", cat:"music"},
   {n:2, name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3", cat:"music"},
-  {n:3, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"}
+  {n:3, name:"Antenne Bayern", url:"http://stream.antenne.de/antenne/stream/mp3", cat:"german"},
+  {n:4, name:"SWR3", url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3", cat:"german"},
+  {n:5, name:"KMYF Tower", url:"http://d.liveatc.net/kmyf1_twr", cat:"atc"},
+  {n:6, name:"KMYF Ground", url:"http://d.liveatc.net/ksan_kmyf_gnd", cat:"atc"},
+  {n:7, name:"KMYF ATIS", url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis", cat:"atc"},
+  {n:8, name:"KSAN Tower", url:"http://d.liveatc.net/ksan1_twr", cat:"atc"},
+  {n:9, name:"KSAN Ground", url:"http://d.liveatc.net/ksan1_gnd", cat:"atc"},
+  {n:10, name:"SoCal Approach (Del Mar)", url:"http://d.liveatc.net/ksan_app_delmar", cat:"atc"}
 ];
 
 const audio = document.getElementById('audio');
-let curIdx = -1, vizMode = 'fft', audioCtx = null, analyser = null, waSource = null, liveAudio = false;
-let sleepEnd = null, eggEnd = null, eggInterval = null, beepInterval = null;
+let eggEnd = null, eggInterval = null, beepInterval = null;
 
-function buildUI() {
-  const list = document.getElementById('stationList');
+function init() {
   STATIONS.forEach(s => {
-    const b = document.createElement('button');
-    b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
-    b.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span>`;
-    list.appendChild(b);
+    const btn = document.createElement('button');
+    btn.className = 'stn-btn';
+    btn.onclick = () => playStn(s);
+    btn.innerHTML = `<span class="stn-num">${s.n}</span><span class="stn-name">${s.name}</span>`;
+    document.getElementById('list-' + s.cat).appendChild(btn);
   });
-  const vu = document.getElementById('vuWrap');
-  for (let i = 0; i < 20; i++) { const b = document.createElement('div'); b.className = 'vu-bar'; vu.appendChild(b); }
-  setInterval(tickClock, 1000); tickClock(); startVUMeter();
+  setInterval(updateClock, 1000);
 }
 
-function tickClock() {
+function playStn(s) {
+  audio.src = s.url;
+  audio.play();
+  document.getElementById('npStation').textContent = s.name;
+  document.querySelectorAll('.stn-btn').forEach(b => b.classList.remove('active'));
+}
+
+function updateClock() {
   const now = new Date();
   document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
-  document.getElementById('utcDisplay').textContent = now.toISOString().split('T')[1].split('.')[0];
-  if (sleepEnd && Date.now() >= sleepEnd) { stopPlay(); sleepEnd = null; document.getElementById('sleepCountdown').textContent = "OFF"; }
-  if (sleepEnd) {
-    const rem = Math.floor((sleepEnd - Date.now()) / 1000);
-    document.getElementById('sleepCountdown').textContent = Math.floor(rem/60) + ":" + String(rem%60).padStart(2,'0');
-  }
 }
 
-function play(station) {
-  if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
-  curIdx = STATIONS.indexOf(station);
-  document.getElementById('npStation').textContent = station.name;
-  document.getElementById('npStation').classList.remove('idle');
-  document.getElementById('stn-'+station.n)?.classList.add('active');
-  audio.src = station.url; audio.play().catch(()=>{});
-  ensureAudioCtx();
-}
-
-function toggleStop() { if (audio.paused) audio.play(); else audio.pause(); }
-function setVolume(v) { audio.volume = v; document.getElementById('volVal').textContent = Math.round(v*100); }
 function switchTab(id, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active'); el.classList.add('active');
-  if (id === 'viz') startSynthViz();
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
 }
 
-// EGG TIMER LOGIC
-function setEggTimer(minutes) {
+function setVolume(v) { audio.volume = v; }
+function toggleStop() { audio.paused ? audio.play() : audio.pause(); }
+
+// EGG TIMER
+function setEggTimer(m) {
   stopEggTimer();
-  eggEnd = Date.now() + (minutes * 60 * 1000);
-  document.getElementById('eggCountdown').classList.remove('off');
-  showToast('Egg Timer: 6 min set', 'ok');
-  eggInterval = setInterval(updateEggDisplay, 500);
+  eggEnd = Date.now() + (m * 60 * 1000);
+  eggInterval = setInterval(() => {
+    const rem = eggEnd - Date.now();
+    if (rem <= 0) { triggerAlarm(); return; }
+    const min = Math.floor(rem/60000), sec = Math.floor((rem%60000)/1000);
+    document.getElementById('eggCountdown').textContent = `${min}:${String(sec).padStart(2,'0')}`;
+  }, 500);
 }
 
-function updateEggDisplay() {
-  const rem = eggEnd - Date.now();
-  const el = document.getElementById('eggCountdown');
-  if (rem <= 0) { el.textContent = "00:00"; el.style.color = "var(--red)"; triggerEggAlarm(); return; }
-  const m = Math.floor(rem / 60000), s = Math.floor((rem % 60000) / 1000);
-  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-  el.style.color = rem < 60000 ? "var(--red)" : "var(--green)";
-}
-
-function triggerEggAlarm() {
+function triggerAlarm() {
   clearInterval(eggInterval);
   document.getElementById('stopEggBtn').style.display = 'block';
-  ensureAudioCtx();
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
   beepInterval = setInterval(() => {
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-    osc.type = 'square'; osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-    if (navigator.vibrate) navigator.vibrate(200);
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = 'square'; o.frequency.value = 880;
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + 0.5);
   }, 1000);
 }
 
 function stopEggTimer() {
-  clearInterval(eggInterval); clearInterval(beepInterval); eggEnd = null;
-  const el = document.getElementById('eggCountdown');
-  el.textContent = "00:00"; el.classList.add('off'); el.style.color = "";
+  clearInterval(eggInterval); clearInterval(beepInterval);
+  document.getElementById('eggCountdown').textContent = "00:00";
   document.getElementById('stopEggBtn').style.display = 'none';
 }
 
-function setSleep(min) { sleepEnd = Date.now() + min * 60000; document.getElementById('sleepCountdown').classList.remove('off'); }
-function clearSleep() { sleepEnd = null; document.getElementById('sleepCountdown').classList.add('off'); }
-
-function ensureAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-function showToast(m, t) {
-  const el = document.getElementById('toast'); el.textContent = m; el.className = 'toast show ' + t;
-  setTimeout(() => el.classList.remove('show'), 3000);
-}
-
-function startVUMeter() {
-  const bars = document.querySelectorAll('.vu-bar');
-  function tick() {
-    requestAnimationFrame(tick);
-    const level = audio.paused ? 0 : 0.3 + Math.random() * 0.4;
-    bars.forEach((b, i) => { b.style.height = (i/bars.length < level) ? (2 + Math.random()*15)+'px' : '2px'; });
-  }
-  tick();
-}
-
-function startSynthViz() {
-  const canvas = document.getElementById('vizCanvas'); const ctx = canvas.getContext('2d');
-  function draw() {
-    requestAnimationFrame(draw);
-    ctx.fillStyle = '#12121a'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.strokeStyle = 'var(--accent)'; ctx.beginPath();
-    for(let i=0; i<canvas.width; i++){
-      const y = 75 + Math.sin(i*0.05 + Date.now()*0.005) * 20;
-      i===0 ? ctx.moveTo(i,y) : ctx.lineTo(i,y);
-    }
-    ctx.stroke();
-  }
-  draw();
-}
-
-window.onload = buildUI;
+init();
 </script>
 </body>
 </html>
