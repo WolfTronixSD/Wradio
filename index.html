@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.31</title>
+<title>Radio v2.33</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -50,9 +50,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
 .btn-stop:active{background:rgba(255,68,102,0.3)}
 .vol-wrap{flex:1;display:flex;align-items:center;gap:6px}
 .vol-icon{font-size:0.85em;color:var(--muted)}
-input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
   background:var(--accent);box-shadow:0 0 8px var(--accent);cursor:pointer}
+/* Seek bar specifically bigger */
+#seekSlider{height:5px}
+#seekSlider::-webkit-slider-thumb{width:26px;height:26px}
 .vol-val{font-family:var(--mono);font-size:0.68em;color:var(--muted);width:28px;text-align:right}
 .vu-wrap{display:flex;gap:2px;align-items:flex-end;height:18px;margin-top:6px}
 .vu-bar{flex:1;border-radius:1px;background:var(--border);transition:height 0.08s;min-height:2px}
@@ -198,7 +201,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <header>
   <div class="header-top">
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.31</span></div>
+      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.33</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.85em;color:var(--text);letter-spacing:2px;padding-left:2px"></div>
     </div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
@@ -372,7 +375,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.31 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
+        <span style="color:var(--accent)">v2.33 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -389,7 +392,20 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.31 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.33 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay wireless stutter fix<br>
+        Smart reconnect with exponential backoff<br>
+        Buffer freeze detector (every 8s)
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.32 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Viz iOS FIXED: isPlaying flag, activates instantly on tap<br>
+        KSMO stations removed<br>
+        Seek slider bigger (easier to grab on phone)<br>
+        Faster start: audio.load() removed from MP3
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.31 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Viz radio FIXED: synthetic always runs for stations<br>
         Faster station start: removed audio.load() delay<br>
@@ -551,12 +567,22 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.31  (2026-04-03)
+//  Version : v2.33  (2026-04-03)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.31 - Viz radio FIXED: synthetic always runs for streams, no CORS attempt
+//  v2.33 - CarPlay/wireless stutter fix: smart reconnect with exponential backoff
+//          Buffer freeze monitor: detects frozen playback every 8s and reconnects
+//          stalled/error events now trigger clean reconnect instead of hanging
+//          Reconnect resets on successful play, max 16s between retries
+//  v2.32 - isPlaying flag fixes viz on iOS, KSMO removed, seek slider bigger
+//          Viz iOS FIXED: no longer relies on audio.paused or hasSrc check
+//          KSMO stations removed
+//          Seek slider bigger (26px thumb, 5px track)
+//          Removed audio.load() from playMp3() for faster start
+//          crossorigin cleared before each src change to avoid stale CORS
+//  v2.31 - Viz radio synthetic always, faster playback, date/UTC header
 //          Radio plays faster: removed audio.load(), direct play() on src change
 //          Header: date bigger + white, UTC orange same size as local clock
 //          Timezone label auto-detects (PDT/PST/EST etc.)
@@ -660,10 +686,6 @@ const STATIONS = [
   {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
   {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
   {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
-  // --- ATC Santa Monica (KSMO) ---
-  {n:23, name:"KSMO ATIS",            url:"http://d.liveatc.net/ksmo2_atis",                                         cat:"atc"},
-  {n:24, name:"KSMO Tower",           url:"http://d.liveatc.net/ksmo2_s",                                            cat:"atc"},
-  {n:25, name:"KSMO Ground",          url:"http://d.liveatc.net/ksmo2_gnd",                                          cat:"atc"},
 ];
 
 // ============================================================
@@ -671,10 +693,11 @@ const STATIONS = [
 //  All runtime variables — reset on page reload
 // ============================================================
 const audio = document.getElementById('audio');
-let curIdx   = -1;   // index into STATIONS array (-1 = nothing playing)
-let vizMode  = 'fft';
-let vizRAF   = null; // requestAnimationFrame handle for visualizer
-let vuRAF    = null; // requestAnimationFrame handle for VU meter
+let curIdx    = -1;      // index into STATIONS array (-1 = nothing playing)
+let vizMode   = 'fft';
+let vizRAF    = null;    // requestAnimationFrame handle for visualizer
+let vuRAF     = null;    // requestAnimationFrame handle for VU meter
+let isPlaying = false;   // explicit flag set by play()/stop() — more reliable than audio.paused on iOS
 
 // Web Audio API — connected once on first play, never disconnected
 // createMediaElementSource() can only be called ONCE per audio element
@@ -894,57 +917,66 @@ function switchTab(id, el) {
 //  PLAYBACK
 // ============================================================
 function play(station) {
+  // Deactivate previous station button
   if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
+  // Clear any pending reconnect from previous station
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  reconnectDelay = 3000;
+  // Deactivate MP3 if switching from it
+  if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
+
   curIdx = STATIONS.indexOf(station);
+  isPlaying = true; // set BEFORE play() so viz activates immediately
+
+  // Update UI instantly — don't wait for audio to start
   document.getElementById('npStation').textContent = station.name;
   document.getElementById('npStation').classList.remove('idle');
   document.getElementById('npMeta').textContent = 'Connecting...';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('stn-'+station.n)?.classList.add('active');
   document.getElementById('seekRow').style.display = 'none';
+  document.getElementById('btnStop').innerHTML = '&#9632; STOP';
 
+  // Speed optimization: set src then immediately call play() — no load()
   audio.pause();
+  audio.removeAttribute('crossorigin'); // clear first to avoid CORS stale state
   audio.crossOrigin = 'anonymous';
-  audio.preload = 'none'; // don't buffer ahead — start immediately
+  audio.preload = 'none';
   audio.src = station.url;
   audio.volume = parseFloat(document.getElementById('volSlider').value);
-  // Don't call audio.load() — src change + play() is faster for live streams
-  const playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      document.getElementById('sigbars').classList.add('active');
-      document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
-      ensureKeepAlive();
-      updateMediaSession(station.name);
-      tryLiveAudio();
-    }).catch(() => {
-      document.getElementById('npMeta').textContent = 'Tap to play';
-    });
-  }
+
+  audio.play().then(() => {
+    document.getElementById('sigbars').classList.add('active');
+    document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
+    ensureKeepAlive();
+    updateMediaSession(station.name);
+    // Don't call tryLiveAudio for streams — CORS blocks it on iOS, wastes time
+  }).catch((e) => {
+    console.warn('[play] Failed:', e.message);
+    document.getElementById('npMeta').textContent = 'Tap to retry';
+    isPlaying = false;
+  });
 }
 
 function toggleStop() {
-  // Both MP3 and streams: pause/resume
-  // Streams resume from same position (live = reconnects), MP3 keeps exact position
-  if (!audio.paused && (curIdx >= 0 || mp3CurIdx >= 0)) {
-    // Currently playing — pause
+  if (isPlaying && !audio.paused) {
+    // Pause
     audio.pause();
+    isPlaying = false;
     document.getElementById('sigbars').classList.remove('active');
     document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
-  } else if (audio.paused && audio.src) {
-    // Currently paused — resume
+  } else if (!isPlaying && audio.src) {
+    // Resume
+    isPlaying = true;
     audio.play().then(() => {
       document.getElementById('sigbars').classList.add('active');
       document.getElementById('btnStop').innerHTML = '&#9632; STOP';
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     }).catch(() => {
-      // Stream may have gone stale — reload it
-      if (curIdx >= 0) {
-        audio.src = STATIONS[curIdx].url;
-        audio.load();
-        audio.play().catch(()=>{});
-      }
+      isPlaying = false;
+      // Stale stream — reload
+      if (curIdx >= 0) { audio.src = STATIONS[curIdx].url; audio.play().catch(()=>{}); }
     });
   } else {
     stopPlay();
@@ -952,10 +984,11 @@ function toggleStop() {
 }
 
 function stopPlay() {
-  // NOTE: never disconnect waSource - createMediaElementSource is permanent
-  // Just pause and clear src; Web Audio graph stays intact for next station
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  audio.pause(); audio.src = '';
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  reconnectDelay = 3000;
+  audio.pause();
+  audio.src = '';
+  isPlaying = false;
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
   document.getElementById('npStation').textContent = 'Select a station';
@@ -1075,8 +1108,8 @@ function startSynthViz() {
     ctx.fillStyle = '#12121a';
     ctx.fillRect(0, 0, W, H);
 
-    const hasSrc = !!audio.src && audio.src !== window.location.href;
-    const playing = (curIdx >= 0 || mp3CurIdx >= 0) && hasSrc;
+    // Use explicit isPlaying flag — more reliable than audio.paused on iOS
+    const playing = isPlaying;
     t += 0.04;
 
     if (!playing) {
@@ -1748,31 +1781,79 @@ function wakeDismiss() {
 }
 
 // ============================================================
-//  AUDIO EVENTS
+//  AUDIO EVENTS — with CarPlay/wireless stutter recovery
 // ============================================================
+
+// Reconnect state — exponential backoff so we don't hammer the server
+let reconnectTimer   = null;
+let reconnectDelay   = 3000;  // ms, doubles on each retry up to max
+const RECONNECT_MAX  = 16000; // max delay between retries
+
+function scheduleReconnect(reason) {
+  if (curIdx < 0 || reconnectTimer) return; // only for stations, not MP3
+  document.getElementById('npMeta').textContent = reason + ' — retrying...';
+  document.getElementById('sigbars').classList.remove('active');
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    if (curIdx >= 0 && isPlaying) {
+      // Reconnect: set src fresh — clears any stale TCP connection
+      const url = STATIONS[curIdx].url;
+      audio.src = '';
+      audio.src = url;
+      audio.play().then(() => {
+        reconnectDelay = 3000; // reset on success
+      }).catch(() => {
+        reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX);
+        scheduleReconnect('Failed');
+      });
+    }
+  }, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 1.5, RECONNECT_MAX);
+}
+
 audio.addEventListener('waiting', () => {
   document.getElementById('npMeta').textContent = 'Buffering...';
   document.getElementById('sigbars').classList.remove('active');
 });
+
 audio.addEventListener('playing', () => {
+  // Clear any pending reconnect — stream recovered
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  reconnectDelay = 3000; // reset backoff
   document.getElementById('sigbars').classList.add('active');
-  if (curIdx >= 0 && document.getElementById('npMeta').textContent === 'Buffering...')
-    document.getElementById('npMeta').textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC feed' : '';
+  if (curIdx >= 0 && document.getElementById('npMeta').textContent !== 'Live ATC')
+    document.getElementById('npMeta').textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC' : '';
 });
-audio.addEventListener('error', () => {
-  document.getElementById('npMeta').textContent = 'Stream error';
-  document.getElementById('sigbars').classList.remove('active');
-  showToast('Stream failed', 'error');
+
+audio.addEventListener('error', (e) => {
+  if (curIdx < 0) return; // ignore errors after stop
+  console.warn('[Audio] Error:', e);
+  scheduleReconnect('Stream error');
+  showToast('Reconnecting...', '');
 });
+
 audio.addEventListener('stalled', () => {
-  document.getElementById('npMeta').textContent = 'Reconnecting...';
-  setTimeout(() => {
-    if (curIdx >= 0) {
-      audio.src = STATIONS[curIdx].url;
-      audio.play().catch(()=>{});
-    }
-  }, 4000);
+  // Stalled = no data arriving — common on wireless/CarPlay
+  // Don't wait — reconnect immediately with fresh connection
+  if (curIdx < 0 || !isPlaying) return;
+  console.log('[Audio] Stalled — reconnecting');
+  scheduleReconnect('Stalled');
 });
+
+// Buffer monitoring — detects frozen playback even when browser doesn't fire stalled
+// Checks every 8s if currentTime has advanced; if not, reconnects
+let lastTime = 0, lastTimeCheck = 0;
+setInterval(() => {
+  if (curIdx < 0 || !isPlaying || audio.paused || reconnectTimer) return;
+  const now = Date.now();
+  if (now - lastTimeCheck < 7000) return;
+  lastTimeCheck = now;
+  if (audio.currentTime === lastTime && audio.readyState < 3) {
+    console.log('[Buffer] Frozen — reconnecting');
+    scheduleReconnect('Buffering');
+  }
+  lastTime = audio.currentTime;
+}, 2000);
 
 function updateMediaSession(name, artist) {
   if (!('mediaSession' in navigator)) return;
@@ -1882,35 +1963,33 @@ function escHtml(s) {
 }
 
 function playMp3(i) {
-  // deactivate stream station if any
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
-  // deactivate old mp3 track
   if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
   mp3CurIdx = i;
+  isPlaying = true; // set immediately so viz activates
   const t = mp3Tracks[i];
   document.getElementById('mp3-'+i)?.classList.add('active');
   document.getElementById('npStation').textContent = t.name;
   document.getElementById('npStation').classList.remove('idle');
   document.getElementById('npMeta').textContent = 'Local MP3';
   document.getElementById('sigbars').classList.remove('active');
+  document.getElementById('btnStop').innerHTML = '&#9632; STOP';
   audio.pause();
-  // Blob URLs don't need crossorigin — removing it prevents iOS CORS errors
-  audio.removeAttribute('crossorigin');
+  audio.removeAttribute('crossorigin'); // blob URLs don't need CORS
   audio.src = t.url;
-  audio.load();
+  // audio.load() not needed for blob URLs — play() starts faster without it
   audio.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
-    document.getElementById('btnStop').innerHTML = '&#9632; STOP';
-    // Show seek bar for MP3
     const seekRow = document.getElementById('seekRow');
     seekRow.style.display = 'flex';
     document.getElementById('seekSlider').value = 0;
     document.getElementById('seekCur').textContent = '0:00';
     document.getElementById('seekDur').textContent = '0:00';
-    ensureKeepAlive(); // keep iOS audio session alive when screen locks
+    ensureKeepAlive();
     updateMediaSession(t.name);
-    tryLiveAudio();
+    tryLiveAudio(); // MP3 blob URLs work with Web Audio — real FFT possible
   }).catch(() => {
+    isPlaying = false;
     document.getElementById('npMeta').textContent = 'Tap again to play';
   });
 }
