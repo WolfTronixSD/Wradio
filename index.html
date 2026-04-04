@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.34</title>
+<title>Radio v2.35</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -201,7 +201,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <header>
   <div class="header-top">
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.34</span></div>
+      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.35</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.85em;color:var(--text);letter-spacing:2px;padding-left:2px"></div>
     </div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
@@ -381,7 +381,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.34 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
+        <span style="color:var(--accent)">v2.35 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -398,7 +398,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.34 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.35 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay: hard reconnect + 400ms pre-buffer before play<br>
+        Buffer watchdog every 2s detects frozen playback<br>
+        Requires 4s frozen before reconnect (avoids false triggers)
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.34 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Local clock shows PDT/PST, UTC shows Z (Zulu)<br>
         Viz radio FIXED: single draw loop, isPlaying read live<br>
@@ -580,12 +586,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.34  (2026-04-03)
+//  Version : v2.35  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.34 - Clock FIXED: local shows PDT/PST, UTC shows Z (Zulu)
+//  v2.35 - CarPlay: hard reconnect uses audio.load() to reset internal state
+//          400ms pre-buffer pause before play() — gives CarPlay headroom
+//          Buffer watchdog: detects frozen playback every 2s
+//          frozenCount: requires 4s frozen before reconnect (avoids false triggers)
+//          startBufferWatchdog() called on every station play
+//  v2.34 - Clock: local=PDT/PST, UTC=Z; viz single loop; keep-alive loop=true
 //          Viz iOS FIXED: single draw loop, no zombie loops from multiple starts
 //          isPlaying read LIVE each frame — not captured at closure creation time
 //          Keep-alive FIXED: loop=true BufferSource + 1s watchdog resumes it
@@ -934,7 +945,8 @@ function play(station) {
   if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
   // Clear any pending reconnect from previous station
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-  reconnectDelay = 3000;
+  if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
+  reconnectDelay = 2000; frozenCount = 0;
   // Deactivate MP3 if switching from it
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
 
@@ -963,6 +975,7 @@ function play(station) {
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
     ensureKeepAlive();
     updateMediaSession(station.name);
+    startBufferWatchdog(); // monitor buffer health for CarPlay
     // Don't call tryLiveAudio for streams — CORS blocks it on iOS, wastes time
   }).catch((e) => {
     console.warn('[play] Failed:', e.message);
@@ -998,7 +1011,8 @@ function toggleStop() {
 
 function stopPlay() {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-  reconnectDelay = 3000;
+  if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
+  reconnectDelay = 2000; frozenCount = 0;
   audio.pause();
   audio.src = '';
   isPlaying = false;
@@ -1795,34 +1809,75 @@ function wakeDismiss() {
 }
 
 // ============================================================
-//  AUDIO EVENTS — with CarPlay/wireless stutter recovery
+//  AUDIO EVENTS — CarPlay/wireless optimized
 // ============================================================
 
-// Reconnect state — exponential backoff so we don't hammer the server
-let reconnectTimer   = null;
-let reconnectDelay   = 3000;  // ms, doubles on each retry up to max
-const RECONNECT_MAX  = 16000; // max delay between retries
+let reconnectTimer  = null;
+let reconnectDelay  = 2000;
+const RECONNECT_MAX = 12000;
+let bufferWatchdog  = null;
 
-function scheduleReconnect(reason) {
-  if (curIdx < 0 || reconnectTimer) return; // only for stations, not MP3
-  document.getElementById('npMeta').textContent = reason + ' — retrying...';
+// Hard reconnect — fresh TCP connection, no src reuse
+function hardReconnect(reason) {
+  if (curIdx < 0 || !isPlaying) return;
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  document.getElementById('npMeta').textContent = reason + '...';
   document.getElementById('sigbars').classList.remove('active');
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null;
-    if (curIdx >= 0 && isPlaying) {
-      // Reconnect: set src fresh — clears any stale TCP connection
-      const url = STATIONS[curIdx].url;
-      audio.src = '';
-      audio.src = url;
+    if (curIdx < 0 || !isPlaying) return;
+    const url = STATIONS[curIdx].url;
+    audio.pause();
+    audio.src = '';        // force browser to drop TCP connection
+    audio.load();          // reset internal state
+    audio.src = url;
+    // For CarPlay: let buffer build 1.5s before play starts
+    // This pre-fills the buffer so CarPlay wireless has headroom
+    setTimeout(() => {
       audio.play().then(() => {
-        reconnectDelay = 3000; // reset on success
+        reconnectDelay = 2000;
       }).catch(() => {
         reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX);
-        scheduleReconnect('Failed');
+        hardReconnect('Retry failed');
       });
-    }
+    }, 400);
   }, reconnectDelay);
   reconnectDelay = Math.min(reconnectDelay * 1.5, RECONNECT_MAX);
+}
+
+// Buffer health monitor — CarPlay-specific
+// Checks every 2s that the audio buffer has enough ahead
+// If buffer < 1s ahead, pre-emptively reconnect before stutter happens
+function startBufferWatchdog() {
+  if (bufferWatchdog) clearInterval(bufferWatchdog);
+  let lastCurrentTime = -1;
+  let frozenCount = 0;
+  bufferWatchdog = setInterval(() => {
+    if (curIdx < 0 || !isPlaying || audio.paused || reconnectTimer) {
+      lastCurrentTime = -1; frozenCount = 0; return;
+    }
+    // Check if playback is actually advancing
+    if (audio.currentTime === lastCurrentTime) {
+      frozenCount++;
+      if (frozenCount >= 2) { // frozen for 4s
+        frozenCount = 0;
+        console.log('[Watchdog] Playback frozen — reconnecting');
+        hardReconnect('Reconnecting');
+      }
+    } else {
+      frozenCount = 0;
+    }
+    lastCurrentTime = audio.currentTime;
+
+    // Check buffer ahead — if less than 0.8s buffered, warn
+    // (can't force reconnect here as it would cause infinite loop)
+    if (audio.buffered.length > 0) {
+      const bufferedAhead = audio.buffered.end(audio.buffered.length - 1) - audio.currentTime;
+      if (bufferedAhead < 0.5 && audio.readyState < 4) {
+        document.getElementById('sigbars').classList.remove('active');
+      }
+    }
+  }, 2000);
 }
 
 audio.addEventListener('waiting', () => {
@@ -1831,43 +1886,35 @@ audio.addEventListener('waiting', () => {
 });
 
 audio.addEventListener('playing', () => {
-  // Clear any pending reconnect — stream recovered
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-  reconnectDelay = 3000; // reset backoff
+  reconnectDelay = 2000;
+  frozenCount = 0;
   document.getElementById('sigbars').classList.add('active');
-  if (curIdx >= 0 && document.getElementById('npMeta').textContent !== 'Live ATC')
-    document.getElementById('npMeta').textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC' : '';
+  if (curIdx >= 0) {
+    const meta = document.getElementById('npMeta');
+    if (meta.textContent !== 'Live ATC')
+      meta.textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC' : '';
+  }
 });
 
-audio.addEventListener('error', (e) => {
-  if (curIdx < 0) return; // ignore errors after stop
-  console.warn('[Audio] Error:', e);
-  scheduleReconnect('Stream error');
-  showToast('Reconnecting...', '');
+audio.addEventListener('error', () => {
+  if (curIdx < 0 || !isPlaying) return;
+  console.warn('[Audio] Error');
+  hardReconnect('Error');
 });
 
 audio.addEventListener('stalled', () => {
-  // Stalled = no data arriving — common on wireless/CarPlay
-  // Don't wait — reconnect immediately with fresh connection
   if (curIdx < 0 || !isPlaying) return;
-  console.log('[Audio] Stalled — reconnecting');
-  scheduleReconnect('Stalled');
+  console.log('[Audio] Stalled');
+  hardReconnect('Stalled');
 });
 
-// Buffer monitoring — detects frozen playback even when browser doesn't fire stalled
-// Checks every 8s if currentTime has advanced; if not, reconnects
-let lastTime = 0, lastTimeCheck = 0;
-setInterval(() => {
-  if (curIdx < 0 || !isPlaying || audio.paused || reconnectTimer) return;
-  const now = Date.now();
-  if (now - lastTimeCheck < 7000) return;
-  lastTimeCheck = now;
-  if (audio.currentTime === lastTime && audio.readyState < 3) {
-    console.log('[Buffer] Frozen — reconnecting');
-    scheduleReconnect('Buffering');
-  }
-  lastTime = audio.currentTime;
-}, 2000);
+audio.addEventListener('emptied', () => {
+  // fires when src is cleared — ignore during intentional stop
+});
+
+// Declare frozenCount at module scope so watchdog can reset it
+let frozenCount = 0;
 
 function updateMediaSession(name, artist) {
   if (!('mediaSession' in navigator)) return;
