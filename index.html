@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.35</title>
+<title>WRadio v2.36</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -200,19 +200,19 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.35</span></div>
-      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.85em;color:var(--text);letter-spacing:2px;padding-left:2px"></div>
+    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.72em;color:var(--muted);letter-spacing:1px">v2.36</span></div>
+      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.75em;color:var(--muted);letter-spacing:2px;padding-left:2px"></div>
     </div>
-    <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
-      <div style="display:flex;align-items:baseline;gap:5px">
+    <div class="sigbars" id="sigbars" style="margin:0 6px"><span></span><span></span><span></span><span></span></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+      <div style="display:flex;align-items:baseline;gap:4px">
         <div class="clock-display" id="clockDisplay">00:00:00</div>
-        <span id="tzLabel" style="font-family:var(--mono);font-size:0.7em;color:var(--muted)">PDT</span>
+        <span id="tzLabel" style="font-family:var(--mono);font-size:0.62em;color:var(--green);letter-spacing:1px;opacity:0.8">PDT</span>
       </div>
-      <div style="display:flex;align-items:baseline;gap:5px">
-        <div style="font-family:var(--mono);font-size:1.3em;color:var(--amber);letter-spacing:2px" id="utcDisplay">00:00:00</div>
-        <span style="font-family:var(--mono);font-size:0.7em;color:var(--amber)">Z</span>
+      <div style="display:flex;align-items:baseline;gap:4px">
+        <div style="font-family:var(--mono);font-size:1.1em;color:var(--amber);letter-spacing:2px;font-weight:normal" id="utcDisplay">00:00:00</div>
+        <span style="font-family:var(--mono);font-size:0.62em;color:var(--amber);letter-spacing:1px;opacity:0.8">Z</span>
       </div>
     </div>
   </div>
@@ -381,7 +381,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.35 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.36 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -398,7 +398,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.35 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.36 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Header redesigned: WRADIO, green local, amber Z time<br>
+        ATC grouped by airport with ICAO + frequency<br>
+        Compact 2-column grid for ATC buttons
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.35 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         CarPlay: hard reconnect + 400ms pre-buffer before play<br>
         Buffer watchdog every 2s detects frozen playback<br>
@@ -586,17 +592,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.35  (2026-04-04)
+//  Version : v2.36  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.35 - CarPlay: hard reconnect uses audio.load() to reset internal state
-//          400ms pre-buffer pause before play() — gives CarPlay headroom
-//          Buffer watchdog: detects frozen playback every 2s
-//          frozenCount: requires 4s frozen before reconnect (avoids false triggers)
-//          startBufferWatchdog() called on every station play
-//  v2.34 - Clock: local=PDT/PST, UTC=Z; viz single loop; keep-alive loop=true
+//  v2.36 - Header redesigned: WRADIO branding, green local/amber UTC, cleaner layout
+//          ATC grouped by airport: KMYF/KSAN/KSDM/KRNM with ICAO header + frequency
+//          ATC buttons in 2-column compact grid, airport name stripped from button label
+//  v2.35 - CarPlay: hard reconnect + 400ms pre-buffer, buffer watchdog every 2s
 //          Viz iOS FIXED: single draw loop, no zombie loops from multiple starts
 //          isPlaying read LIVE each frame — not captured at closure creation time
 //          Keep-alive FIXED: loop=true BufferSource + 1s watchdog resumes it
@@ -752,9 +756,10 @@ let seekDragging = false;
 //  BUILD UI
 // ============================================================
 function buildUI() {
-  // station list
+  // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
-  [{key:'german',label:'German Radio'},{key:'music',label:'Music'},{key:'atc',label:'ATC \u2014 San Diego'}]
+  // Music and German sections built normally
+  [{key:'german',label:'German Radio'},{key:'music',label:'Music'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
@@ -771,48 +776,94 @@ function buildUI() {
         +'<span class="stn-live"><span class="live-dot"></span>LIVE</span>';
       sec.appendChild(b);
     });
-    // Aviation link buttons after ATC section
-    if (cat.key === 'atc') {
-      // Row 1: aviation reference sites
-      const links = [
-        { href:'https://skyvector.com/',         color:'#2a6496', bg:'rgba(42,100,150,0.1)',   icon:'✈', label:'SKYVECTOR' },
-        { href:'https://www.liveatc.net/',        color:'#2a7a3a', bg:'rgba(42,122,58,0.1)',    icon:'📡', label:'LIVEATC' },
-        { href:'https://flightaware.com/',        color:'#7a3a8a', bg:'rgba(122,58,138,0.1)',   icon:'🛫', label:'FLIGHTAWARE' },
-      ];
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:6px;margin-top:8px';
-      links.forEach(l => {
-        const a = document.createElement('a');
-        a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
-        a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
-          +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
-          +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
-          +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
-        a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
-        row.appendChild(a);
-      });
-      sec.appendChild(row);
-      // Row 2: flying club / schedule sites
-      const links2 = [
-        { href:'https://www.plusoneflyers.org/',        color:'#b07a20', bg:'rgba(176,122,32,0.1)',  icon:'🏅', label:'PLUS ONE FLYERS' },
-        { href:'https://my.schedulemaster.com/',        color:'#206060', bg:'rgba(32,96,96,0.1)',    icon:'📅', label:'SCHEDULEMASTER' },
-      ];
-      const row2 = document.createElement('div');
-      row2.style.cssText = 'display:flex;gap:6px;margin-top:6px';
-      links2.forEach(l => {
-        const a = document.createElement('a');
-        a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
-        a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
-          +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
-          +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
-          +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
-        a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
-        row2.appendChild(a);
-      });
-      sec.appendChild(row2);
-    }
     list.appendChild(sec);
   });
+
+  // ATC section — grouped by airport with sub-labels
+  const airports = [
+    { icao:'KMYF', name:'Montgomery Field', freq:'120.7/121.9', stns:[8,9,10,11,12] },
+    { icao:'KSAN', name:'Lindbergh Field',  freq:'119.5/118.3', stns:[13,14,15,16,17,18] },
+    { icao:'KSDM', name:'Brown Field',      freq:'123.0',       stns:[19] },
+    { icao:'KRNM', name:'Ramona',           freq:'122.7',       stns:[20,21,22] },
+  ];
+
+  const atcSec = document.createElement('div');
+  atcSec.className = 'sec-atc';
+  const atcLbl = document.createElement('div');
+  atcLbl.className = 'section-label';
+  atcLbl.textContent = 'ATC \u2014 San Diego';
+  atcSec.appendChild(atcLbl);
+
+  airports.forEach(apt => {
+    // Airport sub-header
+    const aptHdr = document.createElement('div');
+    aptHdr.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;'
+      +'padding:8px 4px 4px;margin-top:4px;border-bottom:1px solid rgba(0,212,255,0.1)';
+    aptHdr.innerHTML =
+      '<span style="font-family:var(--mono);font-size:0.72em;color:var(--accent);letter-spacing:2px;font-weight:bold">'
+      +apt.icao+'</span>'
+      +'<span style="font-family:var(--sans);font-size:0.75em;color:var(--text);flex:1;margin:0 8px">'
+      +apt.name+'</span>'
+      +'<span style="font-family:var(--mono);font-size:0.58em;color:var(--muted)">'
+      +apt.freq+'</span>';
+    atcSec.appendChild(aptHdr);
+
+    // Stations for this airport — compact 2-column grid
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:6px';
+    apt.stns.forEach(n => {
+      const s = STATIONS.find(x => x.n === n);
+      if (!s) return;
+      // Strip airport prefix from name for compact display
+      const shortName = s.name.replace(/^K[A-Z]{3}\s*/,'');
+      const b = document.createElement('button');
+      b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
+      b.style.cssText = 'padding:7px 10px;margin-bottom:0;font-size:0.9em';
+      b.innerHTML = '<span class="stn-name" style="font-size:0.85em">'+shortName+'</span>'
+        +'<span class="stn-live"><span class="live-dot"></span>▶</span>';
+      grid.appendChild(b);
+    });
+    atcSec.appendChild(grid);
+  });
+
+  // Aviation link buttons
+  const links = [
+    { href:'https://skyvector.com/',         color:'#2a6496', bg:'rgba(42,100,150,0.1)',   icon:'✈', label:'SKYVECTOR' },
+    { href:'https://www.liveatc.net/',        color:'#2a7a3a', bg:'rgba(42,122,58,0.1)',    icon:'📡', label:'LIVEATC' },
+    { href:'https://flightaware.com/',        color:'#7a3a8a', bg:'rgba(122,58,138,0.1)',   icon:'🛫', label:'FLIGHTAWARE' },
+  ];
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;margin-top:8px';
+  links.forEach(l => {
+    const a = document.createElement('a');
+    a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
+    a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+      +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
+      +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
+      +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+    a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
+    row.appendChild(a);
+  });
+  atcSec.appendChild(row);
+
+  const links2 = [
+    { href:'https://www.plusoneflyers.org/', color:'#b07a20', bg:'rgba(176,122,32,0.1)', icon:'🏅', label:'PLUS ONE FLYERS' },
+    { href:'https://my.schedulemaster.com/', color:'#206060', bg:'rgba(32,96,96,0.1)',   icon:'📅', label:'SCHEDULEMASTER' },
+  ];
+  const row2 = document.createElement('div');
+  row2.style.cssText = 'display:flex;gap:6px;margin-top:6px';
+  links2.forEach(l => {
+    const a = document.createElement('a');
+    a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
+    a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
+      +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
+      +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
+      +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+    a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
+    row2.appendChild(a);
+  });
+  atcSec.appendChild(row2);
+  list.appendChild(atcSec);
 
   // alarm station select
   const sel = document.getElementById('alarmStation');
