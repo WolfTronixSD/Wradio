@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.33</title>
+<title>Radio v2.34</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -201,13 +201,19 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <header>
   <div class="header-top">
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.33</span></div>
+      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.34</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.85em;color:var(--text);letter-spacing:2px;padding-left:2px"></div>
     </div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
-      <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:1.0em;color:var(--amber);letter-spacing:2px"><span id="utcDisplay">00:00:00</span> <span id="tzLabel" style="font-size:0.75em">UTC</span></div>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <div class="clock-display" id="clockDisplay">00:00:00</div>
+        <span id="tzLabel" style="font-family:var(--mono);font-size:0.7em;color:var(--muted)">PDT</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <div style="font-family:var(--mono);font-size:1.3em;color:var(--amber);letter-spacing:2px" id="utcDisplay">00:00:00</div>
+        <span style="font-family:var(--mono);font-size:0.7em;color:var(--amber)">Z</span>
+      </div>
     </div>
   </div>
   <div class="now-playing">
@@ -375,7 +381,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.33 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
+        <span style="color:var(--accent)">v2.34 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -392,7 +398,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.33 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.34 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Local clock shows PDT/PST, UTC shows Z (Zulu)<br>
+        Viz radio FIXED: single draw loop, isPlaying read live<br>
+        Keep-alive FIXED: loop=true + 1s watchdog<br>
+        Background audio improved for all cases
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.33 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         CarPlay wireless stutter fix<br>
         Smart reconnect with exponential backoff<br>
@@ -567,12 +580,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.33  (2026-04-03)
+//  Version : v2.34  (2026-04-03)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.33 - CarPlay/wireless stutter fix: smart reconnect with exponential backoff
+//  v2.34 - Clock FIXED: local shows PDT/PST, UTC shows Z (Zulu)
+//          Viz iOS FIXED: single draw loop, no zombie loops from multiple starts
+//          isPlaying read LIVE each frame — not captured at closure creation time
+//          Keep-alive FIXED: loop=true BufferSource + 1s watchdog resumes it
+//          Background audio: all handlers use isPlaying flag consistently
+//  v2.33 - CarPlay stutter fix, smart reconnect with backoff
 //          Buffer freeze monitor: detects frozen playback every 8s and reconnects
 //          stalled/error events now trigger clean reconnect instead of hanging
 //          Reconnect resets on successful play, max 16s between retries
@@ -844,14 +862,12 @@ function buildUI() {
     } catch(e) {}
   }
 
-  // Background audio heartbeat — detects if iOS killed audio and restarts it
-  // Fires every 5 seconds; only acts if audio should be playing but isn't
+  // Background audio heartbeat — restarts if iOS killed audio
   setInterval(() => {
-    const shouldBePlaying = (curIdx >= 0 || mp3CurIdx >= 0);
     const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
     const userPaused = btnLabel.includes('RESUME');
-    if (shouldBePlaying && !userPaused && audio.paused && audio.src) {
-      console.log('[Heartbeat] Audio interrupted — restarting');
+    if (isPlaying && !userPaused && audio.paused && audio.src) {
+      console.log('[Heartbeat] Restarting interrupted audio');
       audio.play().catch(() => {});
     }
   }, 5000);
@@ -862,27 +878,29 @@ function buildUI() {
 // ============================================================
 function tickClock() {
   const now = new Date();
+  // Local time with timezone label
   const hh = String(now.getHours()).padStart(2,'0');
   const mm = String(now.getMinutes()).padStart(2,'0');
   const ss = String(now.getSeconds()).padStart(2,'0');
   document.getElementById('clockDisplay').textContent = hh+':'+mm+':'+ss;
+  // Detect local timezone abbreviation (PDT, PST, EST etc.)
+  const tzEl = document.getElementById('tzLabel');
+  if (tzEl) {
+    try {
+      const parts = now.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ');
+      tzEl.textContent = parts[parts.length-1] || 'LCL';
+    } catch(e) { tzEl.textContent = 'LCL'; }
+  }
+  // UTC / Zulu time (always labeled Z)
   const uh = String(now.getUTCHours()).padStart(2,'0');
   const um = String(now.getUTCMinutes()).padStart(2,'0');
   const us = String(now.getUTCSeconds()).padStart(2,'0');
   document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
-  // Timezone abbreviation (PDT, PST, EST, etc.)
-  const tzEl = document.getElementById('tzLabel');
-  if (tzEl) {
-    try {
-      const tzName = now.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop();
-      tzEl.textContent = tzName || 'UTC';
-    } catch(e) { tzEl.textContent = 'UTC'; }
-  }
-  // Date display
-  const days   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  // Date
+  const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const dateEl = document.getElementById('dateDisplay');
-  if (dateEl) dateEl.textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+  if (dateEl) dateEl.textContent = days[now.getDay()]+' '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
   checkSleepTimer();
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
   // Update seek bar for MP3
@@ -902,14 +920,9 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
-  // Restart viz every time the tab becomes visible
   if (id === 'viz') {
-    if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
-    // Try immediately, then retry with increasing delays for iOS
-    startSynthViz();
-    setTimeout(startSynthViz, 100);
-    setTimeout(startSynthViz, 300);
-    setTimeout(startSynthViz, 600);
+    // Single call after layout settles — multiple calls caused zombie draw loops
+    setTimeout(startSynthViz, 80);
   }
 }
 
@@ -1060,7 +1073,7 @@ function connectWebAudio() {
 }
 
 // ============================================================
-//  SYNTHETIC VISUALIZER (works on iOS, always runs)
+//  SYNTHETIC VISUALIZER
 // ============================================================
 function setVizMode(mode, btn) {
   vizMode = mode;
@@ -1068,48 +1081,49 @@ function setVizMode(mode, btn) {
   btn.classList.add('active');
 }
 
+let vizDrawActive = false; // guard — only one draw loop ever
+
 function startSynthViz() {
+  // Cancel any existing loop
   if (vizRAF) { cancelAnimationFrame(vizRAF); vizRAF = null; }
+  vizDrawActive = false; // signal old loop to exit if it checks
+
   const canvas = document.getElementById('vizCanvas');
   const panel  = document.getElementById('panel-viz');
 
-  function resize() {
-    const dpr = window.devicePixelRatio || 1;
-    // Try canvas own offsetWidth first, fall back to parent panel width
-    let w = canvas.offsetWidth;
-    if (w === 0) w = panel.offsetWidth - 24; // 24 = panel padding
-    if (w <= 0) w = window.innerWidth - 24;  // last resort
-    const h = 150; // fixed height matches CSS
-    canvas.width  = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    // Also set explicit style size so CSS doesn't override
-    canvas.style.width  = w + 'px';
-    canvas.style.height = h + 'px';
-  }
-  resize();
-  window.addEventListener('resize', resize);
+  // Size canvas — use window width as reliable fallback on iOS
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(canvas.offsetWidth, panel.offsetWidth - 24, window.innerWidth - 28);
+  canvas.width  = Math.round(w * dpr);
+  canvas.height = Math.round(150 * dpr);
+  canvas.style.width  = w + 'px';
+  canvas.style.height = '150px';
+  window.addEventListener('resize', () => {
+    const nw = Math.max(canvas.offsetWidth, window.innerWidth - 28);
+    canvas.width = Math.round(nw * dpr);
+    canvas.style.width = nw + 'px';
+  });
 
   const ctx = canvas.getContext('2d');
-
-  // synthetic frequency bands - persist across frames for smooth motion
   const NUM_BANDS = 48;
-  const bands = new Float32Array(NUM_BANDS).fill(0);
+  const bands   = new Float32Array(NUM_BANDS).fill(0);
   const targets = new Float32Array(NUM_BANDS).fill(0);
   let t = 0;
+  const myId = ++vizDrawActive; // unique id for this loop (not used as number, just truthy)
+  vizDrawActive = true;
 
   function draw() {
+    if (!vizDrawActive) return; // killed by new startSynthViz call
     vizRAF = requestAnimationFrame(draw);
-    const dpr = window.devicePixelRatio || 1;
     const W = canvas.width / dpr, H = canvas.height / dpr;
-    if (W < 10 || H < 10) return; // safety check
+    if (W < 10 || H < 10) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // clear
     ctx.fillStyle = '#12121a';
     ctx.fillRect(0, 0, W, H);
 
-    // Use explicit isPlaying flag — more reliable than audio.paused on iOS
+    // Read isPlaying LIVE each frame — not captured at creation time
     const playing = isPlaying;
+    t += 0.04;
     t += 0.04;
 
     if (!playing) {
@@ -2196,27 +2210,20 @@ let keepAliveBuffer = null;
 function startKeepAlive() {
   if (keepAliveNode) return;
   try {
-    // Dedicated context — NEVER used for main audio playback
     keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    const bufLen = keepAliveCtx.sampleRate * 2; // 2-second silent buffer
-    keepAliveBuffer = keepAliveCtx.createBuffer(1, bufLen, keepAliveCtx.sampleRate);
-    // Buffer is all zeros = silence
-
+    // 2-second silent buffer
+    keepAliveBuffer = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate * 2, keepAliveCtx.sampleRate);
     const gain = keepAliveCtx.createGain();
-    gain.gain.value = 0.001;
+    gain.gain.value = 0.001; // near-silent
     gain.connect(keepAliveCtx.destination);
-
-    function loopSilence() {
-      const src = keepAliveCtx.createBufferSource();
-      src.buffer = keepAliveBuffer;
-      src.connect(gain);
-      src.onended = loopSilence;
-      src.start();
-      keepAliveNode = src;
-    }
-    loopSilence();
-    console.log('[KeepAlive] Dedicated silent buffer loop started');
+    // Use loop=true — far more reliable than onended callback on iOS
+    const src = keepAliveCtx.createBufferSource();
+    src.buffer = keepAliveBuffer;
+    src.loop = true;
+    src.connect(gain);
+    src.start(0);
+    keepAliveNode = src;
+    console.log('[KeepAlive] Looping silent buffer started');
   } catch(e) {
     console.warn('[KeepAlive] Failed:', e.message);
   }
@@ -2228,17 +2235,23 @@ function ensureKeepAlive() {
   } else if (keepAliveCtx.state === 'suspended') {
     keepAliveCtx.resume().catch(()=>{});
   }
-  // Also resume main audioCtx if it exists
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
 }
+
+// Watchdog: resume keep-alive context if iOS suspends it (happens on screen lock)
+setInterval(() => {
+  if (keepAliveCtx && keepAliveCtx.state === 'suspended') {
+    keepAliveCtx.resume().catch(()=>{});
+  }
+}, 1000);
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') return;
   ensureKeepAlive();
-  const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
+  // Use isPlaying flag — more reliable than checking curIdx/mp3CurIdx
   const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
   const userPaused = btnLabel.includes('RESUME');
-  if (wasPlaying && !userPaused && audio.paused && audio.src) {
+  if (isPlaying && !userPaused && audio.paused && audio.src) {
     audio.play().catch(() => {});
   }
 });
@@ -2246,8 +2259,7 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pageshow', (e) => {
   if (!e.persisted) return;
   ensureKeepAlive();
-  const wasPlaying = (curIdx >= 0 || mp3CurIdx >= 0);
-  if (wasPlaying && audio.paused && audio.src) audio.play().catch(() => {});
+  if (isPlaying && audio.paused && audio.src) audio.play().catch(() => {});
 });
 
 window.addEventListener('load', buildUI);
