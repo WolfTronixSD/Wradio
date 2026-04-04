@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.28</title>
+<title>Radio v2.29</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -186,9 +186,18 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="wake-dismiss" onclick="wakeDismiss()">DISMISS</div>
 </div>
 
+<!-- EGG TIMER DONE OVERLAY -->
+<div class="wake-overlay" id="eggOverlay" style="background:rgba(5,5,10,0.97)">
+  <div style="font-size:4em">🥚</div>
+  <div class="wake-label" style="color:var(--amber);letter-spacing:4px">EGG TIMER</div>
+  <div style="font-family:var(--mono);font-size:2em;color:var(--amber);letter-spacing:4px;text-shadow:0 0 30px var(--amber)">DONE!</div>
+  <div style="font-family:var(--mono);font-size:0.75em;color:var(--muted);letter-spacing:2px;margin-top:8px">6 MINUTES</div>
+  <button class="wake-btn" onclick="eggDismiss()" style="background:var(--amber);color:#000;margin-top:20px;animation:glow 1.5s ease-in-out infinite" id="eggDoneBtn">✓ DISMISS</button>
+</div>
+
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.28</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.29</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
@@ -294,6 +303,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <!-- SLEEP TIMER -->
 <div class="panel" id="panel-timer">
   <div class="card">
+    <div class="card-title">🥚 EGG TIMER</div>
+    <div style="display:flex;align-items:center;justify-content:center;margin:6px 0">
+      <div id="eggCountdown" class="countdown off" style="font-size:3em;letter-spacing:6px;min-width:120px;text-align:center">6:00</div>
+    </div>
+    <div class="pill-row" style="justify-content:center;gap:8px">
+      <div class="pill" id="eggStartBtn" onclick="eggStart()" style="font-size:0.8em;padding:8px 20px;border-color:var(--amber);color:var(--amber)">▶ START</div>
+      <div class="pill" id="eggResetBtn" onclick="eggReset()" style="font-size:0.8em;padding:8px 20px">↺ RESET</div>
+    </div>
+    <div id="eggStatus" style="font-family:var(--mono);font-size:0.65em;color:var(--muted);text-align:center;margin-top:8px;min-height:1em"></div>
+  </div>
+  <div class="card">
     <div class="card-title">SLEEP TIMER</div>
     <div class="pill-row">
       <div class="pill" onclick="setSleep(5)">5 min</div>
@@ -349,7 +369,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.28 <span style="color:var(--muted);font-size:0.85em">2026-03-27 14:00</span></span>
+        <span style="color:var(--accent)">v2.29 <span style="color:var(--muted);font-size:0.85em">2026-04-03 10:00</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -366,7 +386,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.28 <span style="color:var(--muted);font-size:0.85em">2026-03-27 14:00</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.29 <span style="color:var(--muted);font-size:0.85em">2026-04-03 10:00</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        🥚 6-minute egg timer in TIMER tab<br>
+        Countdown: green → amber → red<br>
+        Web Audio beeper alarm, vibration, fullscreen overlay
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.28 <span style="color:var(--muted);font-size:0.85em">2026-03-27 14:00</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Keep-alive on separate AudioContext<br>
         Main audio plays direct through browser<br>
@@ -506,16 +533,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.28  (2026-03-27)
+//  Version : v2.29  (2026-04-03)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.29 - 6-minute egg timer added to TIMER tab
+//          Countdown display with color: green → amber → red
+//          Web Audio beeper alarm (3 rising tones, repeats every 3s)
+//          Fullscreen overlay on completion, vibration on phones
+//          START/STOP toggle, RESET button
 //  v2.28 - Keep-alive uses SEPARATE AudioContext from main audio
-//          Main audio element plays direct through browser (not Web Audio graph)
-//          This prevents iOS from suspending main audio when AudioContext suspends
-//          PWA (Add to Home Screen) still required for lock screen audio
-//  v2.27 - PWA install banner + apple-mobile-web-app meta tags
 //          Install banner: shown in Safari, guides user to Add to Home Screen
 //          Background audio works reliably when installed as PWA (standalone mode)
 //          Viz: added liveAudio + synth/avg debug line for better diagnostics
@@ -751,7 +779,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-03-27 14:00';
+  if (verDate) verDate.textContent = '2026-04-03 10:00';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -1530,6 +1558,112 @@ function setFade(on) {
   fadeEnabled = on;
   document.getElementById('fade-on').classList.toggle('active', on);
   document.getElementById('fade-off').classList.toggle('active', !on);
+}
+
+// ============================================================
+//  EGG TIMER — 6 minutes with Web Audio beeper alarm
+// ============================================================
+const EGG_DURATION = 6 * 60; // 6 minutes in seconds
+let eggEnd      = null;  // timestamp when timer fires
+let eggInterval = null;  // setInterval handle
+let eggBeeping  = false; // true while alarm is sounding
+
+function eggStart() {
+  if (eggEnd) { // already running — pause/resume toggle
+    eggReset(); return;
+  }
+  eggEnd = Date.now() + EGG_DURATION * 1000;
+  document.getElementById('eggStartBtn').textContent = '■ STOP';
+  document.getElementById('eggStartBtn').style.borderColor = 'var(--red)';
+  document.getElementById('eggStartBtn').style.color = 'var(--red)';
+  document.getElementById('eggStatus').textContent = 'Timer running...';
+  document.getElementById('eggCountdown').className = 'countdown';
+  document.getElementById('eggCountdown').style.color = 'var(--green)';
+  eggInterval = setInterval(eggTick, 250);
+  eggTick();
+}
+
+function eggTick() {
+  if (!eggEnd) return;
+  const rem = Math.max(0, eggEnd - Date.now());
+  const m   = Math.floor(rem / 60000);
+  const s   = Math.floor((rem % 60000) / 1000);
+  const el  = document.getElementById('eggCountdown');
+  el.textContent = m + ':' + String(s).padStart(2, '0');
+
+  // Color: green → amber in last 60s → red in last 10s
+  if (rem < 10000)      el.style.color = 'var(--red)';
+  else if (rem < 60000) el.style.color = 'var(--amber)';
+  else                  el.style.color = 'var(--green)';
+
+  if (rem <= 0) {
+    clearInterval(eggInterval);
+    eggInterval = null;
+    eggEnd = null;
+    el.textContent = '0:00';
+    eggFire();
+  }
+}
+
+function eggFire() {
+  // Show fullscreen overlay
+  document.getElementById('eggOverlay').classList.add('show');
+  // Vibrate if supported
+  if (navigator.vibrate) navigator.vibrate([300,100,300,100,300,100,600]);
+  // Play beeper alarm using Web Audio API
+  eggBeeping = true;
+  eggBeep();
+  document.getElementById('eggStatus').textContent = '✓ Done!';
+  document.getElementById('eggStartBtn').textContent = '▶ START';
+  document.getElementById('eggStartBtn').style.borderColor = 'var(--amber)';
+  document.getElementById('eggStartBtn').style.color = 'var(--amber)';
+}
+
+function eggBeep() {
+  if (!eggBeeping) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Three rising tones — classic egg timer beep pattern
+    const beepTimes = [0, 0.3, 0.6, 1.2, 1.5, 1.8]; // seconds
+    const freqs     = [880, 1046, 1318, 880, 1046, 1318];
+    beepTimes.forEach((t, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freqs[i];
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0, ctx.currentTime + t);
+      gain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + t + 0.02);
+      gain.gain.linearRampToValueAtTime(0,   ctx.currentTime + t + 0.2);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.25);
+    });
+    // Repeat beeps every 3 seconds while overlay is open
+    if (eggBeeping) setTimeout(eggBeep, 3000);
+  } catch(e) {
+    console.warn('[EggBeep] Failed:', e.message);
+  }
+}
+
+function eggDismiss() {
+  eggBeeping = false;
+  document.getElementById('eggOverlay').classList.remove('show');
+  eggReset();
+}
+
+function eggReset() {
+  clearInterval(eggInterval);
+  eggInterval = null;
+  eggEnd = null;
+  eggBeeping = false;
+  const el = document.getElementById('eggCountdown');
+  el.textContent = '6:00';
+  el.style.color = '';
+  el.className = 'countdown off';
+  document.getElementById('eggStartBtn').textContent = '▶ START';
+  document.getElementById('eggStartBtn').style.borderColor = 'var(--amber)';
+  document.getElementById('eggStartBtn').style.color = 'var(--amber)';
+  document.getElementById('eggStatus').textContent = '';
 }
 
 // ============================================================
