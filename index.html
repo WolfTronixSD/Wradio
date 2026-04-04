@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.30</title>
+<title>Radio v2.31</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -197,14 +197,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div style="display:flex;flex-direction:column;gap:2px">
-      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.30</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
-      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px;padding-left:2px"></div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.31</span></div>
+      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.85em;color:var(--text);letter-spacing:2px;padding-left:2px"></div>
     </div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:0.9em;color:var(--amber);letter-spacing:2px;font-weight:bold"><span id="utcDisplay">00:00:00</span> <span style="font-size:0.8em">UTC</span></div>
+      <div style="font-family:var(--mono);font-size:1.0em;color:var(--amber);letter-spacing:2px"><span id="utcDisplay">00:00:00</span> <span id="tzLabel" style="font-size:0.75em">UTC</span></div>
     </div>
   </div>
   <div class="now-playing">
@@ -372,7 +372,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.30 <span style="color:var(--muted);font-size:0.85em">2026-04-03 11:00</span></span>
+        <span style="color:var(--accent)">v2.31 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -389,7 +389,15 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.30 <span style="color:var(--muted);font-size:0.85em">2026-04-03 11:00</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.31 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Viz radio FIXED: synthetic always runs for stations<br>
+        Faster station start: removed audio.load() delay<br>
+        Header: bigger date, UTC orange same size as local<br>
+        Timezone auto-detect (PDT/PST/EST etc.)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.30 <span style="color:var(--muted);font-size:0.85em">2026-04-03</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Date shown in header (day, date, month, year)<br>
         UTC time orange + bigger, same size as local clock<br>
@@ -543,16 +551,18 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.30  (2026-04-03)
+//  Version : v2.31  (2026-04-03)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.30 - Current date shown in header (MON 3 APR 2026)
-//          UTC time now orange/amber, same size as local time
-//          Viz radio fix: skip analyser entirely for streams, always use synthetic
-//          Real FFT only attempted for MP3 (no CORS issue with blob URLs)
-//  v2.29 - 6-minute egg timer with beeper alarm
+//  v2.31 - Viz radio FIXED: synthetic always runs for streams, no CORS attempt
+//          Radio plays faster: removed audio.load(), direct play() on src change
+//          Header: date bigger + white, UTC orange same size as local clock
+//          Timezone label auto-detects (PDT/PST/EST etc.)
+//          Removed build date/time stamp from header logo
+//          Debug lines removed from viz canvas
+//  v2.30 - Date in header, UTC orange, viz radio synthetic
 //          Countdown display with color: green → amber → red
 //          Web Audio beeper alarm (3 rising tones, repeats every 3s)
 //          Fullscreen overlay on completion, vibration on phones
@@ -791,10 +801,6 @@ function buildUI() {
     if (banner) banner.style.display = 'flex';
   }
 
-  // Show build date/time in header
-  const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-04-03 11:00';
-
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
   if (savedPlaylist) {
@@ -841,8 +847,16 @@ function tickClock() {
   const um = String(now.getUTCMinutes()).padStart(2,'0');
   const us = String(now.getUTCSeconds()).padStart(2,'0');
   document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
-  // Date display — updates once a second but only changes once a day
-  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  // Timezone abbreviation (PDT, PST, EST, etc.)
+  const tzEl = document.getElementById('tzLabel');
+  if (tzEl) {
+    try {
+      const tzName = now.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop();
+      tzEl.textContent = tzName || 'UTC';
+    } catch(e) { tzEl.textContent = 'UTC'; }
+  }
+  // Date display
+  const days   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const dateEl = document.getElementById('dateDisplay');
   if (dateEl) dateEl.textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
@@ -887,23 +901,26 @@ function play(station) {
   document.getElementById('npMeta').textContent = 'Connecting...';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('stn-'+station.n)?.classList.add('active');
+  document.getElementById('seekRow').style.display = 'none';
 
-  // Radio streams need crossorigin for Web Audio CORS; MP3 blobs do not
   audio.pause();
   audio.crossOrigin = 'anonymous';
+  audio.preload = 'none'; // don't buffer ahead — start immediately
   audio.src = station.url;
   audio.volume = parseFloat(document.getElementById('volSlider').value);
-  audio.load();
-  audio.play().then(() => {
-    document.getElementById('sigbars').classList.add('active');
-    document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC feed' : '';
-    document.getElementById('seekRow').style.display = 'none'; // no seek for live streams
-    ensureKeepAlive(); // keep iOS audio session alive when screen locks
-    updateMediaSession(station.name);
-    tryLiveAudio();
-  }).catch(() => {
-    document.getElementById('npMeta').textContent = 'Tap again to play';
-  });
+  // Don't call audio.load() — src change + play() is faster for live streams
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      document.getElementById('sigbars').classList.add('active');
+      document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
+      ensureKeepAlive();
+      updateMediaSession(station.name);
+      tryLiveAudio();
+    }).catch(() => {
+      document.getElementById('npMeta').textContent = 'Tap to play';
+    });
+  }
 }
 
 function toggleStop() {
@@ -1058,14 +1075,6 @@ function startSynthViz() {
     ctx.fillStyle = '#12121a';
     ctx.fillRect(0, 0, W, H);
 
-    // DEBUG line — shows state on canvas so we can diagnose on iPhone
-    ctx.fillStyle = '#4a5060';
-    ctx.font = "9px 'Share Tech Mono'";
-    ctx.textAlign = 'left';
-    ctx.fillText('cur:'+curIdx+' mp3:'+mp3CurIdx+' paused:'+audio.paused+' live:'+liveAudio+' src:'+(audio.src?'yes':'no'), 4, 10);
-
-    // Consider playing if we have a station/track selected with a source loaded
-    // Don't use audio.paused alone — streams show paused=true while buffering
     const hasSrc = !!audio.src && audio.src !== window.location.href;
     const playing = (curIdx >= 0 || mp3CurIdx >= 0) && hasSrc;
     t += 0.04;
@@ -1090,58 +1099,45 @@ function startSynthViz() {
       return;
     }
 
-    // REAL FFT: only works for MP3 (blob URLs, no CORS issue)
-    // For radio streams on iOS, CORS always blocks createMediaElementSource
-    // so we skip the analyser entirely and go straight to synthetic
+    // VIZ DATA SOURCE:
+    // - MP3 (blob URL, no CORS): try real FFT analyser
+    // - Radio streams (iOS CORS blocks): always synthetic
     let usingSynth = true;
-    if (liveAudio && analyser && mp3CurIdx >= 0) {
-      // MP3 only — real FFT works since blob URLs have no CORS
+    if (mp3CurIdx >= 0 && liveAudio && analyser) {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       const timeData = new Uint8Array(analyser.fftSize);
       analyser.getByteFrequencyData(freqData);
       analyser.getByteTimeDomainData(timeData);
-      const hasSignal = freqData.some(v => v > 5);
-      if (hasSignal) {
+      if (freqData.some(v => v > 5)) {
         usingSynth = false;
-        const binCount = analyser.frequencyBinCount;
+        const bc = analyser.frequencyBinCount;
         for (let i = 0; i < NUM_BANDS; i++) {
-          const logStart = Math.pow(binCount, i / NUM_BANDS);
-          const logEnd   = Math.pow(binCount, (i+1) / NUM_BANDS);
-          const start = Math.floor(logStart);
-          const end   = Math.min(Math.ceil(logEnd), binCount - 1);
-          let sum = 0;
-          for (let b = start; b <= end; b++) sum += freqData[b];
-          bands[i] += (sum / (end - start + 1) / 255 - bands[i]) * 0.5;
+          const s = Math.floor(Math.pow(bc, i/NUM_BANDS));
+          const e = Math.min(Math.ceil(Math.pow(bc,(i+1)/NUM_BANDS)), bc-1);
+          let sum = 0; for (let b=s;b<=e;b++) sum+=freqData[b];
+          bands[i] += (sum/(e-s+1)/255 - bands[i]) * 0.5;
         }
         bands._timeData = timeData;
       }
     }
 
+    // Synthetic always runs for radio; also fallback if FFT has no signal
     if (usingSynth) {
-    // SYNTHETIC: energetic fake spectrum — used on iOS for radio (CORS blocks analyser)
-    synthPhase += 0.05;
-    const vol = Math.max(0.6, parseFloat(document.getElementById('volSlider').value));
-    const boost = playing ? 1.4 : 0.3;
-    for (let i = 0; i < NUM_BANDS; i++) {
-      const freq = i / NUM_BANDS;
-      const envelope = freq < 0.15 ? 0.95 : freq < 0.4 ? 0.80 : freq < 0.7 ? 0.55 : 0.25;
-      const pulse = 0.5 + 0.4 * Math.sin(synthPhase * 2.1 + i * 0.3)
-                       * Math.sin(synthPhase * 1.3 + i * 0.7)
-                  + 0.15 * Math.sin(synthPhase * 3.7 + i * 0.5);
-      const noise = (Math.random() - 0.5) * 0.25;
-      targets[i] = Math.max(0, Math.min(1, envelope * pulse * vol * boost + noise * envelope));
+      synthPhase += 0.05;
+      const vol   = Math.max(0.6, parseFloat(document.getElementById('volSlider').value));
+      const boost = playing ? 1.4 : 0.3;
+      for (let i = 0; i < NUM_BANDS; i++) {
+        const freq = i / NUM_BANDS;
+        const env  = freq<0.15?0.95:freq<0.4?0.80:freq<0.7?0.55:0.25;
+        const pulse = 0.5 + 0.4*Math.sin(synthPhase*2.1+i*0.3)*Math.sin(synthPhase*1.3+i*0.7)
+                         + 0.15*Math.sin(synthPhase*3.7+i*0.5);
+        const noise = (Math.random()-0.5)*0.25;
+        targets[i] = Math.max(0, Math.min(1, env*pulse*vol*boost + noise*env));
+      }
+      for (let i=0;i<NUM_BANDS;i++) {
+        bands[i] += (targets[i]-bands[i]) * (bands[i]<targets[i]?0.5:0.18);
+      }
     }
-    for (let i = 0; i < NUM_BANDS; i++) {
-      bands[i] += (targets[i] - bands[i]) * (bands[i] < targets[i] ? 0.5 : 0.18);
-    }
-    } // end synthetic
-
-    // Second debug line — shows which mode is active and signal level
-    const avgBand = (bands.reduce((a,b)=>a+b,0)/NUM_BANDS).toFixed(2);
-    ctx.fillStyle = '#4a5060';
-    ctx.font = "9px 'Share Tech Mono'";
-    ctx.textAlign = 'left';
-    ctx.fillText('synth:'+usingSynth+' avg:'+avgBand+' play:'+playing, 4, 20);
 
     // pick current station color theme
     const cat = curIdx >= 0 ? STATIONS[curIdx].cat : 'mp3';
