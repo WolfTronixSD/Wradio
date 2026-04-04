@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Radio v2.29</title>
+<title>Radio v2.30</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -197,11 +197,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.29</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div class="logo">&#9632; RADIO <span style="font-size:0.9em;color:var(--accent);letter-spacing:1px">v2.30</span> <span style="font-size:0.8em;color:var(--muted);letter-spacing:1px" id="verDate"></span></div>
+      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px;padding-left:2px"></div>
+    </div>
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
       <div class="clock-display" id="clockDisplay">00:00:00</div>
-      <div style="font-family:var(--mono);font-size:0.85em;color:var(--muted);letter-spacing:1px"><span id="utcDisplay">00:00:00</span> <span style="color:var(--amber)">UTC</span></div>
+      <div style="font-family:var(--mono);font-size:0.9em;color:var(--amber);letter-spacing:2px;font-weight:bold"><span id="utcDisplay">00:00:00</span> <span style="font-size:0.8em">UTC</span></div>
     </div>
   </div>
   <div class="now-playing">
@@ -369,7 +372,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.29 <span style="color:var(--muted);font-size:0.85em">2026-04-03 10:00</span></span>
+        <span style="color:var(--accent)">v2.30 <span style="color:var(--muted);font-size:0.85em">2026-04-03 11:00</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -386,7 +389,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.29 <span style="color:var(--muted);font-size:0.85em">2026-04-03 10:00</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.30 <span style="color:var(--muted);font-size:0.85em">2026-04-03 11:00</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Date shown in header (day, date, month, year)<br>
+        UTC time orange + bigger, same size as local clock<br>
+        Viz radio: always synthetic (real FFT only for MP3)
+      </div>
+
+      <div style="color:var(--accent);margin-top:10px">v2.29 <span style="color:var(--muted);font-size:0.85em">2026-04-03 10:00</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         🥚 6-minute egg timer in TIMER tab<br>
         Countdown: green → amber → red<br>
@@ -533,12 +543,16 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.29  (2026-04-03)
+//  Version : v2.30  (2026-04-03)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.29 - 6-minute egg timer added to TIMER tab
+//  v2.30 - Current date shown in header (MON 3 APR 2026)
+//          UTC time now orange/amber, same size as local time
+//          Viz radio fix: skip analyser entirely for streams, always use synthetic
+//          Real FFT only attempted for MP3 (no CORS issue with blob URLs)
+//  v2.29 - 6-minute egg timer with beeper alarm
 //          Countdown display with color: green → amber → red
 //          Web Audio beeper alarm (3 rising tones, repeats every 3s)
 //          Fullscreen overlay on completion, vibration on phones
@@ -779,7 +793,7 @@ function buildUI() {
 
   // Show build date/time in header
   const verDate = document.getElementById('verDate');
-  if (verDate) verDate.textContent = '2026-04-03 10:00';
+  if (verDate) verDate.textContent = '2026-04-03 11:00';
 
   // Restore last Google Drive playlist (names only shown — re-fetched when user signs in)
   const savedPlaylist = localStorage.getItem('wradio_gdrive_playlist');
@@ -827,6 +841,11 @@ function tickClock() {
   const um = String(now.getUTCMinutes()).padStart(2,'0');
   const us = String(now.getUTCSeconds()).padStart(2,'0');
   document.getElementById('utcDisplay').textContent = uh+':'+um+':'+us;
+  // Date display — updates once a second but only changes once a day
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const dateEl = document.getElementById('dateDisplay');
+  if (dateEl) dateEl.textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
   checkSleepTimer();
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
   // Update seek bar for MP3
@@ -1071,20 +1090,19 @@ function startSynthViz() {
       return;
     }
 
-    // REAL FFT: use live analyser data only if it actually has signal
-    // On iOS, liveAudio may be true (keep-alive AudioContext) but the stream
-    // is NOT connected to the analyser due to CORS — all bins return 0
+    // REAL FFT: only works for MP3 (blob URLs, no CORS issue)
+    // For radio streams on iOS, CORS always blocks createMediaElementSource
+    // so we skip the analyser entirely and go straight to synthetic
     let usingSynth = true;
-    if (liveAudio && analyser) {
+    if (liveAudio && analyser && mp3CurIdx >= 0) {
+      // MP3 only — real FFT works since blob URLs have no CORS
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       const timeData = new Uint8Array(analyser.fftSize);
       analyser.getByteFrequencyData(freqData);
       analyser.getByteTimeDomainData(timeData);
-      // Check if there's actual signal (not all zeros)
       const hasSignal = freqData.some(v => v > 5);
       if (hasSignal) {
         usingSynth = false;
-        // Map real FFT data into our bands array for unified rendering
         const binCount = analyser.frequencyBinCount;
         for (let i = 0; i < NUM_BANDS; i++) {
           const logStart = Math.pow(binCount, i / NUM_BANDS);
