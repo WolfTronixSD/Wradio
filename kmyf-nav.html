@@ -357,7 +357,7 @@
   <!-- Data panels -->
   <div class="panels">
     <div class="panel">
-      <div class="panel-label">BEARING</div>
+      <div class="panel-label">BRG TO KMYF</div>
       <div class="panel-value" id="bearingVal">---</div>
       <div class="panel-unit">DEGREES MAG</div>
     </div>
@@ -367,14 +367,14 @@
       <div class="panel-unit" id="distUnit">NM</div>
     </div>
     <div class="panel">
-      <div class="panel-label">HEADING</div>
+      <div class="panel-label">MY HEADING</div>
       <div class="panel-value" id="headingVal">---</div>
-      <div class="panel-unit">DEG TRUE</div>
+      <div class="panel-unit">DEG MAG</div>
     </div>
     <div class="panel">
       <div class="panel-label">REL BEARING</div>
       <div class="panel-value" id="relBearingVal">---</div>
-      <div class="panel-unit">TO KMYF</div>
+      <div class="panel-unit">TO KMYF MAG</div>
     </div>
     <div class="panel panel-wide">
       <div class="coord-block">
@@ -425,10 +425,14 @@
   <!-- Version history -->
   <div id="ver-bar" onclick="toggleHistory()" style="width:100%;padding:5px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-top:1px solid rgba(255,179,0,0.1);">
     <span style="font-size:9px;letter-spacing:2px;color:#7a5500;">VER HISTORY</span>
-    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.4 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
+    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.5 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
   </div>
   <div id="ver-history" style="display:none;width:100%;padding:4px 18px 8px;max-height:160px;overflow-y:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.8;">
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.5</td>
+        <td style="color:#7a5500;">Full magnetic correction: MAG_VAR=-11° applied to true bearing → magnetic bearing to KMYF. webkitCompassHeading already magnetic. All panels now consistent magnetic frame. Labels updated: BRG TO KMYF, MY HEADING DEG MAG.</td>
+      </tr>
       <tr>
         <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.4</td>
         <td style="color:#7a5500;">Corrected all frequencies: ATIS 126.9, TWR 119.2 (alt 125.7), GND 118.225 (CLR 123.72), SoCal App 124.35 (Dep 119.6). LiveATC buttons open KMYF/KSAN feed pages.</td>
@@ -470,20 +474,29 @@
 // KMYF Montgomery-Gibbs Executive Airport
 const KMYF = { lat: 32.8157, lon: -117.1396 };
 
-let currentHeading = null; // device compass heading
+// San Diego magnetic variation: -11° (east variation, subtract from true to get mag)
+// True + VAR = Mag  →  Mag = True - 11  (west var would be +)
+const MAG_VAR = -11; // degrees — negative = east variation for San Diego
+
+let currentHeading = null; // device compass heading (already magnetic via webkitCompassHeading)
 let currentLat = null, currentLon = null;
 
 function toRad(d) { return d * Math.PI / 180; }
 function toDeg(r) { return r * 180 / Math.PI; }
-function fmt3(n) { return String(Math.round(n) % 360).padStart(3,'0'); }
+function fmt3(n) { return String(((Math.round(n) % 360) + 360) % 360).padStart(3,'0'); }
 
-// Great-circle bearing from (lat1,lon1) to (lat2,lon2)
-function bearing(lat1, lon1, lat2, lon2) {
+// Great-circle TRUE bearing from (lat1,lon1) to (lat2,lon2)
+function trueBearing(lat1, lon1, lat2, lon2) {
   const φ1 = toRad(lat1), φ2 = toRad(lat2);
   const Δλ = toRad(lon2 - lon1);
   const y = Math.sin(Δλ) * Math.cos(φ2);
   const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+
+// Convert true bearing to magnetic using local variation
+function toMag(trueBrg) {
+  return ((trueBrg + MAG_VAR) + 360) % 360;
 }
 
 // Haversine distance in NM
@@ -520,26 +533,31 @@ function distNM(lat1, lon1, lat2, lon2) {
 function updateDisplay() {
   if (currentLat === null) return;
 
-  const brg = bearing(currentLat, currentLon, KMYF.lat, KMYF.lon);
+  const brgTrue = trueBearing(currentLat, currentLon, KMYF.lat, KMYF.lon);
+  const brgMag  = toMag(brgTrue);   // magnetic bearing to KMYF
   const dist = distNM(currentLat, currentLon, KMYF.lat, KMYF.lon);
 
-  document.getElementById('bearingVal').textContent = fmt3(brg);
+  // webkitCompassHeading is already magnetic on iOS
+  // So all arithmetic stays in magnetic frame — no further correction needed
+  const headingMag = currentHeading !== null ? currentHeading : null;
+
+  document.getElementById('bearingVal').textContent = fmt3(brgMag);   // MAG bearing to KMYF
   document.getElementById('distVal').textContent = dist < 100 ? dist.toFixed(1) : Math.round(dist);
   document.getElementById('latVal').textContent = (currentLat >= 0 ? 'N' : 'S') + Math.abs(currentLat).toFixed(5);
   document.getElementById('lonVal').textContent = (currentLon >= 0 ? 'E' : 'W') + Math.abs(currentLon).toFixed(5);
 
-  // Compass rose rotates opposite to heading so N always points to device heading
-  const heading = currentHeading !== null ? currentHeading : 0;
-  document.getElementById('compassRose').style.transform = `rotate(${-heading}deg)`;
-  document.getElementById('headingVal').textContent = currentHeading !== null ? fmt3(currentHeading) : '---';
+  // Compass rose: rotates so N faces heading direction
+  // headingMag already in magnetic frame; rose N mark points to mag north of device
+  const hMag = headingMag !== null ? headingMag : 0;
+  document.getElementById('compassRose').style.transform = `rotate(${-hMag}deg)`;
+  document.getElementById('headingVal').textContent = headingMag !== null ? fmt3(headingMag) : '---';
 
-  // Needle points to bearing (absolute), corrected by heading
-  // Needle's 0° is up (north). Rotate so it points to brg relative to screen top.
-  const needleAngle = brg - heading;
+  // Needle: both brgMag and hMag are magnetic — subtraction gives correct relative angle
+  const needleAngle = brgMag - hMag;
   document.getElementById('needleGroup').setAttribute('transform', `rotate(${needleAngle},150,150)`);
 
-  // Relative bearing
-  let rel = Math.round((brg - heading + 360) % 360);
+  // Relative bearing (magnetic bearing to KMYF relative to magnetic heading)
+  let rel = Math.round(((brgMag - hMag) + 360) % 360);
   if (rel > 180) rel -= 360; // -180..+180
   const relStr = (rel >= 0 ? '+' : '') + rel + '°';
   document.getElementById('relBearingVal').textContent = rel === 0 ? '000' : relStr;
