@@ -15,6 +15,7 @@
     --amber-glow: rgba(255,179,0,0.18);
     --green: #00FF88;
     --green-dim: #004422;
+    --red: #ff4444;
     --bg: #070a0e;
     --panel: rgba(10,16,22,0.92);
     --border: rgba(255,179,0,0.22);
@@ -27,18 +28,18 @@
     background: var(--bg);
     color: var(--amber);
     font-family: 'Share Tech Mono', monospace;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     user-select: none;
   }
 
-  /* Starfield / radar grid background */
   body::before {
     content: '';
     position: fixed; inset: 0;
     background:
-      radial-gradient(ellipse at 50% 40%, rgba(255,179,0,0.05) 0%, transparent 65%),
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,179,0,0.04) 40px),
-      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,179,0,0.04) 40px);
+      radial-gradient(ellipse at 50% 30%, rgba(255,179,0,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,179,0,0.03) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,179,0,0.03) 40px);
     pointer-events: none;
     z-index: 0;
   }
@@ -49,8 +50,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
-    padding: 0 0 env(safe-area-inset-bottom);
+    min-height: 100%;
+    padding-bottom: max(env(safe-area-inset-bottom), 12px);
     padding-top: env(safe-area-inset-top);
   }
 
@@ -60,15 +61,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px 8px;
+    padding: 10px 18px 8px;
     border-bottom: 1px solid var(--border);
-    background: rgba(7,10,14,0.8);
+    background: rgba(7,10,14,0.9);
     backdrop-filter: blur(8px);
+    flex-shrink: 0;
   }
   .callsign {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: 22px;
+    font-size: 20px;
     letter-spacing: 3px;
     color: var(--amber);
     text-shadow: 0 0 12px var(--amber);
@@ -81,277 +83,378 @@
     letter-spacing: 2px;
     text-shadow: 0 0 8px var(--green);
     text-align: right;
-    line-height: 1.4;
   }
 
-  /* ── Compass rose ── */
+  /* ── Clock bar ── */
+  .clock-bar {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    background: rgba(5,8,12,0.8);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 18px;
+    gap: 0;
+  }
+  .clock-block { flex: 1; text-align: center; }
+  .clock-label { font-size: 8px; letter-spacing: 2px; color: var(--amber-dim); margin-bottom: 1px; }
+  .clock-time {
+    font-family: 'Orbitron', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,179,0,0.35);
+    letter-spacing: 1px;
+    line-height: 1.1;
+  }
+  .clock-time.zulu { color: var(--green); text-shadow: 0 0 8px rgba(0,255,136,0.35); }
+  .clock-date { font-size: 9px; color: var(--amber-dim); letter-spacing: 1px; margin-top: 1px; }
+  .clock-sep { width: 1px; background: var(--border); margin: 2px 14px; }
+
+  /* ── Compass ── */
   .compass-wrap {
     position: relative;
-    width: min(78vw, 310px);
-    height: min(78vw, 310px);
-    margin: 18px auto 10px;
+    width: min(82vw, 310px);
+    height: min(82vw, 310px);
+    margin: 14px auto 8px;
     flex-shrink: 0;
   }
 
-  .compass-ring {
+  /* Outer bezel */
+  .compass-bezel {
     position: absolute; inset: 0;
     border-radius: 50%;
-    border: 2px solid var(--border);
+    background:
+      radial-gradient(ellipse at 35% 20%, rgba(90,65,5,0.6), transparent 50%),
+      conic-gradient(from 0deg, #151000, #2e2200, #1a1500, #2e2200, #151000, #2e2200, #1a1500, #2e2200, #151000);
     box-shadow:
-      0 0 0 1px rgba(255,179,0,0.08),
-      0 0 30px rgba(255,179,0,0.08),
-      inset 0 0 40px rgba(0,0,0,0.6);
-    background: radial-gradient(ellipse at 50% 30%, rgba(255,179,0,0.06), transparent 70%);
+      0 0 0 2px rgba(255,179,0,0.5),
+      0 0 0 4px rgba(80,55,0,0.4),
+      0 0 30px rgba(255,179,0,0.12),
+      0 6px 30px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(255,200,50,0.15);
   }
 
-  .compass-svg {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Inner compass face */
+  .compass-face {
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 45% 30%, #0d1520 0%, #060a10 70%, #030508 100%);
+    box-shadow:
+      inset 0 0 40px rgba(0,0,0,0.9),
+      inset 0 0 15px rgba(255,179,0,0.04),
+      0 0 0 1px rgba(255,179,0,0.1);
   }
 
-  /* The bearing needle (doesn't rotate with compass) */
-  .needle-layer {
+  /* Subtle glow highlight */
+  .compass-face::before {
+    content: '';
     position: absolute; inset: 0;
-    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 40% 25%, rgba(255,179,0,0.05), transparent 55%);
+  }
+
+  /* Radar sweep */
+  @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .compass-sweep {
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    background: conic-gradient(from -5deg, transparent 0deg, rgba(255,179,0,0.05) 35deg, transparent 37deg);
+    animation: sweep 4s linear infinite;
     pointer-events: none;
+    z-index: 3;
   }
 
-  .center-dot {
+  /* Rotating rose SVG */
+  .compass-svg {
+    position: absolute;
+    inset: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
+    z-index: 4;
+  }
+
+  /* Fixed needle SVG */
+  .needle-layer {
+    position: absolute;
+    inset: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    pointer-events: none;
+    z-index: 8;
+  }
+
+  /* Fixed lubber line at top */
+  .lubber-line {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 3px; height: 22px;
+    background: linear-gradient(to bottom, rgba(255,220,50,0.95), rgba(255,179,0,0.1));
+    border-radius: 2px;
+    z-index: 12;
+  }
+
+  /* Center hub */
+  .center-hub {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 12px; height: 12px;
+    width: 14px; height: 14px;
     border-radius: 50%;
-    background: var(--amber);
-    box-shadow: 0 0 10px var(--amber), 0 0 20px var(--amber);
-    z-index: 10;
+    background: radial-gradient(circle at 38% 32%, #fff8d0, #cc7700);
+    box-shadow: 0 0 6px rgba(255,179,0,0.9), 0 0 14px rgba(255,179,0,0.4);
+    z-index: 20;
   }
 
   /* ── Data panels ── */
   .panels {
     width: 100%;
-    padding: 0 18px;
+    padding: 0 14px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
-
   .panel {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 12px 14px;
+    padding: 10px 12px;
     position: relative;
     overflow: hidden;
   }
   .panel::before {
     content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
   }
-  .panel-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--amber-dim);
-    margin-bottom: 4px;
-    text-transform: uppercase;
-  }
+  .panel-label { font-size: 8px; letter-spacing: 2px; color: var(--amber-dim); margin-bottom: 3px; text-transform: uppercase; }
   .panel-value {
     font-family: 'Orbitron', monospace;
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 24px; font-weight: 700;
     color: var(--amber);
     text-shadow: 0 0 10px rgba(255,179,0,0.5);
     line-height: 1;
   }
-  .panel-unit {
-    font-size: 10px;
-    color: var(--amber-dim);
-    margin-top: 2px;
-    letter-spacing: 1px;
-  }
-
-  /* wide panel for coordinates */
+  .panel-unit { font-size: 9px; color: var(--amber-dim); margin-top: 2px; letter-spacing: 1px; }
   .panel-wide {
     grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px;
   }
   .panel-wide .coord-block { text-align: center; flex: 1; }
-  .panel-wide .coord-sep {
-    width: 1px;
-    height: 30px;
-    background: var(--border);
-    margin: 0 10px;
-  }
+  .panel-wide .coord-sep { width:1px; height:28px; background:var(--border); margin:0 8px; }
   .coord-val {
     font-family: 'Orbitron', monospace;
-    font-size: 13px;
-    color: var(--amber);
+    font-size: 12px; color: var(--amber);
     text-shadow: 0 0 6px rgba(255,179,0,0.4);
   }
 
-  /* ── Status bar ── */
-  .status {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--amber-dim);
-    padding: 4px 20px 10px;
-    text-align: center;
-    width: 100%;
+  /* ── ATC Freq buttons ── */
+  .freq-section { width:100%; padding: 0 14px 8px; }
+  .freq-section-label {
+    font-size: 8px; letter-spacing: 2px; color: var(--amber-dim);
+    margin-bottom: 6px; padding-top: 4px;
+    border-top: 1px solid rgba(255,179,0,0.1);
   }
-  .status.ok { color: var(--green); text-shadow: 0 0 6px var(--green); }
-  .status.warn { color: #ff6b35; }
+  .freq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-  /* ── Tap target ── */
-  #start-btn {
-    display: none;
-    margin: auto;
-    font-family: 'Orbitron', monospace;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    background: transparent;
-    border: 1px solid var(--amber);
-    color: var(--amber);
-    padding: 14px 32px;
-    border-radius: 6px;
-    text-shadow: 0 0 8px var(--amber);
-    box-shadow: 0 0 20px rgba(255,179,0,0.15);
-    cursor: pointer;
-  }
-  #start-btn:active { background: var(--amber-glow); }
-
-  /* sweep animation on compass */
-  @keyframes sweep {
-    0%   { opacity: 1; }
-    100% { opacity: 0; transform: rotate(360deg); }
-  }
-  .sweep {
-    position: absolute; inset: 0;
-    border-radius: 50%;
-    background: conic-gradient(from -10deg, transparent 0deg, rgba(255,179,0,0.12) 60deg, transparent 61deg);
-    animation: sweep 3s linear infinite;
-    pointer-events: none;
-  }
-
-  /* ── Frequency buttons ── */
   .freq-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex; flex-direction: column; align-items: flex-start;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 12px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
+    padding: 9px 11px;
+    cursor: pointer; position: relative; overflow: hidden;
     transition: border-color 0.15s, background 0.15s;
     text-align: left;
   }
   .freq-btn::before {
     content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
+    position: absolute; top:0; left:0; right:0; height:1px;
     background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
   }
-  .freq-btn:active {
-    background: rgba(255,179,0,0.12);
-    border-color: var(--amber);
-  }
-  .freq-btn-socal {
-    border-color: rgba(0,255,136,0.25);
-  }
-  .freq-btn-socal::before {
-    background: linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent);
-  }
-  .freq-btn-socal:active {
-    background: rgba(0,255,136,0.08);
+  .freq-btn.playing {
     border-color: var(--green);
+    background: rgba(0,255,136,0.07);
   }
-  .freq-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--amber-dim);
-    margin-bottom: 3px;
-  }
-  .freq-btn-socal .freq-label { color: #004422; }
+  .freq-btn.playing::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+  .freq-btn-socal { border-color: rgba(0,255,136,0.22); }
+  .freq-btn-socal::before { background: linear-gradient(90deg, transparent, rgba(0,255,136,0.25), transparent); }
+  .freq-btn-socal .freq-label { color: #005530; }
+  .freq-btn-socal .freq-hz { color: var(--green); text-shadow: 0 0 8px rgba(0,255,136,0.4); }
+  .freq-btn-socal .freq-sub { color: #005530; }
+
+  .freq-label  { font-size: 8px; letter-spacing: 2px; color: var(--amber-dim); margin-bottom: 2px; }
   .freq-hz {
     font-family: 'Orbitron', monospace;
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 16px; font-weight: 700;
     color: var(--amber);
     text-shadow: 0 0 8px rgba(255,179,0,0.4);
-    letter-spacing: 1px;
-    line-height: 1;
+    letter-spacing: 1px; line-height: 1;
   }
-  .freq-btn-socal .freq-hz { color: var(--green); text-shadow: 0 0 8px rgba(0,255,136,0.4); }
-  .freq-sub {
-    font-size: 8px;
-    letter-spacing: 1.5px;
-    color: var(--amber-dim);
-    margin-top: 3px;
+  .freq-sub { font-size: 8px; letter-spacing: 1.5px; color: var(--amber-dim); margin-top: 2px; }
+  .freq-play-icon {
+    position: absolute; top: 7px; right: 9px;
+    font-size: 10px; color: var(--amber-dim);
+    transition: color 0.15s;
   }
-  .freq-btn-socal .freq-sub { color: #004422; }
+  .freq-btn.playing .freq-play-icon { color: var(--green); }
 
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.5; }
+  /* ── Now playing ── */
+  .now-playing {
+    display: none;
+    width: 100%; padding: 7px 14px;
+    background: rgba(0,255,136,0.05);
+    border-top: 1px solid rgba(0,255,136,0.15);
+    border-bottom: 1px solid rgba(0,255,136,0.15);
+    align-items: center; gap: 10px;
   }
+  .now-playing.active { display: flex; }
+  @keyframes npPulse { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+  .np-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 6px var(--green);
+    flex-shrink: 0; animation: npPulse 1s ease-in-out infinite;
+  }
+  .np-text { font-size: 9px; letter-spacing: 1.5px; color: var(--green); flex: 1; }
+  .np-stop {
+    font-size: 9px; color: var(--red); letter-spacing: 1px;
+    cursor: pointer; padding: 3px 8px;
+    border: 1px solid rgba(255,68,68,0.3); border-radius: 4px;
+  }
+
+  /* ── Status / buttons ── */
+  .status {
+    font-size: 9px; letter-spacing: 1.5px; color: var(--amber-dim);
+    padding: 4px 18px 6px; text-align: center; width: 100%;
+  }
+  .status.ok   { color: var(--green); text-shadow: 0 0 6px var(--green); }
+  .status.warn { color: #ff6b35; }
+
+  #start-btn {
+    display: none; margin: 4px auto;
+    font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; letter-spacing: 3px;
+    background: transparent; border: 1px solid var(--amber); color: var(--amber);
+    padding: 12px 28px; border-radius: 6px;
+    text-shadow: 0 0 8px var(--amber); box-shadow: 0 0 20px rgba(255,179,0,0.15);
+    cursor: pointer;
+  }
+  #manual-btn {
+    display: none; margin: 4px auto;
+    font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    background: transparent; border: 1px solid var(--amber-dim); color: var(--amber-dim);
+    padding: 8px 20px; border-radius: 6px; cursor: pointer;
+  }
+  #manual-input { display: none; width: 100%; padding: 6px 14px; }
+  #manual-input .mi-label { font-size:8px; letter-spacing:2px; color:var(--amber-dim); margin-bottom:5px; text-align:center; }
+  #manual-input .mi-row   { display:flex; gap:8px; }
+  #manual-input input {
+    flex:1; background:var(--panel); border:1px solid var(--amber-dim); border-radius:6px;
+    color:var(--amber); font-family:'Share Tech Mono',monospace; font-size:13px;
+    padding:7px; text-align:center;
+  }
+  #manual-input .mi-set {
+    width:100%; margin-top:6px;
+    font-family:'Orbitron',monospace; font-size:11px; font-weight:700; letter-spacing:2px;
+    background:rgba(255,179,0,0.08); border:1px solid var(--amber); color:var(--amber);
+    padding:9px; border-radius:6px; cursor:pointer;
+  }
+
+  /* ── Version history ── */
+  .ver-bar {
+    width:100%; padding:6px 14px;
+    display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; border-top:1px solid rgba(255,179,0,0.1);
+    background:rgba(5,8,12,0.5);
+  }
+  .ver-bar-label { font-size:8px; letter-spacing:2px; color:var(--amber-dim); }
+  .ver-bar-badge { font-family:'Orbitron',monospace; font-size:11px; color:var(--amber); letter-spacing:2px; }
+  .ver-table {
+    display: none; width:100%; padding:4px 14px 12px;
+    background:rgba(5,8,12,0.4);
+    border-bottom: 1px solid rgba(255,179,0,0.08);
+  }
+  .ver-table table { width:100%; border-collapse:collapse; font-size:9px; line-height:1.9; }
+  .ver-table td:first-child {
+    color:var(--amber); font-family:'Orbitron',monospace;
+    white-space:nowrap; padding-right:10px; vertical-align:top; font-size:10px;
+  }
+  .ver-table td:last-child { color:var(--amber-dim); }
+  .ver-table tr { border-bottom:1px solid rgba(255,179,0,0.04); }
+
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
   .blink { animation: pulse 1.2s ease-in-out infinite; }
 </style>
 </head>
 <body>
 <div id="app">
 
+  <!-- Header -->
   <header>
     <div class="callsign">NAV</div>
-    <div class="airport-id">KMYF<br>MONTGOMERY</div>
+    <div class="airport-id">KMYF · MONTGOMERY</div>
   </header>
+
+  <!-- Clock bar -->
+  <div class="clock-bar">
+    <div class="clock-block">
+      <div class="clock-label">LOCAL</div>
+      <div class="clock-time" id="localTime">--:--:--</div>
+      <div class="clock-date" id="localDate">--- -- ----</div>
+    </div>
+    <div class="clock-sep"></div>
+    <div class="clock-block">
+      <div class="clock-label">ZULU (UTC)</div>
+      <div class="clock-time zulu" id="zuluTime">--:--:--Z</div>
+      <div class="clock-date" id="zuluDate">--- -- ----</div>
+    </div>
+  </div>
 
   <!-- Compass -->
   <div class="compass-wrap">
-    <div class="compass-ring"></div>
-    <div class="sweep"></div>
+    <div class="compass-bezel"></div>
+    <div class="compass-face"></div>
+    <div class="compass-sweep"></div>
 
-    <!-- Rotating compass rose (tracks heading) -->
-    <svg class="compass-svg" id="compassRose" viewBox="0 0 300 300">
-      <!-- Cardinal tick marks -->
-      <g id="ticks"></g>
-      <!-- Cardinal letters -->
-      <text x="150" y="30" text-anchor="middle" fill="#FFB300" font-family="Orbitron,monospace" font-size="18" font-weight="900" opacity="0.9">N</text>
-      <text x="150" y="278" text-anchor="middle" fill="#FFB300" font-family="Orbitron,monospace" font-size="14" font-weight="700" opacity="0.6">S</text>
-      <text x="278" y="155" text-anchor="middle" fill="#FFB300" font-family="Orbitron,monospace" font-size="14" font-weight="700" opacity="0.6">E</text>
-      <text x="22"  y="155" text-anchor="middle" fill="#FFB300" font-family="Orbitron,monospace" font-size="14" font-weight="700" opacity="0.6">W</text>
-
-      <!-- Degree marks -->
+    <!-- Rotating rose -->
+    <svg class="compass-svg" id="compassRose" viewBox="0 0 284 284">
       <g id="degMarks"></g>
+      <g id="cardinalLabels"></g>
     </svg>
 
-    <!-- Fixed needle pointing to KMYF -->
-    <svg class="needle-layer" id="needleLayer" viewBox="0 0 300 300">
-      <!-- Bearing needle -->
-      <g id="needleGroup" transform="rotate(0,150,150)">
-        <!-- head -->
-        <polygon points="150,42 143,90 157,90" fill="#00FF88" opacity="0.95"/>
-        <!-- tail -->
-        <polygon points="150,258 144,210 156,210" fill="#ff4444" opacity="0.7"/>
-        <!-- shaft -->
-        <line x1="150" y1="90" x2="150" y2="210" stroke="#FFB300" stroke-width="1" opacity="0.4"/>
+    <!-- Fixed needle -->
+    <svg class="needle-layer" viewBox="0 0 284 284">
+      <defs>
+        <filter id="needleGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="3.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="redGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="needleGroup" transform="rotate(0,142,142)">
+        <!-- North/KMYF head — bright green diamond -->
+        <polygon points="142,34 135,78 142,93 149,78"
+          fill="#00FF88" filter="url(#needleGlow)" opacity="0.95"/>
+        <!-- South tail — red -->
+        <polygon points="142,250 136,206 142,193 148,206"
+          fill="#ff3333" filter="url(#redGlow)" opacity="0.8"/>
+        <!-- Center shaft -->
+        <line x1="142" y1="93" x2="142" y2="193"
+          stroke="rgba(255,179,0,0.2)" stroke-width="1.5"/>
       </g>
-      <!-- Fixed heading indicator at top -->
-      <polygon points="150,8 145,20 155,20" fill="#FFB300" opacity="0.8"/>
     </svg>
 
-    <div class="center-dot"></div>
+    <!-- Fixed lubber line at top -->
+    <div class="lubber-line"></div>
+    <!-- Center hub -->
+    <div class="center-hub"></div>
   </div>
 
   <!-- Data panels -->
@@ -364,7 +467,7 @@
     <div class="panel">
       <div class="panel-label">DISTANCE</div>
       <div class="panel-value" id="distVal">---</div>
-      <div class="panel-unit" id="distUnit">NM</div>
+      <div class="panel-unit">NM</div>
     </div>
     <div class="panel">
       <div class="panel-label">MY HEADING</div>
@@ -387,241 +490,306 @@
         <div class="coord-val" id="lonVal">---.------</div>
       </div>
     </div>
-    <div class="panel" style="grid-column:1">
+    <div class="panel">
       <div class="panel-label">SPEED</div>
       <div class="panel-value" id="spdKtVal">---</div>
       <div class="panel-unit">KNOTS</div>
     </div>
-    <div class="panel" style="grid-column:2">
+    <div class="panel">
       <div class="panel-label">SPEED</div>
       <div class="panel-value" id="spdMphVal">---</div>
       <div class="panel-unit">MPH</div>
     </div>
   </div>
 
-  <!-- Frequency buttons -->
-  <div style="width:100%;padding:0 18px 10px;">
-    <div style="font-size:9px;letter-spacing:2px;color:#7a5500;margin-bottom:7px;padding-top:6px;border-top:1px solid rgba(255,179,0,0.1);">FREQUENCIES</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+  <!-- ATC frequencies -->
+  <div class="freq-section">
+    <div class="freq-section-label">▶ ATC LIVE STREAMS — TAP TO PLAY / STOP</div>
+    <div class="freq-grid">
 
-      <button class="freq-btn" onclick="openLiveATC('KMYF ATIS','https://www.liveatc.net/search/?icao=kmyf')">
+      <button class="freq-btn" id="btn-atis" onclick="toggleStream('atis')">
+        <span class="freq-play-icon" id="icon-atis">▶</span>
         <span class="freq-label">ATIS</span>
         <span class="freq-hz">126.900</span>
         <span class="freq-sub">KMYF</span>
       </button>
 
-      <button class="freq-btn" onclick="openLiveATC('KMYF TWR','https://www.liveatc.net/search/?icao=kmyf')">
+      <button class="freq-btn" id="btn-twr" onclick="toggleStream('twr')">
+        <span class="freq-play-icon" id="icon-twr">▶</span>
         <span class="freq-label">TOWER</span>
         <span class="freq-hz">119.200</span>
         <span class="freq-sub">KMYF · 125.7 ALT</span>
       </button>
 
-      <button class="freq-btn" onclick="openLiveATC('KMYF GND','https://www.liveatc.net/search/?icao=kmyf')">
+      <button class="freq-btn" id="btn-gnd" onclick="toggleStream('gnd')">
+        <span class="freq-play-icon" id="icon-gnd">▶</span>
         <span class="freq-label">GROUND</span>
         <span class="freq-hz">118.225</span>
         <span class="freq-sub">KMYF · CLR 123.72</span>
       </button>
 
-      <button class="freq-btn freq-btn-socal" onclick="openLiveATC('SOCAL APP','https://www.liveatc.net/search/?icao=ksan')">
+      <button class="freq-btn freq-btn-socal" id="btn-socal" onclick="toggleStream('socal')">
+        <span class="freq-play-icon" id="icon-socal">▶</span>
         <span class="freq-label">SOCAL APP</span>
         <span class="freq-hz">124.350</span>
         <span class="freq-sub">DEP 119.600</span>
       </button>
 
     </div>
-    <div id="freq-toast" style="display:none;text-align:center;font-size:9px;letter-spacing:2px;color:#00FF88;margin-top:6px;"></div>
+  </div>
+
+  <!-- Now playing -->
+  <div class="now-playing" id="nowPlaying">
+    <div class="np-dot"></div>
+    <div class="np-text" id="npText">LIVE ATC</div>
+    <div class="np-stop" onclick="stopStream()">■ STOP</div>
+  </div>
+
+  <!-- Status / buttons -->
+  <div class="status blink" id="statusMsg">AWAITING PERMISSION...</div>
+  <button id="start-btn" onclick="requestSensors()">INITIALIZE NAV</button>
+  <button id="manual-btn" onclick="useManualLocation()">USE MANUAL COORDS</button>
+  <div id="manual-input">
+    <div class="mi-label">ENTER YOUR POSITION</div>
+    <div class="mi-row">
+      <input id="manLat" type="number" step="0.0001" placeholder="LAT 32.72">
+      <input id="manLon" type="number" step="0.0001" placeholder="LON -117.15">
+    </div>
+    <button class="mi-set" onclick="applyManual()">SET POSITION</button>
   </div>
 
   <!-- Version history -->
-  <div id="ver-bar" onclick="toggleHistory()" style="width:100%;padding:5px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-top:1px solid rgba(255,179,0,0.1);">
-    <span style="font-size:9px;letter-spacing:2px;color:#7a5500;">VER HISTORY</span>
-    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.6 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
+  <div class="ver-bar" onclick="toggleHistory()">
+    <span class="ver-bar-label">VERSION HISTORY</span>
+    <span class="ver-bar-badge">v1.7 <span id="ver-arrow">▼</span></span>
   </div>
-  <div id="ver-history" style="display:none;width:100%;padding:4px 18px 8px;max-height:160px;overflow-y:auto;">
-    <table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.8;">
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.6</td>
-        <td style="color:#7a5500;">Added speed panels: KNOTS and MPH from GPS coords.speed (m/s). Shows --- when stationary or speed unavailable.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.5</td>
-        <td style="color:#7a5500;">Full magnetic correction: MAG_VAR=-11° applied to true bearing → magnetic bearing to KMYF. webkitCompassHeading already magnetic. All panels now consistent magnetic frame. Labels updated: BRG TO KMYF, MY HEADING DEG MAG.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.4</td>
-        <td style="color:#7a5500;">Corrected all frequencies: ATIS 126.9, TWR 119.2 (alt 125.7), GND 118.225 (CLR 123.72), SoCal App 124.35 (Dep 119.6). LiveATC buttons open KMYF/KSAN feed pages.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.3</td>
-        <td style="color:#7a5500;">Added frequency buttons: KMYF ATIS 135.025, TWR 132.175, GND 121.600, SoCal Approach 124.350. Tap opens LiveATC feed.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.2</td>
-        <td style="color:#7a5500;">Manual coords fallback when GPS blocked on file:// origin. Auto pre-fills San Diego center.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.1</td>
-        <td style="color:#7a5500;">GPS watchPosition with high accuracy. Compass permission button for iOS 13+. Absolute orientation preferred over deviceorientation.</td>
-      </tr>
-      <tr>
-        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.0</td>
-        <td style="color:#7a5500;">Initial release. Rotating compass rose, great-circle bearing &amp; haversine distance to KMYF. Green needle, bearing/distance/heading/rel-bearing panels.</td>
-      </tr>
+  <div class="ver-table" id="ver-history">
+    <table>
+      <tr><td>v1.7</td><td>Enhanced compass: beveled bezel, degree numbers, cardinal/intercardinal labels without overlap. Clock bar: local + Zulu + date. ATC buttons stream live audio inline. Now-playing bar with stop. Version history shown in-page.</td></tr>
+      <tr><td>v1.6</td><td>Speed panels: KNOTS and MPH from GPS coords.speed (m/s).</td></tr>
+      <tr><td>v1.5</td><td>Full magnetic correction: MAG_VAR=−11° (San Diego east variation). True→mag bearing. All panels consistent magnetic frame.</td></tr>
+      <tr><td>v1.4</td><td>Corrected frequencies: ATIS 126.9, TWR 119.2 (alt 125.7), GND 118.225 (CLR 123.72), SoCal App 124.35 (Dep 119.6).</td></tr>
+      <tr><td>v1.3</td><td>Added frequency buttons for ATIS, TWR, GND, SoCal Approach opening LiveATC.</td></tr>
+      <tr><td>v1.2</td><td>Manual coords fallback when GPS blocked on file:// origin. Pre-fills San Diego center.</td></tr>
+      <tr><td>v1.1</td><td>GPS watchPosition with high accuracy. iOS 13+ compass permission button. Absolute orientation preferred.</td></tr>
+      <tr><td>v1.0</td><td>Initial release. Rotating compass rose, great-circle bearing + haversine distance to KMYF. Green needle, 4 data panels.</td></tr>
     </table>
   </div>
 
-  <div class="status blink" id="statusMsg">AWAITING PERMISSION...</div>
-  <button id="start-btn" onclick="requestSensors()">INITIALIZE NAV</button>
-  <button id="manual-btn" onclick="useManualLocation()" style="display:none;margin:6px auto 0;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;background:transparent;border:1px solid #7a5500;color:#7a5500;padding:10px 24px;border-radius:6px;cursor:pointer;">USE MANUAL COORDS</button>
-  <div id="manual-input" style="display:none;width:100%;padding:8px 18px;">
-    <div style="font-size:9px;letter-spacing:2px;color:#7a5500;margin-bottom:6px;text-align:center;">ENTER YOUR POSITION</div>
-    <div style="display:flex;gap:8px;">
-      <input id="manLat" type="number" step="0.0001" placeholder="LAT e.g. 32.72" style="flex:1;background:#0a1016;border:1px solid #7a5500;border-radius:6px;color:#FFB300;font-family:'Share Tech Mono',monospace;font-size:14px;padding:8px;text-align:center;">
-      <input id="manLon" type="number" step="0.0001" placeholder="LON e.g. -117.15" style="flex:1;background:#0a1016;border:1px solid #7a5500;border-radius:6px;color:#FFB300;font-family:'Share Tech Mono',monospace;font-size:14px;padding:8px;text-align:center;">
-    </div>
-    <button onclick="applyManual()" style="width:100%;margin-top:8px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;background:rgba(255,179,0,0.1);border:1px solid #FFB300;color:#FFB300;padding:10px;border-radius:6px;cursor:pointer;">SET POSITION</button>
-  </div>
+</div><!-- #app -->
 
-</div>
+<audio id="atcAudio" preload="none"></audio>
 
 <script>
-// KMYF Montgomery-Gibbs Executive Airport
-const KMYF = { lat: 32.8157, lon: -117.1396 };
+// ── Constants ──
+const KMYF    = { lat: 32.8157, lon: -117.1396 };
+const MAG_VAR = -11; // San Diego: east variation → magnetic = true − 11
 
-// San Diego magnetic variation: -11° (east variation, subtract from true to get mag)
-// True + VAR = Mag  →  Mag = True - 11  (west var would be +)
-const MAG_VAR = -11; // degrees — negative = east variation for San Diego
+// LiveATC stream mount points (confirmed from liveatc.net search results)
+const STREAMS = {
+  atis:  { label: 'KMYF ATIS',       url: 'https://www.liveatc.net/hlisten.php?mount=ksan_kmyf_atis&icao=kmyf' },
+  twr:   { label: 'KMYF TOWER',      url: 'https://www.liveatc.net/hlisten.php?mount=kmyf1_twr&icao=kmyf'     },
+  gnd:   { label: 'KMYF GROUND/TWR', url: 'https://www.liveatc.net/hlisten.php?mount=kmyf_twr&icao=kmyf'      },
+  socal: { label: 'SOCAL APPROACH',  url: 'https://www.liveatc.net/hlisten.php?mount=kmyf_app&icao=kmyf'      }
+};
 
-let currentHeading = null; // device compass heading (already magnetic via webkitCompassHeading)
-let currentLat = null, currentLon = null;
-let currentSpeedMps = null; // m/s from GPS
+// ── State ──
+let currentHeading = null, currentLat = null, currentLon = null, currentSpeedMps = null;
+let activeStream = null;
 
-function toRad(d) { return d * Math.PI / 180; }
-function toDeg(r) { return r * 180 / Math.PI; }
-function fmt3(n) { return String(((Math.round(n) % 360) + 360) % 360).padStart(3,'0'); }
+// ── Math ──
+const toRad = d => d * Math.PI / 180;
+const toDeg = r => r * 180 / Math.PI;
+const fmt3  = n => String(((Math.round(n) % 360) + 360) % 360).padStart(3, '0');
+const pad2  = n => String(n).padStart(2, '0');
 
-// Great-circle TRUE bearing from (lat1,lon1) to (lat2,lon2)
 function trueBearing(lat1, lon1, lat2, lon2) {
-  const φ1 = toRad(lat1), φ2 = toRad(lat2);
-  const Δλ = toRad(lon2 - lon1);
+  const φ1 = toRad(lat1), φ2 = toRad(lat2), Δλ = toRad(lon2 - lon1);
   const y = Math.sin(Δλ) * Math.cos(φ2);
   const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
 }
+const toMag = t => ((t + MAG_VAR) + 360) % 360;
 
-// Convert true bearing to magnetic using local variation
-function toMag(trueBrg) {
-  return ((trueBrg + MAG_VAR) + 360) % 360;
-}
-
-// Haversine distance in NM
 function distNM(lat1, lon1, lat2, lon2) {
-  const R = 3440.065; // NM
-  const φ1=toRad(lat1), φ2=toRad(lat2);
-  const Δφ=toRad(lat2-lat1), Δλ=toRad(lon2-lon1);
+  const R = 3440.065;
+  const φ1=toRad(lat1), φ2=toRad(lat2), Δφ=toRad(lat2-lat1), Δλ=toRad(lon2-lon1);
   const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Build compass degree marks
+// ── Build compass rose ──
 (function buildCompass() {
-  const svg = document.getElementById('degMarks');
-  const cx=150, cy=150, r=135;
-  for (let i=0; i<360; i+=5) {
-    const angle = toRad(i-90);
-    const isMajor = i%30===0;
-    const len = isMajor ? 14 : (i%10===0 ? 9 : 5);
-    const x1 = cx + r*Math.cos(angle);
-    const y1 = cy + r*Math.sin(angle);
-    const x2 = cx + (r-len)*Math.cos(angle);
-    const y2 = cy + (r-len)*Math.sin(angle);
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
-    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
-    line.setAttribute('stroke','#FFB300');
-    line.setAttribute('stroke-width', isMajor?1.5:0.8);
-    line.setAttribute('opacity', isMajor?0.7:0.3);
-    svg.appendChild(line);
+  const marksG  = document.getElementById('degMarks');
+  const labelsG = document.getElementById('cardinalLabels');
+  const cx = 142, cy = 142, R = 128;
+
+  // Ticks + numbers
+  for (let i = 0; i < 360; i += 5) {
+    const isMaj30 = i % 30 === 0;
+    const isMaj10 = i % 10 === 0;
+    const len = isMaj30 ? 17 : (isMaj10 ? 11 : 5);
+    const sw  = isMaj30 ? 2   : (isMaj10 ? 1.2 : 0.7);
+    const op  = isMaj30 ? 0.9 : (isMaj10 ? 0.5 : 0.22);
+    const col = isMaj30 ? '#FFB300' : '#b07a00';
+    const ang = toRad(i - 90);
+    const x1 = cx + R * Math.cos(ang), y1 = cy + R * Math.sin(ang);
+    const x2 = cx + (R-len)*Math.cos(ang), y2 = cy + (R-len)*Math.sin(ang);
+    const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',x1); ln.setAttribute('y1',y1);
+    ln.setAttribute('x2',x2); ln.setAttribute('y2',y2);
+    ln.setAttribute('stroke',col); ln.setAttribute('stroke-width',sw); ln.setAttribute('opacity',op);
+    marksG.appendChild(ln);
+
+    // Degree numbers every 30°, skip the 4 cardinals (they get letter labels)
+    if (isMaj30 && i !== 0 && i !== 90 && i !== 180 && i !== 270) {
+      const nr = R - 28;
+      const tx = cx + nr*Math.cos(ang), ty = cy + nr*Math.sin(ang);
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',tx); t.setAttribute('y',ty);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+      t.setAttribute('fill','#FFB300'); t.setAttribute('font-family','Orbitron,monospace');
+      t.setAttribute('font-size','10'); t.setAttribute('font-weight','600');
+      t.setAttribute('opacity','0.6');
+      t.setAttribute('transform',`rotate(${i},${tx},${ty})`);
+      t.textContent = i;
+      marksG.appendChild(t);
+    }
   }
+
+  // Cardinal + intercardinal letter labels
+  const cards = [
+    { d:   0, l:'N',  s:20, w:'900', c:'#ffffff', glow:'rgba(255,255,255,0.7)' },
+    { d:  90, l:'E',  s:15, w:'700', c:'#FFB300', glow:'rgba(255,179,0,0.5)'   },
+    { d: 180, l:'S',  s:15, w:'700', c:'#FFB300', glow:'rgba(255,179,0,0.5)'   },
+    { d: 270, l:'W',  s:15, w:'700', c:'#FFB300', glow:'rgba(255,179,0,0.5)'   },
+    { d:  45, l:'NE', s:9,  w:'400', c:'#996600', glow:null },
+    { d: 135, l:'SE', s:9,  w:'400', c:'#996600', glow:null },
+    { d: 225, l:'SW', s:9,  w:'400', c:'#996600', glow:null },
+    { d: 315, l:'NW', s:9,  w:'400', c:'#996600', glow:null },
+  ];
+  const LR = R - 30;
+  cards.forEach(c => {
+    const ang = toRad(c.d - 90);
+    const tx = cx + LR*Math.cos(ang), ty = cy + LR*Math.sin(ang);
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',tx); t.setAttribute('y',ty);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+    t.setAttribute('fill',c.c); t.setAttribute('font-family','Orbitron,monospace');
+    t.setAttribute('font-size',c.s); t.setAttribute('font-weight',c.w);
+    if (c.glow) t.setAttribute('filter',`drop-shadow(0 0 4px ${c.glow})`);
+    labelsG.appendChild(t);
+    t.textContent = c.l;
+  });
 })();
 
+// ── Clocks ──
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function updateClocks() {
+  const n = new Date();
+  document.getElementById('localTime').textContent = `${pad2(n.getHours())}:${pad2(n.getMinutes())}:${pad2(n.getSeconds())}`;
+  document.getElementById('localDate').textContent = `${MONTHS[n.getMonth()]} ${pad2(n.getDate())} ${n.getFullYear()}`;
+  document.getElementById('zuluTime').textContent  = `${pad2(n.getUTCHours())}:${pad2(n.getUTCMinutes())}:${pad2(n.getUTCSeconds())}Z`;
+  document.getElementById('zuluDate').textContent  = `${MONTHS[n.getUTCMonth()]} ${pad2(n.getUTCDate())} ${n.getUTCFullYear()}`;
+}
+setInterval(updateClocks, 1000);
+updateClocks();
+
+// ── Display update ──
 function updateDisplay() {
   if (currentLat === null) return;
-
   const brgTrue = trueBearing(currentLat, currentLon, KMYF.lat, KMYF.lon);
-  const brgMag  = toMag(brgTrue);   // magnetic bearing to KMYF
-  const dist = distNM(currentLat, currentLon, KMYF.lat, KMYF.lon);
+  const brgMag  = toMag(brgTrue);
+  const dist    = distNM(currentLat, currentLon, KMYF.lat, KMYF.lon);
+  const hMag    = currentHeading !== null ? currentHeading : 0;
 
-  // webkitCompassHeading is already magnetic on iOS
-  // So all arithmetic stays in magnetic frame — no further correction needed
-  const headingMag = currentHeading !== null ? currentHeading : null;
+  document.getElementById('bearingVal').textContent  = fmt3(brgMag);
+  document.getElementById('distVal').textContent     = dist < 100 ? dist.toFixed(1) : Math.round(dist);
+  document.getElementById('latVal').textContent      = (currentLat>=0?'N':'S') + Math.abs(currentLat).toFixed(5);
+  document.getElementById('lonVal').textContent      = (currentLon>=0?'E':'W') + Math.abs(currentLon).toFixed(5);
+  document.getElementById('headingVal').textContent  = currentHeading !== null ? fmt3(hMag) : '---';
 
-  document.getElementById('bearingVal').textContent = fmt3(brgMag);   // MAG bearing to KMYF
-  document.getElementById('distVal').textContent = dist < 100 ? dist.toFixed(1) : Math.round(dist);
-  document.getElementById('latVal').textContent = (currentLat >= 0 ? 'N' : 'S') + Math.abs(currentLat).toFixed(5);
-  document.getElementById('lonVal').textContent = (currentLon >= 0 ? 'E' : 'W') + Math.abs(currentLon).toFixed(5);
-
-  // Compass rose: rotates so N faces heading direction
-  // headingMag already in magnetic frame; rose N mark points to mag north of device
-  const hMag = headingMag !== null ? headingMag : 0;
   document.getElementById('compassRose').style.transform = `rotate(${-hMag}deg)`;
-  document.getElementById('headingVal').textContent = headingMag !== null ? fmt3(headingMag) : '---';
+  document.getElementById('needleGroup').setAttribute('transform', `rotate(${brgMag - hMag},142,142)`);
 
-  // Needle: both brgMag and hMag are magnetic — subtraction gives correct relative angle
-  const needleAngle = brgMag - hMag;
-  document.getElementById('needleGroup').setAttribute('transform', `rotate(${needleAngle},150,150)`);
-
-  // Relative bearing (magnetic bearing to KMYF relative to magnetic heading)
   let rel = Math.round(((brgMag - hMag) + 360) % 360);
-  if (rel > 180) rel -= 360; // -180..+180
-  const relStr = (rel >= 0 ? '+' : '') + rel + '°';
-  document.getElementById('relBearingVal').textContent = rel === 0 ? '000' : relStr;
+  if (rel > 180) rel -= 360;
+  document.getElementById('relBearingVal').textContent = rel===0 ? '000' : ((rel>=0?'+':'') + rel + '°');
 
-  // Speed — GPS gives m/s; convert to knots (×1.94384) and mph (×2.23694)
   if (currentSpeedMps !== null && currentSpeedMps >= 0) {
-    const kts = currentSpeedMps * 1.94384;
-    const mph = currentSpeedMps * 2.23694;
-    document.getElementById('spdKtVal').textContent = kts.toFixed(1);
-    document.getElementById('spdMphVal').textContent = mph.toFixed(1);
+    document.getElementById('spdKtVal').textContent  = (currentSpeedMps * 1.94384).toFixed(1);
+    document.getElementById('spdMphVal').textContent = (currentSpeedMps * 2.23694).toFixed(1);
   } else {
-    document.getElementById('spdKtVal').textContent = '---';
+    document.getElementById('spdKtVal').textContent  = '---';
     document.getElementById('spdMphVal').textContent = '---';
   }
 }
 
-// ── Geolocation ──
-function startGPS() {
-  if (!navigator.geolocation) {
-    setStatus('GPS NOT AVAILABLE', 'warn');
-    showManualFallback();
-    return;
+// ── ATC Audio streaming ──
+const audio = document.getElementById('atcAudio');
+
+window.toggleStream = function(key) {
+  if (activeStream === key) { stopStream(); return; }
+  stopStream();
+  activeStream = key;
+  const s = STREAMS[key];
+  audio.src = s.url;
+  audio.load();
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      // Direct stream failed; open LiveATC page in browser
+      window.open(s.url, '_blank');
+      activeStream = null;
+      setStatus('OPENED IN BROWSER — DIRECT STREAM BLOCKED', 'warn');
+    });
   }
+  document.getElementById('btn-'  + key).classList.add('playing');
+  document.getElementById('icon-' + key).textContent = '■';
+  document.getElementById('npText').textContent = '▶ ' + s.label;
+  document.getElementById('nowPlaying').classList.add('active');
+};
+
+window.stopStream = function() {
+  if (activeStream) {
+    audio.pause(); audio.src = '';
+    document.getElementById('btn-'  + activeStream).classList.remove('playing');
+    document.getElementById('icon-' + activeStream).textContent = '▶';
+    activeStream = null;
+  }
+  document.getElementById('nowPlaying').classList.remove('active');
+};
+
+audio.addEventListener('error', () => {
+  if (activeStream) {
+    window.open(STREAMS[activeStream].url, '_blank');
+    stopStream();
+    setStatus('STREAM ERROR — OPENED IN BROWSER', 'warn');
+  }
+});
+
+// ── GPS ──
+function startGPS() {
+  if (!navigator.geolocation) { setStatus('GPS NOT AVAILABLE','warn'); showManualFallback(); return; }
   navigator.geolocation.watchPosition(pos => {
     currentLat = pos.coords.latitude;
     currentLon = pos.coords.longitude;
-    currentSpeedMps = pos.coords.speed; // m/s, may be null
-    // Hide manual input if GPS kicks in
+    currentSpeedMps = pos.coords.speed;
     document.getElementById('manual-btn').style.display = 'none';
     document.getElementById('manual-input').style.display = 'none';
     updateDisplay();
     setStatus('GPS LOCK · KMYF IN RANGE', 'ok');
   }, err => {
-    const msg = err.code === 1
-      ? 'GPS DENIED — USE MANUAL COORDS OR HOST ON HTTPS'
-      : 'GPS ERROR: ' + err.message.toUpperCase();
-    setStatus(msg, 'warn');
+    setStatus(err.code===1 ? 'GPS DENIED — USE MANUAL COORDS OR HOST ON HTTPS' : 'GPS ERROR: '+err.message.toUpperCase(), 'warn');
     showManualFallback();
-  }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
+  }, { enableHighAccuracy:true, maximumAge:2000, timeout:10000 });
 }
 
-function showManualFallback() {
-  document.getElementById('manual-btn').style.display = 'block';
-}
+function showManualFallback() { document.getElementById('manual-btn').style.display = 'block'; }
 
 window.useManualLocation = function() {
   document.getElementById('manual-btn').style.display = 'none';
   document.getElementById('manual-input').style.display = 'block';
-  // Pre-fill with central San Diego as a starting hint
   if (!document.getElementById('manLat').value) {
     document.getElementById('manLat').value = '32.7157';
     document.getElementById('manLon').value = '-117.1611';
@@ -631,46 +799,28 @@ window.useManualLocation = function() {
 window.applyManual = function() {
   const lat = parseFloat(document.getElementById('manLat').value);
   const lon = parseFloat(document.getElementById('manLon').value);
-  if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-    setStatus('INVALID COORDINATES', 'warn');
-    return;
-  }
-  currentLat = lat;
-  currentLon = lon;
+  if (isNaN(lat)||isNaN(lon)||lat<-90||lat>90||lon<-180||lon>180) { setStatus('INVALID COORDINATES','warn'); return; }
+  currentLat=lat; currentLon=lon;
   document.getElementById('manual-input').style.display = 'none';
   updateDisplay();
-  setStatus('MANUAL POS SET · COMPASS ACTIVE', 'ok');
+  setStatus('MANUAL POS SET · COMPASS ACTIVE','ok');
 };
 
-// ── Compass (DeviceOrientation) ──
+// ── Compass ──
 function startCompass() {
-  // iOS 13+ requires permission
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    // Show button to trigger request on gesture
     document.getElementById('start-btn').style.display = 'block';
     setStatus('TAP INITIALIZE TO ENABLE COMPASS', 'warn');
-  } else {
-    listenOrientation();
-    startGPS();
-  }
+  } else { listenOrientation(); startGPS(); }
 }
 
 window.requestSensors = async function() {
   document.getElementById('start-btn').style.display = 'none';
   try {
-    const perm = await DeviceOrientationEvent.requestPermission();
-    if (perm === 'granted') {
-      listenOrientation();
-      startGPS();
-      setStatus('COMPASS + GPS ACTIVE', 'ok');
-    } else {
-      setStatus('COMPASS DENIED — BEARING ONLY', 'warn');
-      startGPS();
-    }
-  } catch(e) {
-    setStatus('COMPASS UNAVAILABLE', 'warn');
-    startGPS();
-  }
+    const p = await DeviceOrientationEvent.requestPermission();
+    if (p === 'granted') { listenOrientation(); startGPS(); setStatus('COMPASS + GPS ACTIVE','ok'); }
+    else { setStatus('COMPASS DENIED — BEARING ONLY','warn'); startGPS(); }
+  } catch(e) { setStatus('COMPASS UNAVAILABLE','warn'); startGPS(); }
 };
 
 function listenOrientation() {
@@ -682,45 +832,31 @@ let absEventReceived = false;
 function handleOrientation(e) {
   if (e.type === 'deviceorientationabsolute') absEventReceived = true;
   if (e.type === 'deviceorientation' && absEventReceived) return;
-
-  let heading;
-  if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
-    // iOS: webkitCompassHeading is degrees from magnetic north, clockwise
-    heading = e.webkitCompassHeading;
-  } else if (e.absolute && e.alpha !== null) {
-    heading = (360 - e.alpha) % 360;
-  } else {
-    return; // not absolute, ignore
-  }
-  currentHeading = heading;
+  let h;
+  if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) h = e.webkitCompassHeading;
+  else if (e.absolute && e.alpha !== null) h = (360 - e.alpha) % 360;
+  else return;
+  currentHeading = h;
   updateDisplay();
 }
 
 function setStatus(msg, type) {
   const el = document.getElementById('statusMsg');
   el.textContent = msg;
-  el.className = 'status' + (type ? ' ' + type : ' blink');
+  el.className = 'status' + (type ? ' '+type : ' blink');
 }
-
-window.openLiveATC = function(label, url) {
-  window.open(url, '_blank');
-  const toast = document.getElementById('freq-toast');
-  toast.textContent = '▶ LIVEATC · ' + label;
-  toast.style.display = 'block';
-  setTimeout(() => { toast.style.display = 'none'; }, 3000);
-};
 
 window.toggleHistory = function() {
   const el = document.getElementById('ver-history');
   const arrow = document.getElementById('ver-arrow');
-  const open = el.style.display === 'none';
+  const open = el.style.display !== 'block';
   el.style.display = open ? 'block' : 'none';
   arrow.textContent = open ? '▲' : '▼';
 };
 
-// Start
+// ── Boot ──
 startCompass();
-setStatus('REQUESTING GPS...', '');
+setStatus('REQUESTING GPS...','');
 </script>
 </body>
 </html>
