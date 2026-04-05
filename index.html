@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.37</title>
+<title>WRadio v2.38</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -202,20 +202,20 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO</div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.38</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
     <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
-    <!-- Right: two stacked clocks, right-aligned -->
+    <!-- Right: two stacked clocks, right-aligned, labels fixed width for alignment -->
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-      <div style="display:flex;align-items:baseline;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:5px">
         <div class="clock-display" id="clockDisplay">00:00:00</div>
-        <span id="tzLabel" style="font-family:var(--mono);font-size:0.65em;color:var(--green);letter-spacing:1px">PDT</span>
+        <span id="tzLabel" style="font-family:var(--mono);font-size:0.65em;color:var(--green);letter-spacing:1px;display:inline-block;width:3ch;text-align:left">PDT</span>
       </div>
-      <div style="display:flex;align-items:baseline;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:5px">
         <div style="font-family:var(--mono);font-size:1.55em;color:var(--amber);letter-spacing:2px;line-height:1" id="utcDisplay">00:00:00</div>
-        <span style="font-family:var(--mono);font-size:0.65em;color:var(--amber);letter-spacing:1px">Z</span>
+        <span style="font-family:var(--mono);font-size:0.65em;color:var(--amber);letter-spacing:1px;display:inline-block;width:3ch;text-align:left">ZUL</span>
       </div>
     </div>
   </div>
@@ -384,7 +384,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.37 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.38 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -401,7 +401,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.37 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.38 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Version restored to header<br>
+        PDT/ZUL fixed-width labels — clocks now align<br>
+        Viz simplified: synthetic for all sources, bug fixed
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.37 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Header: bigger aligned clocks, balanced layout<br>
         MP3 background: plays through home screen (no Web Audio routing)<br>
@@ -601,12 +607,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.37  (2026-04-04)
+//  Version : v2.38  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.37 - Header: bigger clocks (1.55em both), centered sigbars, aligned columns
+//  v2.38 - Version number restored to header logo
+//          Clock labels fixed-width (3ch) so PDT/ZUL align perfectly
+//          UTC label changed from Z to ZUL (3 chars = same width as PDT)
+//          Viz: simplified to always-synthetic for all sources (radio + MP3)
+//          Viz: fixed double t+=0.04 bug causing 2x idle animation speed
+//  v2.37 - Header bigger clocks, MP3 background fix, CarPlay preload=auto
 //          MP3 background: removed tryLiveAudio() — direct browser playback survives background
 //          MP3 background: audio 'pause' event restarts if not user-initiated
 //          CarPlay: preload=auto buffers aggressively, removed artificial 400ms delay
@@ -1203,7 +1214,6 @@ function startSynthViz() {
     // Read isPlaying LIVE each frame — not captured at creation time
     const playing = isPlaying;
     t += 0.04;
-    t += 0.04;
 
     if (!playing) {
       // idle: slow gentle wave
@@ -1226,28 +1236,12 @@ function startSynthViz() {
     }
 
     // VIZ DATA SOURCE:
-    // - MP3 (blob URL, no CORS): try real FFT analyser
-    // - Radio streams (iOS CORS blocks): always synthetic
+    // - Radio streams: always synthetic (CORS blocks Web Audio on iOS)
+    // - MP3: synthetic too (we stopped routing through Web Audio to fix background playback)
+    // Both use the same energetic synthetic spectrum driven by synthPhase
     let usingSynth = true;
-    if (mp3CurIdx >= 0 && liveAudio && analyser) {
-      const freqData = new Uint8Array(analyser.frequencyBinCount);
-      const timeData = new Uint8Array(analyser.fftSize);
-      analyser.getByteFrequencyData(freqData);
-      analyser.getByteTimeDomainData(timeData);
-      if (freqData.some(v => v > 5)) {
-        usingSynth = false;
-        const bc = analyser.frequencyBinCount;
-        for (let i = 0; i < NUM_BANDS; i++) {
-          const s = Math.floor(Math.pow(bc, i/NUM_BANDS));
-          const e = Math.min(Math.ceil(Math.pow(bc,(i+1)/NUM_BANDS)), bc-1);
-          let sum = 0; for (let b=s;b<=e;b++) sum+=freqData[b];
-          bands[i] += (sum/(e-s+1)/255 - bands[i]) * 0.5;
-        }
-        bands._timeData = timeData;
-      }
-    }
 
-    // Synthetic always runs for radio; also fallback if FFT has no signal
+    // Synthetic — runs for all sources on iOS
     if (usingSynth) {
       synthPhase += 0.05;
       const vol   = Math.max(0.6, parseFloat(document.getElementById('volSlider').value));
