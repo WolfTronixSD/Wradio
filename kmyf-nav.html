@@ -23,13 +23,19 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  html, body {
+  html {
     height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    min-height: 100%;
     background: var(--bg);
     color: var(--amber);
     font-family: 'Share Tech Mono', monospace;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     user-select: none;
   }
 
@@ -386,6 +392,75 @@
   .ver-table td:last-child { color:var(--amber-dim); }
   .ver-table tr { border-bottom:1px solid rgba(255,179,0,0.04); }
 
+  /* ── METAR Weather ── */
+  .metar-section { width:100%; padding: 0 14px 8px; }
+  .metar-section-label {
+    font-size: 8px; letter-spacing: 2px; color: var(--amber-dim);
+    margin-bottom: 6px; padding-top: 4px;
+    border-top: 1px solid rgba(255,179,0,0.1);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .metar-refresh {
+    font-size: 9px; color: var(--amber-dim); cursor: pointer;
+    padding: 2px 6px; border: 1px solid rgba(255,179,0,0.2); border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .metar-refresh:active { background: var(--amber-glow); }
+
+  .metar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .metar-cell {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 8px;
+    position: relative; overflow: hidden;
+  }
+  .metar-cell::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:1px;
+    background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
+  }
+  .metar-cell-label { font-size: 7px; letter-spacing: 2px; color: var(--amber-dim); margin-bottom: 2px; }
+  .metar-cell-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px; font-weight: 700;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,179,0,0.4);
+    line-height: 1.1;
+  }
+  .metar-cell-unit { font-size: 8px; color: var(--amber-dim); margin-top: 1px; letter-spacing: 1px; }
+
+  /* Flight category color coding */
+  .cat-vfr  .metar-cell-value { color: var(--green); text-shadow: 0 0 8px rgba(0,255,136,0.5); }
+  .cat-mvfr .metar-cell-value { color: #4da6ff; text-shadow: 0 0 8px rgba(77,166,255,0.5); }
+  .cat-ifr  .metar-cell-value { color: #ff4444; text-shadow: 0 0 8px rgba(255,68,68,0.5); }
+  .cat-lifr .metar-cell-value { color: #cc44cc; text-shadow: 0 0 8px rgba(200,68,200,0.5); }
+
+  .metar-raw {
+    background: rgba(5,8,12,0.8);
+    border: 1px solid rgba(255,179,0,0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 9px;
+    color: var(--amber-dim);
+    letter-spacing: 1px;
+    line-height: 1.6;
+    word-break: break-all;
+  }
+  .metar-age {
+    font-size: 8px; color: var(--amber-dim); letter-spacing: 1px;
+    text-align: right; margin-top: 4px;
+  }
+  .metar-loading {
+    text-align: center; padding: 12px;
+    font-size: 9px; letter-spacing: 2px; color: var(--amber-dim);
+  }
+
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
   .blink { animation: pulse 1.2s ease-in-out infinite; }
 </style>
@@ -545,6 +620,17 @@
     <div class="np-stop" onclick="stopStream()">■ STOP</div>
   </div>
 
+  <!-- METAR Weather -->
+  <div class="metar-section">
+    <div class="metar-section-label">
+      <span>⛅ KMYF METAR</span>
+      <span class="metar-refresh" onclick="fetchMetar()">↻ REFRESH</span>
+    </div>
+    <div id="metarContent">
+      <div class="metar-loading blink">FETCHING METAR...</div>
+    </div>
+  </div>
+
   <!-- Status / buttons -->
   <div class="status blink" id="statusMsg">AWAITING PERMISSION...</div>
   <button id="start-btn" onclick="requestSensors()">INITIALIZE NAV</button>
@@ -561,10 +647,11 @@
   <!-- Version history -->
   <div class="ver-bar" onclick="toggleHistory()">
     <span class="ver-bar-label">VERSION HISTORY</span>
-    <span class="ver-bar-badge">v1.7 <span id="ver-arrow">▼</span></span>
+    <span class="ver-bar-badge">v1.8 <span id="ver-arrow">▼</span></span>
   </div>
   <div class="ver-table" id="ver-history">
     <table>
+      <tr><td>v1.8</td><td>Fixed iPhone scroll (overflow-y:scroll + touch-action:pan-y). Live METAR panel: fetches aviationweather.gov every 5 min — flight category color-coded, wind, visibility, temp C+F, dewpoint, altimeter, sky, raw string. Manual ↻ refresh.</td></tr>
       <tr><td>v1.7</td><td>Enhanced compass: beveled bezel, degree numbers, cardinal/intercardinal labels without overlap. Clock bar: local + Zulu + date. ATC buttons stream live audio inline. Now-playing bar with stop. Version history shown in-page.</td></tr>
       <tr><td>v1.6</td><td>Speed panels: KNOTS and MPH from GPS coords.speed (m/s).</td></tr>
       <tr><td>v1.5</td><td>Full magnetic correction: MAG_VAR=−11° (San Diego east variation). True→mag bearing. All panels consistent magnetic frame.</td></tr>
@@ -853,6 +940,118 @@ window.toggleHistory = function() {
   el.style.display = open ? 'block' : 'none';
   arrow.textContent = open ? '▲' : '▼';
 };
+
+// ── METAR ──
+function fetchMetar() {
+  const el = document.getElementById('metarContent');
+  el.innerHTML = '<div class="metar-loading blink">FETCHING METAR...</div>';
+  // aviationweather.gov free API — no key required
+  fetch('https://aviationweather.gov/api/data/metar?ids=KMYF&format=json')
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.length) throw new Error('No data');
+      renderMetar(data[0]);
+    })
+    .catch(() => {
+      el.innerHTML = '<div class="metar-loading" style="color:#ff6b35">METAR UNAVAILABLE — CHECK WHEN ONLINE</div>';
+    });
+}
+
+function renderMetar(m) {
+  // m fields from aviationweather.gov JSON schema
+  const raw     = m.rawOb  || m.raw_text || '';
+  const temp    = m.temp   != null ? m.temp   : null;
+  const dewp    = m.dewp   != null ? m.dewp   : null;
+  const wspd    = m.wspd   != null ? m.wspd   : null;  // knots
+  const wdir    = m.wdir   != null ? m.wdir   : null;
+  const visib   = m.visib  != null ? m.visib  : null;  // SM
+  const altim   = m.altim  != null ? m.altim  : null;  // inHg
+  const cover   = m.cover  || (m.clouds && m.clouds.length ? m.clouds[0].cover : null);
+  const wxStr   = m.wx_string || m.presentWx || '';
+  const flCat   = m.flightCategory || m.flight_category || '';
+  const obsTime = m.reportTime || m.observation_time || '';
+
+  // Age string
+  let ageStr = '';
+  if (obsTime) {
+    const obs = new Date(obsTime);
+    const diffMin = Math.round((Date.now() - obs) / 60000);
+    ageStr = diffMin < 60 ? `${diffMin} MIN AGO` : `${Math.round(diffMin/60)}H AGO`;
+  }
+
+  // Temp/dewpoint with C and F
+  const fmtTemp = c => c != null ? `${c}°` : '--';
+  const toF = c => c != null ? Math.round(c * 9/5 + 32) : null;
+
+  // Wind
+  const windStr = wdir != null && wspd != null
+    ? (wdir === 0 && wspd === 0 ? 'CALM' : `${String(wdir).padStart(3,'0')}/${wspd}`)
+    : '--';
+
+  // Visibility
+  const visStr = visib != null ? (visib >= 10 ? '10+' : visib) : '--';
+
+  // Altimeter
+  const altStr = altim != null ? altim.toFixed(2) : '--';
+
+  // Sky / ceiling
+  const skyStr = cover || '--';
+
+  // Flight category CSS class
+  const catClass = {VFR:'cat-vfr', MVFR:'cat-mvfr', IFR:'cat-ifr', LIFR:'cat-lifr'}[flCat] || '';
+
+  const el = document.getElementById('metarContent');
+  el.innerHTML = `
+    <div class="metar-grid">
+      <div class="metar-cell ${catClass}">
+        <div class="metar-cell-label">CATEGORY</div>
+        <div class="metar-cell-value">${flCat || '--'}</div>
+        <div class="metar-cell-unit">FLIGHT CAT</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">WIND</div>
+        <div class="metar-cell-value" style="font-size:13px">${windStr}</div>
+        <div class="metar-cell-unit">DIR°/KTS</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">VISIBILITY</div>
+        <div class="metar-cell-value">${visStr}</div>
+        <div class="metar-cell-unit">STAT MILES</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">TEMP</div>
+        <div class="metar-cell-value">${fmtTemp(temp)}C</div>
+        <div class="metar-cell-unit">${toF(temp) != null ? toF(temp)+'°F' : ''}</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">DEWPOINT</div>
+        <div class="metar-cell-value">${fmtTemp(dewp)}C</div>
+        <div class="metar-cell-unit">${toF(dewp) != null ? toF(dewp)+'°F' : ''}</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">ALTIMETER</div>
+        <div class="metar-cell-value" style="font-size:17px">${altStr}</div>
+        <div class="metar-cell-unit">IN HG</div>
+      </div>
+      <div class="metar-cell">
+        <div class="metar-cell-label">SKY</div>
+        <div class="metar-cell-value" style="font-size:16px">${skyStr}</div>
+        <div class="metar-cell-unit">COVERAGE</div>
+      </div>
+      ${wxStr ? `<div class="metar-cell" style="grid-column:2/-1">
+        <div class="metar-cell-label">WX</div>
+        <div class="metar-cell-value" style="font-size:14px">${wxStr}</div>
+        <div class="metar-cell-unit">PRESENT WX</div>
+      </div>` : ''}
+    </div>
+    <div class="metar-raw">${raw}</div>
+    ${ageStr ? `<div class="metar-age">${ageStr}</div>` : ''}
+  `;
+}
+
+// Auto-fetch on load, refresh every 5 minutes
+fetchMetar();
+setInterval(fetchMetar, 5 * 60 * 1000);
 
 // ── Boot ──
 startCompass();
