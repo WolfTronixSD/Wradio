@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.39</title>
+<title>WRadio v2.40</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -169,6 +169,10 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <body>
 
 <audio id="audio" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
+<!-- Second audio element used ONLY for Web Audio FFT analysis.
+     Main audio plays directly through browser (background-safe).
+     This clone plays at volume 0 just to feed the analyser. -->
+<audio id="audioFFT" preload="none" playsinline muted style="display:none"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- iOS install prompt — only shows in Safari, not when running as PWA -->
@@ -202,7 +206,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.39</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.40</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -386,7 +390,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.39 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -403,7 +407,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.39 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Dual audio: main plays direct (background-safe), clone feeds FFT<br>
+        Stations viz now works (FFT clone plays stream silently)<br>
+        MP3 background fixed: main audio never touches Web Audio
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.39 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Real FFT viz for ALL sources — no more synthetic<br>
         CORS bypass: Web Audio connected before src is set<br>
@@ -616,12 +626,18 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.39  (2026-04-04)
+//  Version : v2.40  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.39 - Real FFT viz for ALL sources: Web Audio connected on first tap
+//  v2.40 - DUAL AUDIO ARCHITECTURE: separate <audio> element for FFT only
+//          Main audio plays DIRECTLY (no Web Audio routing) = background-safe
+//          FFT clone plays same URL at volume=0 for analyser data only
+//          Stations: FFT clone started after play() succeeds
+//          MP3: FFT clone uses blob URL (no CORS issue)
+//          Both viz and background audio now work simultaneously
+//  v2.39 - Real FFT, BOUNCE + MATRIX viz modes added
 //          CORS bypass: createMediaElementSource() called BEFORE src set
 //          Synthetic fallback only if Web Audio fails or signal is zero
 //          All viz modes use real audio bands (radar, aurora, nebula fixed)
@@ -1069,7 +1085,8 @@ function play(station) {
     ensureKeepAlive();
     updateMediaSession(station.name);
     startBufferWatchdog();
-    tryLiveAudio(); // connect Web Audio for real FFT viz
+    // Start silent FFT clone for real viz — main audio untouched
+    startFFTClone(station.url);
   }).catch((e) => {
     console.warn('[play] Failed:', e.message);
     document.getElementById('npMeta').textContent = 'Tap to retry';
@@ -1108,6 +1125,7 @@ function stopPlay() {
   reconnectDelay = 2000; frozenCount = 0;
   audio.pause();
   audio.src = '';
+  stopFFTClone(); // stop silent FFT clone too
   isPlaying = false;
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
@@ -1141,15 +1159,21 @@ function seekMp3(val) {
 }
 
 // ============================================================
-//  WEB AUDIO — real FFT for visualizer
-//  createMediaElementSource() is called ONCE on first user tap,
-//  BEFORE any src is set. This avoids iOS CORS issues because
-//  the graph is built while audio.src is empty — no CORS check.
-//  After this, changing audio.src flows through the same graph.
+//  WEB AUDIO — real FFT via a separate silent audio clone
+//
+//  KEY INSIGHT: Routing the MAIN audio element through Web Audio
+//  causes iOS to suspend it when app goes to background.
+//  Solution: keep main audio element completely untouched for
+//  direct browser playback (background-safe). A SECOND hidden
+//  <audio> element plays the same URL at volume=0, routed through
+//  createMediaElementSource → analyser. It's used ONLY for FFT.
+//  The user hears nothing from it — main audio does all the sound.
 // ============================================================
-function tryLiveAudio() {
-  if (liveAudio) {
-    // Already connected — just resume if suspended
+const audioFFT = document.getElementById('audioFFT');
+let fftConnected = false;
+
+function connectFFT() {
+  if (fftConnected) {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
     return;
   }
@@ -1161,18 +1185,41 @@ function tryLiveAudio() {
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.82;
     }
-    // Connect ONCE — audio element → analyser → destination
-    // Works for any subsequent src (stream or blob) without CORS issues
-    waSource = audioCtx.createMediaElementSource(audio);
-    waSource.connect(analyser);
-    waSource.connect(audioCtx.destination);
+    // Connect the FFT element (NOT main audio) — no background audio impact
+    const fftSource = audioCtx.createMediaElementSource(audioFFT);
+    fftSource.connect(analyser);
+    // Do NOT connect to destination — we want silence from this element
+    // audioFFT is already muted via HTML attribute, but don't output to speakers
+    fftConnected = true;
     liveAudio = true;
-    console.log('[WebAudio] Connected — real FFT active');
+    console.log('[FFT] Analysis element connected');
   } catch(e) {
-    console.warn('[WebAudio] Failed:', e.message);
+    console.warn('[FFT] Failed:', e.message);
     liveAudio = false;
   }
 }
+
+// Start FFT clone playing the same src as main audio
+function startFFTClone(src) {
+  if (!src || src === window.location.href) return;
+  connectFFT();
+  if (!fftConnected) return;
+  // Reset and play clone
+  audioFFT.pause();
+  audioFFT.crossOrigin = 'anonymous';
+  audioFFT.src = src;
+  audioFFT.volume = 0;
+  audioFFT.muted = true;
+  audioFFT.play().catch(()=>{}); // silent — just for FFT data
+}
+
+function stopFFTClone() {
+  audioFFT.pause();
+  audioFFT.src = '';
+}
+
+// Keep legacy name so existing call sites work
+function tryLiveAudio() { connectFFT(); }
 
 // ============================================================
 //  SYNTHETIC VISUALIZER
@@ -2216,7 +2263,8 @@ function playMp3(i) {
     document.getElementById('seekDur').textContent = '0:00';
     ensureKeepAlive();
     updateMediaSession(t.name);
-    tryLiveAudio(); // real FFT for MP3 viz
+    // FFT clone for MP3: blob URL works cross-origin-free
+    startFFTClone(t.url);
   }).catch(() => {
     isPlaying = false;
     document.getElementById('npMeta').textContent = 'Tap again to play';
@@ -2456,10 +2504,14 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') return;
   ensureKeepAlive();
-  // If audio was playing and got interrupted, restart it
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
   if (isPlaying && !userPaused && audio.paused && audio.src) {
     audio.play().catch(()=>{});
+  }
+  // Resume FFT clone too
+  if (isPlaying && audioFFT.src && audioFFT.paused) {
+    audioFFT.play().catch(()=>{});
   }
 });
 
@@ -2487,12 +2539,11 @@ audio.addEventListener('pause', () => {
 
 window.addEventListener('load', buildUI);
 
-// Start keep-alive AND connect Web Audio on first user interaction
-// Connecting Web Audio before src is set avoids CORS restrictions on iOS
+// Start keep-alive AND pre-connect FFT element on first user interaction
 ['touchstart','mousedown','keydown'].forEach(evt =>
   document.addEventListener(evt, () => {
     ensureKeepAlive();
-    tryLiveAudio(); // connect graph while audio.src is empty — no CORS check
+    connectFFT(); // connect FFT element while audioFFT.src is empty — no CORS
   }, {once:true})
 );
 </script>
