@@ -387,6 +387,16 @@
         <div class="coord-val" id="lonVal">---.------</div>
       </div>
     </div>
+    <div class="panel" style="grid-column:1">
+      <div class="panel-label">SPEED</div>
+      <div class="panel-value" id="spdKtVal">---</div>
+      <div class="panel-unit">KNOTS</div>
+    </div>
+    <div class="panel" style="grid-column:2">
+      <div class="panel-label">SPEED</div>
+      <div class="panel-value" id="spdMphVal">---</div>
+      <div class="panel-unit">MPH</div>
+    </div>
   </div>
 
   <!-- Frequency buttons -->
@@ -425,10 +435,14 @@
   <!-- Version history -->
   <div id="ver-bar" onclick="toggleHistory()" style="width:100%;padding:5px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-top:1px solid rgba(255,179,0,0.1);">
     <span style="font-size:9px;letter-spacing:2px;color:#7a5500;">VER HISTORY</span>
-    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.5 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
+    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.6 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
   </div>
   <div id="ver-history" style="display:none;width:100%;padding:4px 18px 8px;max-height:160px;overflow-y:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.8;">
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.6</td>
+        <td style="color:#7a5500;">Added speed panels: KNOTS and MPH from GPS coords.speed (m/s). Shows --- when stationary or speed unavailable.</td>
+      </tr>
       <tr>
         <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.5</td>
         <td style="color:#7a5500;">Full magnetic correction: MAG_VAR=-11° applied to true bearing → magnetic bearing to KMYF. webkitCompassHeading already magnetic. All panels now consistent magnetic frame. Labels updated: BRG TO KMYF, MY HEADING DEG MAG.</td>
@@ -480,6 +494,7 @@ const MAG_VAR = -11; // degrees — negative = east variation for San Diego
 
 let currentHeading = null; // device compass heading (already magnetic via webkitCompassHeading)
 let currentLat = null, currentLon = null;
+let currentSpeedMps = null; // m/s from GPS
 
 function toRad(d) { return d * Math.PI / 180; }
 function toDeg(r) { return r * 180 / Math.PI; }
@@ -561,6 +576,17 @@ function updateDisplay() {
   if (rel > 180) rel -= 360; // -180..+180
   const relStr = (rel >= 0 ? '+' : '') + rel + '°';
   document.getElementById('relBearingVal').textContent = rel === 0 ? '000' : relStr;
+
+  // Speed — GPS gives m/s; convert to knots (×1.94384) and mph (×2.23694)
+  if (currentSpeedMps !== null && currentSpeedMps >= 0) {
+    const kts = currentSpeedMps * 1.94384;
+    const mph = currentSpeedMps * 2.23694;
+    document.getElementById('spdKtVal').textContent = kts.toFixed(1);
+    document.getElementById('spdMphVal').textContent = mph.toFixed(1);
+  } else {
+    document.getElementById('spdKtVal').textContent = '---';
+    document.getElementById('spdMphVal').textContent = '---';
+  }
 }
 
 // ── Geolocation ──
@@ -573,6 +599,7 @@ function startGPS() {
   navigator.geolocation.watchPosition(pos => {
     currentLat = pos.coords.latitude;
     currentLon = pos.coords.longitude;
+    currentSpeedMps = pos.coords.speed; // m/s, may be null
     // Hide manual input if GPS kicks in
     document.getElementById('manual-btn').style.display = 'none';
     document.getElementById('manual-input').style.display = 'none';
