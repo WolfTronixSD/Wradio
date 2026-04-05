@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.36</title>
+<title>WRadio v2.37</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -29,11 +29,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
 
 /* HEADER */
-header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.96);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 14px 8px}
-.header-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.logo{font-family:var(--mono);font-size:1em;color:var(--accent);letter-spacing:3px}
-.clock-display{font-family:var(--mono);font-size:1.3em;color:var(--green);margin-left:auto;letter-spacing:2px}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.97);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:8px 14px 8px}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.logo{font-family:var(--mono);font-size:1.1em;color:var(--accent);letter-spacing:4px}
+.clock-display{font-family:var(--mono);font-size:1.55em;color:var(--green);letter-spacing:2px;line-height:1}
 .sigbars{display:flex;gap:2px;align-items:flex-end;height:14px}
 .sigbars span{width:3px;border-radius:1px;background:var(--muted);transition:background 0.3s}
 .sigbars span:nth-child(1){height:4px}.sigbars span:nth-child(2){height:7px}
@@ -200,19 +200,22 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 
 <header>
   <div class="header-top">
-    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.72em;color:var(--muted);letter-spacing:1px">v2.36</span></div>
-      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.75em;color:var(--muted);letter-spacing:2px;padding-left:2px"></div>
+    <!-- Left: branding + date -->
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div class="logo">&#9632; WRADIO</div>
+      <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
-    <div class="sigbars" id="sigbars" style="margin:0 6px"><span></span><span></span><span></span><span></span></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
-      <div style="display:flex;align-items:baseline;gap:4px">
+    <!-- Center: signal bars -->
+    <div class="sigbars" id="sigbars"><span></span><span></span><span></span><span></span></div>
+    <!-- Right: two stacked clocks, right-aligned -->
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;align-items:baseline;gap:6px">
         <div class="clock-display" id="clockDisplay">00:00:00</div>
-        <span id="tzLabel" style="font-family:var(--mono);font-size:0.62em;color:var(--green);letter-spacing:1px;opacity:0.8">PDT</span>
+        <span id="tzLabel" style="font-family:var(--mono);font-size:0.65em;color:var(--green);letter-spacing:1px">PDT</span>
       </div>
-      <div style="display:flex;align-items:baseline;gap:4px">
-        <div style="font-family:var(--mono);font-size:1.1em;color:var(--amber);letter-spacing:2px;font-weight:normal" id="utcDisplay">00:00:00</div>
-        <span style="font-family:var(--mono);font-size:0.62em;color:var(--amber);letter-spacing:1px;opacity:0.8">Z</span>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <div style="font-family:var(--mono);font-size:1.55em;color:var(--amber);letter-spacing:2px;line-height:1" id="utcDisplay">00:00:00</div>
+        <span style="font-family:var(--mono);font-size:0.65em;color:var(--amber);letter-spacing:1px">Z</span>
       </div>
     </div>
   </div>
@@ -381,7 +384,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.36 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.37 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -398,7 +401,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.36 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.37 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Header: bigger aligned clocks, balanced layout<br>
+        MP3 background: plays through home screen (no Web Audio routing)<br>
+        CarPlay: preload=auto for better buffering, pause event restarts audio
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.36 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Header redesigned: WRADIO, green local, amber Z time<br>
         ATC grouped by airport with ICAO + frequency<br>
@@ -592,12 +601,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.36  (2026-04-04)
+//  Version : v2.37  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.36 - Header redesigned: WRADIO branding, green local/amber UTC, cleaner layout
+//  v2.37 - Header: bigger clocks (1.55em both), centered sigbars, aligned columns
+//          MP3 background: removed tryLiveAudio() — direct browser playback survives background
+//          MP3 background: audio 'pause' event restarts if not user-initiated
+//          CarPlay: preload=auto buffers aggressively, removed artificial 400ms delay
+//          Keep-alive: 800ms watchdog interval, cleaner event handlers
+//  v2.36 - Header redesign, ATC grouped by airport with ICAO + frequency
 //          ATC grouped by airport: KMYF/KSAN/KSDM/KRNM with ICAO header + frequency
 //          ATC buttons in 2-column compact grid, airport name stripped from button label
 //  v2.35 - CarPlay: hard reconnect + 400ms pre-buffer, buffer watchdog every 2s
@@ -1015,9 +1029,9 @@ function play(station) {
 
   // Speed optimization: set src then immediately call play() — no load()
   audio.pause();
-  audio.removeAttribute('crossorigin'); // clear first to avoid CORS stale state
+  audio.removeAttribute('crossorigin');
   audio.crossOrigin = 'anonymous';
-  audio.preload = 'none';
+  audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
   audio.src = station.url;
   audio.volume = parseFloat(document.getElementById('volSlider').value);
 
@@ -1879,19 +1893,18 @@ function hardReconnect(reason) {
     if (curIdx < 0 || !isPlaying) return;
     const url = STATIONS[curIdx].url;
     audio.pause();
-    audio.src = '';        // force browser to drop TCP connection
-    audio.load();          // reset internal state
+    audio.src = '';
+    audio.load();          // reset internal state fully
+    audio.preload = 'auto'; // tell browser to buffer aggressively
     audio.src = url;
-    // For CarPlay: let buffer build 1.5s before play starts
-    // This pre-fills the buffer so CarPlay wireless has headroom
-    setTimeout(() => {
-      audio.play().then(() => {
-        reconnectDelay = 2000;
-      }).catch(() => {
-        reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX);
-        hardReconnect('Retry failed');
-      });
-    }, 400);
+    // Play immediately — no artificial delay
+    // preload=auto gives CarPlay the buffer it needs before consuming
+    audio.play().then(() => {
+      reconnectDelay = 2000;
+    }).catch(() => {
+      reconnectDelay = Math.min(reconnectDelay * 2, RECONNECT_MAX);
+      hardReconnect('Retry failed');
+    });
   }, reconnectDelay);
   reconnectDelay = Math.min(reconnectDelay * 1.5, RECONNECT_MAX);
 }
@@ -2099,7 +2112,10 @@ function playMp3(i) {
     document.getElementById('seekDur').textContent = '0:00';
     ensureKeepAlive();
     updateMediaSession(t.name);
-    tryLiveAudio(); // MP3 blob URLs work with Web Audio — real FFT possible
+    // NOTE: do NOT call tryLiveAudio() for MP3 on iOS
+    // Routing through Web Audio makes iOS treat it as "processing" not "media"
+    // which causes it to suspend when screen locks or app goes to background
+    // The audio element plays directly through browser = survives background
   }).catch(() => {
     isPlaying = false;
     document.getElementById('npMeta').textContent = 'Tap again to play';
@@ -2293,83 +2309,87 @@ function setGStatus(msg, color) {
 }
 
 // ============================================================
-//  iOS BACKGROUND AUDIO KEEP-ALIVE
-//  IMPORTANT: We use a SEPARATE AudioContext for keep-alive.
-//  The main audio element plays DIRECTLY through the browser
-//  (NOT through Web Audio graph) — this is the most reliable
-//  way to survive screen lock on iOS PWA.
-//  The keep-alive AudioContext runs a silent buffer loop which
-//  keeps the iOS audio session active between track changes.
+//  iOS BACKGROUND AUDIO
+//  The ONLY reliable way to keep audio playing on iOS when the
+//  app goes to background or screen locks is:
+//  1. The audio element must be the direct playback source
+//     (NOT routed through Web Audio API createMediaElementSource)
+//  2. A separate Web Audio context with a looping silent buffer
+//     keeps the audio session "active" so iOS doesn't suspend it
+//  3. The Media Session API tells iOS this is a music app
+//  4. On visibilitychange (returning), restart if interrupted
 // ============================================================
-let keepAliveCtx  = null;
-let keepAliveNode = null;
-let keepAliveBuffer = null;
+let keepAliveCtx    = null;
+let keepAliveNode   = null;
 
 function startKeepAlive() {
   if (keepAliveNode) return;
   try {
     keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // 2-second silent buffer
-    keepAliveBuffer = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate * 2, keepAliveCtx.sampleRate);
+    const buf  = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate, keepAliveCtx.sampleRate);
     const gain = keepAliveCtx.createGain();
-    gain.gain.value = 0.001; // near-silent
+    gain.gain.value = 0.001;
     gain.connect(keepAliveCtx.destination);
-    // Use loop=true — far more reliable than onended callback on iOS
     const src = keepAliveCtx.createBufferSource();
-    src.buffer = keepAliveBuffer;
-    src.loop = true;
+    src.buffer = buf;
+    src.loop   = true;
     src.connect(gain);
     src.start(0);
     keepAliveNode = src;
-    console.log('[KeepAlive] Looping silent buffer started');
-  } catch(e) {
-    console.warn('[KeepAlive] Failed:', e.message);
-  }
+    console.log('[KeepAlive] Started');
+  } catch(e) { console.warn('[KeepAlive]', e.message); }
 }
 
 function ensureKeepAlive() {
-  if (!keepAliveCtx) {
-    startKeepAlive();
-  } else if (keepAliveCtx.state === 'suspended') {
-    keepAliveCtx.resume().catch(()=>{});
-  }
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  if (!keepAliveCtx) { startKeepAlive(); return; }
+  if (keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
 }
 
-// Watchdog: resume keep-alive context if iOS suspends it (happens on screen lock)
+// Resume keepAlive context every second — setInterval still fires briefly
+// even when suspended, enough to trigger resume
 setInterval(() => {
-  if (keepAliveCtx && keepAliveCtx.state === 'suspended') {
-    keepAliveCtx.resume().catch(()=>{});
-  }
-}, 1000);
+  if (keepAliveCtx && keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
+}, 800);
 
+// When page becomes visible again (user returns from home screen / other app)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') return;
   ensureKeepAlive();
-  // Use isPlaying flag — more reliable than checking curIdx/mp3CurIdx
-  const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
-  const userPaused = btnLabel.includes('RESUME');
+  // If audio was playing and got interrupted, restart it
+  const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
   if (isPlaying && !userPaused && audio.paused && audio.src) {
-    audio.play().catch(() => {});
+    audio.play().catch(()=>{});
   }
 });
 
-window.addEventListener('pageshow', (e) => {
+// pageshow fires when returning from bfcache (iOS Safari back navigation)
+window.addEventListener('pageshow', e => {
   if (!e.persisted) return;
   ensureKeepAlive();
-  if (isPlaying && audio.paused && audio.src) audio.play().catch(() => {});
+  if (isPlaying && audio.paused && audio.src) audio.play().catch(()=>{});
+});
+
+// Heartbeat: audio 'pause' event fires when iOS interrupts playback
+// Restart immediately if it was not user-initiated
+audio.addEventListener('pause', () => {
+  if (!isPlaying) return; // user stopped it, don't restart
+  const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
+  if (userPaused) return;
+  // Small delay to distinguish CarPlay/system pause from network stall
+  setTimeout(() => {
+    if (isPlaying && audio.paused && audio.src) {
+      console.log('[Pause event] Restarting interrupted audio');
+      audio.play().catch(()=>{});
+    }
+  }, 500);
 });
 
 window.addEventListener('load', buildUI);
 
-// Start keep-alive on first ANY user tap — iOS requires user gesture
-// This way the audio session is established before play is even tapped
-['touchstart','mousedown','keydown'].forEach(evt => {
-  document.addEventListener(evt, function initOnce() {
-    ensureKeepAlive();
-    document.removeEventListener(evt, initOnce);
-  }, {once:true});
-});
+// Start keep-alive on first user interaction
+['touchstart','mousedown','keydown'].forEach(evt =>
+  document.addEventListener(evt, () => ensureKeepAlive(), {once:true})
+);
 </script>
 </body>
 </html>
