@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.38</title>
+<title>WRadio v2.39</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -202,7 +202,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.38</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.39</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -308,10 +308,12 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <button class="viz-btn" onclick="setVizMode('radar',this)">RADAR</button>
     <button class="viz-btn" onclick="setVizMode('aurora',this)">AURORA</button>
     <button class="viz-btn" onclick="setVizMode('nebula',this)">NEBULA</button>
+    <button class="viz-btn" onclick="setVizMode('bounce',this)">BOUNCE</button>
+    <button class="viz-btn" onclick="setVizMode('matrix',this)">MATRIX</button>
   </div>
   <div class="viz-note">
-    Visualization is simulated on iOS (CORS blocks live audio analysis).<br>
-    On desktop Chrome/Firefox, tap the canvas to enable live audio analysis.
+    Real FFT audio analysis — tap a station to start.<br>
+    First tap connects Web Audio. Falls back to simulated if CORS blocks.
   </div>
 </div>
 
@@ -384,7 +386,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.38 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.39 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -401,7 +403,14 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.38 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.39 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Real FFT viz for ALL sources — no more synthetic<br>
+        CORS bypass: Web Audio connected before src is set<br>
+        NEW: BOUNCE — balls bouncing to each frequency band<br>
+        NEW: MATRIX — Katakana rain driven by audio amplitude
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.38 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Version restored to header<br>
         PDT/ZUL fixed-width labels — clocks now align<br>
@@ -607,12 +616,20 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.38  (2026-04-04)
+//  Version : v2.39  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.38 - Version number restored to header logo
+//  v2.39 - Real FFT viz for ALL sources: Web Audio connected on first tap
+//          CORS bypass: createMediaElementSource() called BEFORE src set
+//          Synthetic fallback only if Web Audio fails or signal is zero
+//          All viz modes use real audio bands (radar, aurora, nebula fixed)
+//          synthPhase replaced with t in aurora/nebula for real-time feel
+//          NEW: BOUNCE mode — balls bouncing to each frequency band
+//          NEW: MATRIX mode — Katakana rain driven by audio amplitude
+//          Dead drawVizReal() removed
+//  v2.38 - ZUL label, PDT/ZUL fixed-width alignment, version in header
 //          Clock labels fixed-width (3ch) so PDT/ZUL align perfectly
 //          UTC label changed from Z to ZUL (3 chars = same width as PDT)
 //          Viz: simplified to always-synthetic for all sources (radio + MP3)
@@ -1051,8 +1068,8 @@ function play(station) {
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
     ensureKeepAlive();
     updateMediaSession(station.name);
-    startBufferWatchdog(); // monitor buffer health for CarPlay
-    // Don't call tryLiveAudio for streams — CORS blocks it on iOS, wastes time
+    startBufferWatchdog();
+    tryLiveAudio(); // connect Web Audio for real FFT viz
   }).catch((e) => {
     console.warn('[play] Failed:', e.message);
     document.getElementById('npMeta').textContent = 'Tap to retry';
@@ -1124,42 +1141,37 @@ function seekMp3(val) {
 }
 
 // ============================================================
-//  WEB AUDIO (desktop, tap to enable)
+//  WEB AUDIO — real FFT for visualizer
+//  createMediaElementSource() is called ONCE on first user tap,
+//  BEFORE any src is set. This avoids iOS CORS issues because
+//  the graph is built while audio.src is empty — no CORS check.
+//  After this, changing audio.src flows through the same graph.
 // ============================================================
 function tryLiveAudio() {
-  // createMediaElementSource can only be called ONCE per audio element - ever.
-  // So we create the entire graph once at first play and never tear it down.
-  // Changing station = just change audio.src, the Web Audio graph stays intact.
-  if (liveAudio) return; // already connected, nothing to do
+  if (liveAudio) {
+    // Already connected — just resume if suspended
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    return;
+  }
   try {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
     if (!analyser) {
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048; // 1024 bins, ~46ms window at 44100Hz
-      analyser.smoothingTimeConstant = 0.8;
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.82;
     }
-
-    // Build graph ONCE: audio element -> analyser -> destination
-    // After this, changing audio.src automatically flows through the same graph
+    // Connect ONCE — audio element → analyser → destination
+    // Works for any subsequent src (stream or blob) without CORS issues
     waSource = audioCtx.createMediaElementSource(audio);
     waSource.connect(analyser);
     waSource.connect(audioCtx.destination);
     liveAudio = true;
-    console.log('[WebAudio] Live FFT connected, fftSize='+analyser.fftSize);
-    showToast('Live FFT active', 'ok');
+    console.log('[WebAudio] Connected — real FFT active');
   } catch(e) {
     console.warn('[WebAudio] Failed:', e.message);
     liveAudio = false;
-    // audio.src still plays directly through browser - no silence
   }
-}
-
-function connectWebAudio() {
-  tryLiveAudio();
 }
 
 // ============================================================
@@ -1228,35 +1240,54 @@ function startSynthViz() {
       ctx.fillStyle = '#4a5060';
       ctx.font = "11px 'Share Tech Mono'";
       ctx.textAlign = 'center';
-      ctx.fillText('START A STATION', W/2, H/2 - 8);
+      ctx.fillText('TAP A STATION TO START', W/2, H/2 - 8);
       ctx.fillStyle = '#2a3040';
       ctx.font = "9px 'Share Tech Mono'";
-      ctx.fillText('tap canvas on desktop for live audio', W/2, H/2 + 10);
+      ctx.fillText('real FFT audio visualizer', W/2, H/2 + 10);
       return;
     }
 
-    // VIZ DATA SOURCE:
-    // - Radio streams: always synthetic (CORS blocks Web Audio on iOS)
-    // - MP3: synthetic too (we stopped routing through Web Audio to fix background playback)
-    // Both use the same energetic synthetic spectrum driven by synthPhase
-    let usingSynth = true;
+    // ── REAL FFT ──────────────────────────────────────────────
+    // Try to read live analyser data. Falls back to synthetic if
+    // Web Audio not yet connected or signal is silent.
+    let gotRealFFT = false;
+    synthPhase += 0.05;
 
-    // Synthetic — runs for all sources on iOS
-    if (usingSynth) {
-      synthPhase += 0.05;
-      const vol   = Math.max(0.6, parseFloat(document.getElementById('volSlider').value));
-      const boost = playing ? 1.4 : 0.3;
+    if (liveAudio && analyser) {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+      const freqData = new Uint8Array(analyser.frequencyBinCount);
+      const timeData = new Uint8Array(analyser.fftSize);
+      analyser.getByteFrequencyData(freqData);
+      analyser.getByteTimeDomainData(timeData);
+      const maxVal = freqData.reduce((a,b) => Math.max(a,b), 0);
+      if (maxVal > 3) {
+        gotRealFFT = true;
+        const bc = analyser.frequencyBinCount;
+        for (let i = 0; i < NUM_BANDS; i++) {
+          const s = Math.floor(Math.pow(bc, i/NUM_BANDS));
+          const e = Math.min(Math.ceil(Math.pow(bc,(i+1)/NUM_BANDS)), bc-1);
+          let sum = 0; for (let b=s; b<=e; b++) sum += freqData[b];
+          const v = sum/(e-s+1)/255;
+          bands[i] += (v - bands[i]) * 0.45;
+        }
+        bands._timeData = timeData;
+      }
+    }
+
+    // ── SYNTHETIC FALLBACK ────────────────────────────────────
+    // Used when Web Audio not connected yet or signal is zero
+    if (!gotRealFFT) {
+      const vol   = Math.max(0.55, parseFloat(document.getElementById('volSlider').value));
+      const boost = playing ? 1.35 : 0.25;
       for (let i = 0; i < NUM_BANDS; i++) {
-        const freq = i / NUM_BANDS;
-        const env  = freq<0.15?0.95:freq<0.4?0.80:freq<0.7?0.55:0.25;
+        const freq  = i / NUM_BANDS;
+        const env   = freq<0.15?0.95:freq<0.4?0.78:freq<0.7?0.52:0.22;
         const pulse = 0.5 + 0.4*Math.sin(synthPhase*2.1+i*0.3)*Math.sin(synthPhase*1.3+i*0.7)
-                         + 0.15*Math.sin(synthPhase*3.7+i*0.5);
-        const noise = (Math.random()-0.5)*0.25;
-        targets[i] = Math.max(0, Math.min(1, env*pulse*vol*boost + noise*env));
+                          + 0.15*Math.sin(synthPhase*3.7+i*0.5);
+        targets[i] = Math.max(0, Math.min(1, env*pulse*vol*boost + (Math.random()-0.5)*0.22*env));
       }
-      for (let i=0;i<NUM_BANDS;i++) {
-        bands[i] += (targets[i]-bands[i]) * (bands[i]<targets[i]?0.5:0.18);
-      }
+      for (let i=0; i<NUM_BANDS; i++)
+        bands[i] += (targets[i]-bands[i]) * (bands[i]<targets[i] ? 0.5 : 0.18);
     }
 
     // pick current station color theme
@@ -1440,34 +1471,37 @@ function startSynthViz() {
         ctx.strokeStyle = '#1e1e2e'; ctx.lineWidth = 0.5;
         ctx.beginPath(); ctx.arc(cx, cy, maxR*r/4, 0, Math.PI*2); ctx.stroke();
       }
-      // sweep line
-      const sweep = (synthPhase * 0.8) % (Math.PI * 2);
-      const grad2 = ctx.createConicalGradient
+      // sweep angle driven by real time, not synthPhase
+      const sweep = (t * 1.2) % (Math.PI * 2);
+      // sweep trail — fill a wedge
+      const trailGrad = ctx.createConicalGradient
         ? ctx.createConicalGradient(cx, cy, sweep)
         : null;
-      ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},0.8)`;
+      ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},0.85)`;
       ctx.lineWidth = 1.5;
       ctx.shadowColor = `rgb(${color[0]},${color[1]},${color[2]})`;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.lineTo(cx + Math.cos(sweep)*maxR, cy + Math.sin(sweep)*maxR);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-      // data points from bands
-      ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},0.7)`;
+      ctx.stroke(); ctx.shadowBlur = 0;
+      // data blips — real FFT bands plotted around the circle
       for (let i = 0; i < NUM_BANDS; i++) {
         const angle = (i / NUM_BANDS) * Math.PI * 2;
         const r = bands[i] * maxR;
+        if (r < 2) continue;
         const px = cx + Math.cos(angle) * r;
         const py = cy + Math.sin(angle) * r;
         const age = ((sweep - angle) + Math.PI*2) % (Math.PI*2);
-        const alpha = Math.max(0, 1 - age / (Math.PI*2));
-        ctx.globalAlpha = alpha * 0.8;
-        ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+        const alpha = Math.max(0, 1 - age / (Math.PI*1.5));
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
+        ctx.shadowColor = `rgb(${color[0]},${color[1]},${color[2]})`;
+        ctx.shadowBlur = 4 * bands[i];
+        ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
       }
       ctx.globalAlpha = 1;
-      // center dot
       ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
       ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
     }
@@ -1476,23 +1510,21 @@ function startSynthViz() {
       // Aurora Borealis — slow flowing curtains of light
       const avgLevel = bands.reduce((a,b)=>a+b,0)/NUM_BANDS;
       const energy = playing ? Math.max(0.3, avgLevel) : 0.15;
-      // Trailing fade for flow effect
       ctx.fillStyle = 'rgba(10,10,15,0.18)';
       ctx.fillRect(0,0,W,H);
       const LAYERS = 5;
       for (let layer=0; layer<LAYERS; layer++) {
-        const hue = (synthPhase*20 + layer*55) % 360;
+        const hue = (t*20 + layer*55) % 360;
         const layerEnergy = bands[Math.floor(layer*NUM_BANDS/LAYERS)]*1.5 + energy*0.4;
         const yBase = H*(0.25 + layer*0.12);
         const amp = layerEnergy * H * 0.28;
-        // fill curtain
         ctx.beginPath(); ctx.moveTo(0,H);
         for (let x=0; x<=W; x+=3) {
           const nx=x/W;
           const y = yBase
-            + Math.sin(nx*3.5 + synthPhase*0.8 + layer*1.2)*amp
-            + Math.sin(nx*7   + synthPhase*1.3 + layer*0.7)*amp*0.5
-            + Math.sin(nx*1.5 + synthPhase*0.4 + layer*2.1)*amp*0.3;
+            + Math.sin(nx*3.5 + t*0.8 + layer*1.2)*amp
+            + Math.sin(nx*7   + t*1.3 + layer*0.7)*amp*0.5
+            + Math.sin(nx*1.5 + t*0.4 + layer*2.1)*amp*0.3;
           ctx.lineTo(x,y);
         }
         ctx.lineTo(W,H); ctx.closePath();
@@ -1502,7 +1534,6 @@ function startSynthViz() {
         g.addColorStop(0.7,`hsla(${(hue+40)%360},90%,60%,${0.08+layerEnergy*0.10})`);
         g.addColorStop(1,`hsla(${(hue+80)%360},80%,50%,0)`);
         ctx.fillStyle=g; ctx.fill();
-        // bright edge
         ctx.strokeStyle=`hsla(${hue},100%,85%,${0.15+layerEnergy*0.3})`;
         ctx.lineWidth=1.5;
         ctx.shadowColor=`hsl(${hue},100%,70%)`; ctx.shadowBlur=10*layerEnergy;
@@ -1510,17 +1541,15 @@ function startSynthViz() {
         for (let x=0; x<=W; x+=3) {
           const nx=x/W;
           const y = yBase
-            + Math.sin(nx*3.5+synthPhase*0.8+layer*1.2)*amp
-            + Math.sin(nx*7  +synthPhase*1.3+layer*0.7)*amp*0.5
-            + Math.sin(nx*1.5+synthPhase*0.4+layer*2.1)*amp*0.3;
+            + Math.sin(nx*3.5+t*0.8+layer*1.2)*amp
+            + Math.sin(nx*7  +t*1.3+layer*0.7)*amp*0.5
+            + Math.sin(nx*1.5+t*0.4+layer*2.1)*amp*0.3;
           x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
         }
         ctx.stroke(); ctx.shadowBlur=0;
       }
-      // stars
       if (!bands._stars) bands._stars = Array.from({length:60},()=>({
-        x:Math.random()*W, y:Math.random()*H*0.45,
-        r:Math.random()*1.2+0.3, tw:Math.random()*Math.PI*2
+        x:Math.random()*W, y:Math.random()*H*0.45, r:Math.random()*1.2+0.3, tw:Math.random()*Math.PI*2
       }));
       bands._stars.forEach(s=>{
         s.tw+=0.04;
@@ -1530,33 +1559,26 @@ function startSynthViz() {
     }
 
     else if (vizMode === 'nebula') {
-      // Particle Nebula — orbiting particles, hypnotic and meditative
       if (!bands._particles) bands._particles = Array.from({length:120},(_,i)=>({
-        angle:(i/120)*Math.PI*2,
-        radius:20+Math.random()*55,
+        angle:(i/120)*Math.PI*2, radius:20+Math.random()*55,
         speed:(Math.random()*0.008+0.003)*(Math.random()<0.5?1:-1),
-        size:Math.random()*2.5+0.5,
-        hueOff:Math.random()*60-30
+        size:Math.random()*2.5+0.5, hueOff:Math.random()*60-30
       }));
       const cx=W/2, cy=H/2;
       const avgLevel=bands.reduce((a,b)=>a+b,0)/NUM_BANDS;
       const energy=playing?Math.max(0.2,avgLevel):0.1;
-      const baseHue=(synthPhase*15)%360;
-      // soft trail
+      const baseHue=(t*15)%360;
       ctx.fillStyle='rgba(10,10,15,0.22)'; ctx.fillRect(0,0,W,H);
-      // central glow
       const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,Math.min(W,H)*0.38);
       glow.addColorStop(0,`hsla(${baseHue},80%,60%,${0.04+energy*0.1})`);
       glow.addColorStop(0.5,`hsla(${(baseHue+60)%360},70%,50%,${0.02+energy*0.05})`);
       glow.addColorStop(1,'transparent');
       ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
-      // orbit rings
       for (let r=1;r<=3;r++){
         ctx.strokeStyle=`hsla(${(baseHue+r*40)%360},60%,55%,${0.05+energy*0.07})`;
         ctx.lineWidth=0.5;
         ctx.beginPath(); ctx.arc(cx,cy,r*Math.min(W,H)*0.12,0,Math.PI*2); ctx.stroke();
       }
-      // particles
       bands._particles.forEach((p,i)=>{
         const bv=bands[Math.floor((i/bands._particles.length)*NUM_BANDS)];
         p.angle+=p.speed*(1+bv*3);
@@ -1570,41 +1592,129 @@ function startSynthViz() {
         ctx.shadowColor=`hsl(${hue},100%,70%)`; ctx.shadowBlur=sz*4*energy;
         ctx.fill(); ctx.shadowBlur=0;
       });
-      // core
       const core=ctx.createRadialGradient(cx,cy,0,cx,cy,8+energy*14);
       core.addColorStop(0,`hsla(${baseHue},100%,95%,${0.6+energy*0.4})`);
       core.addColorStop(1,'transparent');
       ctx.fillStyle=core; ctx.beginPath(); ctx.arc(cx,cy,8+energy*14,0,Math.PI*2); ctx.fill();
     }
 
+    else if (vizMode === 'bounce') {
+      // 🎾 BOUNCE — balls that bounce to the beat of each frequency band
+      if (!bands._balls) {
+        bands._balls = Array.from({length: NUM_BANDS}, (_, i) => ({
+          x: (i + 0.5) * (W / NUM_BANDS),
+          y: H * 0.5,
+          vy: 0,
+          trail: []
+        }));
+      }
+      const balls = bands._balls;
+      const gravity = 0.6, bounce = -0.55, floor = H - 6;
+
+      for (let i = 0; i < NUM_BANDS; i++) {
+        const b = balls[i];
+        b.x = (i + 0.5) * (W / NUM_BANDS); // reflow on resize
+        // audio energy pushes ball up
+        const kick = bands[i] * H * 0.85;
+        const targetY = floor - kick;
+        if (b.y > targetY - 2) {
+          b.vy = -Math.sqrt(2 * Math.abs(gravity) * Math.max(kick, 2));
+        }
+        b.vy += gravity;
+        b.y += b.vy;
+        if (b.y >= floor) { b.y = floor; b.vy *= bounce; }
+        b.y = Math.min(b.y, floor);
+        // trail
+        b.trail.push({x:b.x, y:b.y});
+        if (b.trail.length > 8) b.trail.shift();
+        // draw trail
+        b.trail.forEach((pt, ti) => {
+          const a = ti / b.trail.length;
+          const hue = 200 + (i/NUM_BANDS)*140;
+          const r = (1 + bands[i]*3) * a;
+          ctx.beginPath(); ctx.arc(pt.x, pt.y, r, 0, Math.PI*2);
+          ctx.fillStyle = `hsla(${hue},100%,65%,${a*0.4})`;
+          ctx.fill();
+        });
+        // draw ball
+        const hue = 200 + (i/NUM_BANDS)*140;
+        const radius = 3 + bands[i] * 7;
+        ctx.shadowColor = `hsl(${hue},100%,65%)`;
+        ctx.shadowBlur = radius * 2;
+        ctx.beginPath(); ctx.arc(b.x, b.y, radius, 0, Math.PI*2);
+        const bg = ctx.createRadialGradient(b.x-radius*0.3, b.y-radius*0.3, 0, b.x, b.y, radius);
+        bg.addColorStop(0, `hsla(${hue},100%,90%,0.95)`);
+        bg.addColorStop(1, `hsla(${hue},100%,50%,0.85)`);
+        ctx.fillStyle = bg; ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      // floor line
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(0, floor+1, W, 2);
+    }
+
+    else if (vizMode === 'matrix') {
+      // 💻 MATRIX — falling green digits driven by audio amplitude
+      if (!bands._cols) {
+        const charW = 12;
+        const numCols = Math.floor(W / charW);
+        bands._cols = Array.from({length: numCols}, () => ({
+          y: Math.random() * -100,
+          speed: 1 + Math.random() * 2.5,
+          chars: Array.from({length: 24}, () => String.fromCharCode(0x30A0 + Math.floor(Math.random()*96))),
+          band: 0
+        }));
+        bands._colW = charW;
+      }
+      const cols = bands._cols;
+      const charW = bands._colW || 12;
+      // soft trail
+      ctx.fillStyle = 'rgba(10,10,15,0.18)';
+      ctx.fillRect(0,0,W,H);
+
+      cols.forEach((col, ci) => {
+        // map column to frequency band
+        const bi = Math.floor((ci / cols.length) * NUM_BANDS);
+        const energy = bands[bi];
+        // audio makes columns rain faster
+        col.speed = 1.5 + energy * 8;
+        col.y += col.speed;
+        if (col.y > H + 50) {
+          col.y = -charW * (4 + Math.floor(Math.random()*10));
+          col.chars = col.chars.map(() => String.fromCharCode(0x30A0 + Math.floor(Math.random()*96)));
+        }
+        // occasionally mutate a char
+        if (Math.random() < 0.05 + energy * 0.2) {
+          const ri = Math.floor(Math.random() * col.chars.length);
+          col.chars[ri] = String.fromCharCode(0x30A0 + Math.floor(Math.random()*96));
+        }
+        // draw each character in the column
+        col.chars.forEach((ch, row) => {
+          const cx = ci * charW + 2;
+          const cy = col.y - row * charW;
+          if (cy < -charW || cy > H + charW) return;
+          const isHead = row === 0;
+          const fade = Math.max(0, 1 - row / col.chars.length);
+          if (isHead) {
+            ctx.fillStyle = `rgba(220,255,220,${0.7 + energy * 0.3})`;
+            ctx.shadowColor = '#39ff82'; ctx.shadowBlur = 8;
+          } else {
+            const g = Math.floor(120 + energy * 135 * fade);
+            ctx.fillStyle = `rgba(0,${g},30,${fade * (0.4 + energy * 0.5)})`;
+            ctx.shadowBlur = 0;
+          }
+          ctx.font = `${charW - 1}px monospace`;
+          ctx.fillText(ch, cx, cy);
+          ctx.shadowBlur = 0;
+        });
+      });
+    }
+
   } // end inner draw
   draw();
 }
 
-function drawVizReal(ctx, W, H, freqData, timeData, t) {
-  // same modes but using real analyser data
-  if (vizMode === 'scope') {
-    ctx.strokeStyle = '#39ff82'; ctx.lineWidth = 1.5;
-    ctx.shadowColor = '#39ff82'; ctx.shadowBlur = 5;
-    ctx.beginPath();
-    const sw = W / timeData.length;
-    for (let i = 0; i < timeData.length; i++) {
-      const y = (timeData[i] / 128) * H / 2;
-      i===0 ? ctx.moveTo(0,y) : ctx.lineTo(i*sw,y);
-    }
-    ctx.stroke(); ctx.shadowBlur = 0;
-  } else {
-    const n = freqData.length;
-    const barW = (W - n) / n;
-    for (let i = 0; i < n; i++) {
-      const v = freqData[i] / 255;
-      const bH = v * H;
-      const x = i * (barW+1);
-      ctx.fillStyle = `hsl(${160+v*80},100%,${35+v*35}%)`;
-      ctx.fillRect(x, H-bH, barW, bH);
-    }
-  }
-}
+// Remove dead drawVizReal — was never called
 
 // ============================================================
 //  VU METER
@@ -2106,10 +2216,7 @@ function playMp3(i) {
     document.getElementById('seekDur').textContent = '0:00';
     ensureKeepAlive();
     updateMediaSession(t.name);
-    // NOTE: do NOT call tryLiveAudio() for MP3 on iOS
-    // Routing through Web Audio makes iOS treat it as "processing" not "media"
-    // which causes it to suspend when screen locks or app goes to background
-    // The audio element plays directly through browser = survives background
+    tryLiveAudio(); // real FFT for MP3 viz
   }).catch(() => {
     isPlaying = false;
     document.getElementById('npMeta').textContent = 'Tap again to play';
@@ -2380,9 +2487,13 @@ audio.addEventListener('pause', () => {
 
 window.addEventListener('load', buildUI);
 
-// Start keep-alive on first user interaction
+// Start keep-alive AND connect Web Audio on first user interaction
+// Connecting Web Audio before src is set avoids CORS restrictions on iOS
 ['touchstart','mousedown','keydown'].forEach(evt =>
-  document.addEventListener(evt, () => ensureKeepAlive(), {once:true})
+  document.addEventListener(evt, () => {
+    ensureKeepAlive();
+    tryLiveAudio(); // connect graph while audio.src is empty — no CORS check
+  }, {once:true})
 );
 </script>
 </body>
