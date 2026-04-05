@@ -575,6 +575,16 @@
       <div class="panel-value" id="spdMphVal">---</div>
       <div class="panel-unit">MPH</div>
     </div>
+    <div class="panel">
+      <div class="panel-label">ALT AGL</div>
+      <div class="panel-value" id="altAGLVal">---</div>
+      <div class="panel-unit">FT (REF KMYF)</div>
+    </div>
+    <div class="panel">
+      <div class="panel-label">ALT MSL</div>
+      <div class="panel-value" id="altMSLVal">---</div>
+      <div class="panel-unit">FT GPS MSL</div>
+    </div>
   </div>
 
   <!-- ATC frequencies -->
@@ -647,11 +657,12 @@
   <!-- Version history -->
   <div class="ver-bar" onclick="toggleHistory()">
     <span class="ver-bar-label">VERSION HISTORY</span>
-    <span class="ver-bar-badge">v1.8 <span id="ver-arrow">▼</span></span>
+    <span class="ver-bar-badge">v1.9 <span id="ver-arrow">▼</span></span>
   </div>
   <div class="ver-table" id="ver-history">
     <table>
-      <tr><td>v1.8</td><td>Fixed iPhone scroll (overflow-y:scroll + touch-action:pan-y). Live METAR panel: fetches aviationweather.gov every 5 min — flight category color-coded, wind, visibility, temp C+F, dewpoint, altimeter, sky, raw string. Manual ↻ refresh.</td></tr>
+      <tr><td>v1.9</td><td>Added ALT AGL + ALT MSL panels (GPS altitude − KMYF elev 427ft). Fixed LiveATC: now uses direct .mp3 stream URL, falls back to .pls playlist (iOS native). Fixed METAR: corrected altim hPa→inHg conversion, ceiling FT AGL from clouds array, clear error message when blocked on file://.</td></tr>
+      <tr><td>v1.8</td><td>Fixed iPhone scroll. Live METAR panel from aviationweather.gov: flight category, wind, temp/dewpoint C+F, altimeter, ceiling AGL, raw string. Manual refresh.</td></tr>
       <tr><td>v1.7</td><td>Enhanced compass: beveled bezel, degree numbers, cardinal/intercardinal labels without overlap. Clock bar: local + Zulu + date. ATC buttons stream live audio inline. Now-playing bar with stop. Version history shown in-page.</td></tr>
       <tr><td>v1.6</td><td>Speed panels: KNOTS and MPH from GPS coords.speed (m/s).</td></tr>
       <tr><td>v1.5</td><td>Full magnetic correction: MAG_VAR=−11° (San Diego east variation). True→mag bearing. All panels consistent magnetic frame.</td></tr>
@@ -671,17 +682,21 @@
 // ── Constants ──
 const KMYF    = { lat: 32.8157, lon: -117.1396 };
 const MAG_VAR = -11; // San Diego: east variation → magnetic = true − 11
+const KMYF_ELEV_FT = 427; // KMYF field elevation MSL in feet
 
-// LiveATC stream mount points (confirmed from liveatc.net search results)
+// LiveATC: direct MP3 stream URLs (d.liveatc.net = streaming CDN, no CORS issue for audio)
+// hlisten.php pages are HTML wrappers — audio element needs the raw stream
+// .pls playlist opens natively in iOS Safari if direct stream is blocked
 const STREAMS = {
-  atis:  { label: 'KMYF ATIS',       url: 'https://www.liveatc.net/hlisten.php?mount=ksan_kmyf_atis&icao=kmyf' },
-  twr:   { label: 'KMYF TOWER',      url: 'https://www.liveatc.net/hlisten.php?mount=kmyf1_twr&icao=kmyf'     },
-  gnd:   { label: 'KMYF GROUND/TWR', url: 'https://www.liveatc.net/hlisten.php?mount=kmyf_twr&icao=kmyf'      },
-  socal: { label: 'SOCAL APPROACH',  url: 'https://www.liveatc.net/hlisten.php?mount=kmyf_app&icao=kmyf'      }
+  atis:  { label: 'KMYF ATIS',       mp3: 'https://www.liveatc.net/play/ksan_kmyf_atis.mp3', pls: 'https://www.liveatc.net/play/ksan_kmyf_atis.pls' },
+  twr:   { label: 'KMYF TOWER',      mp3: 'https://www.liveatc.net/play/kmyf1_twr.mp3',      pls: 'https://www.liveatc.net/play/kmyf1_twr.pls'      },
+  gnd:   { label: 'KMYF GROUND/TWR', mp3: 'https://www.liveatc.net/play/kmyf_twr.mp3',       pls: 'https://www.liveatc.net/play/kmyf_twr.pls'       },
+  socal: { label: 'SOCAL APPROACH',  mp3: 'https://www.liveatc.net/play/kmyf_app.mp3',       pls: 'https://www.liveatc.net/play/kmyf_app.pls'       }
 };
 
 // ── State ──
 let currentHeading = null, currentLat = null, currentLon = null, currentSpeedMps = null;
+let currentAltMSL = null; // GPS altitude in meters MSL
 let activeStream = null;
 
 // ── Math ──
@@ -810,6 +825,17 @@ function updateDisplay() {
     document.getElementById('spdKtVal').textContent  = '---';
     document.getElementById('spdMphVal').textContent = '---';
   }
+
+  // Altitude AGL = GPS altitude MSL (meters→feet) minus KMYF field elevation
+  if (currentAltMSL !== null) {
+    const altFtMSL = currentAltMSL * 3.28084;
+    const altFtAGL = Math.round(altFtMSL - KMYF_ELEV_FT);
+    document.getElementById('altAGLVal').textContent = altFtAGL >= 0 ? altFtAGL : '0';
+    document.getElementById('altMSLVal').textContent = Math.round(altFtMSL);
+  } else {
+    document.getElementById('altAGLVal').textContent = '---';
+    document.getElementById('altMSLVal').textContent = '---';
+  }
 }
 
 // ── ATC Audio streaming ──
@@ -820,15 +846,15 @@ window.toggleStream = function(key) {
   stopStream();
   activeStream = key;
   const s = STREAMS[key];
-  audio.src = s.url;
+  audio.src = s.mp3;
   audio.load();
   const playPromise = audio.play();
   if (playPromise !== undefined) {
     playPromise.catch(() => {
-      // Direct stream failed; open LiveATC page in browser
-      window.open(s.url, '_blank');
-      activeStream = null;
-      setStatus('OPENED IN BROWSER — DIRECT STREAM BLOCKED', 'warn');
+      // Direct MP3 blocked — open .pls playlist; iOS Safari handles natively
+      stopStream();
+      window.open(s.pls, '_blank');
+      setStatus('OPENED .PLS IN SAFARI — TAP PLAY', 'warn');
     });
   }
   document.getElementById('btn-'  + key).classList.add('playing');
@@ -849,9 +875,10 @@ window.stopStream = function() {
 
 audio.addEventListener('error', () => {
   if (activeStream) {
-    window.open(STREAMS[activeStream].url, '_blank');
+    const s = STREAMS[activeStream];
     stopStream();
-    setStatus('STREAM ERROR — OPENED IN BROWSER', 'warn');
+    window.open(s.pls, '_blank');
+    setStatus('STREAM ERROR — OPENED .PLS IN SAFARI', 'warn');
   }
 });
 
@@ -862,6 +889,7 @@ function startGPS() {
     currentLat = pos.coords.latitude;
     currentLon = pos.coords.longitude;
     currentSpeedMps = pos.coords.speed;
+    currentAltMSL = pos.coords.altitude; // meters MSL, may be null
     document.getElementById('manual-btn').style.display = 'none';
     document.getElementById('manual-input').style.display = 'none';
     updateDisplay();
@@ -942,111 +970,108 @@ window.toggleHistory = function() {
 };
 
 // ── METAR ──
+// Works from HTTPS (GitHub Pages). CORS blocks on file://
 function fetchMetar() {
   const el = document.getElementById('metarContent');
   el.innerHTML = '<div class="metar-loading blink">FETCHING METAR...</div>';
-  // aviationweather.gov free API — no key required
-  fetch('https://aviationweather.gov/api/data/metar?ids=KMYF&format=json')
-    .then(r => r.json())
-    .then(data => {
-      if (!data || !data.length) throw new Error('No data');
-      renderMetar(data[0]);
-    })
+  fetch('https://aviationweather.gov/api/data/metar?ids=KMYF&format=json&taf=false')
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => { if (!data || !data.length) throw new Error('empty'); renderMetar(data[0]); })
     .catch(() => {
-      el.innerHTML = '<div class="metar-loading" style="color:#ff6b35">METAR UNAVAILABLE — CHECK WHEN ONLINE</div>';
+      const isFile = location.protocol === 'file:';
+      el.innerHTML = '<div class="metar-loading" style="color:#ff6b35;line-height:1.9">METAR BLOCKED' +
+        (isFile ? ' — FILE:// ORIGIN' : '') +
+        '<br><span style="font-size:8px;color:#7a5500">HOST ON GITHUB PAGES FOR LIVE DATA</span></div>';
     });
 }
 
 function renderMetar(m) {
-  // m fields from aviationweather.gov JSON schema
-  const raw     = m.rawOb  || m.raw_text || '';
-  const temp    = m.temp   != null ? m.temp   : null;
-  const dewp    = m.dewp   != null ? m.dewp   : null;
-  const wspd    = m.wspd   != null ? m.wspd   : null;  // knots
-  const wdir    = m.wdir   != null ? m.wdir   : null;
-  const visib   = m.visib  != null ? m.visib  : null;  // SM
-  const altim   = m.altim  != null ? m.altim  : null;  // inHg
-  const cover   = m.cover  || (m.clouds && m.clouds.length ? m.clouds[0].cover : null);
-  const wxStr   = m.wx_string || m.presentWx || '';
-  const flCat   = m.flightCategory || m.flight_category || '';
-  const obsTime = m.reportTime || m.observation_time || '';
+  const raw   = m.rawOb || '';
+  const temp  = m.temp  != null ? m.temp  : null;
+  const dewp  = m.dewp  != null ? m.dewp  : null;
+  const wspd  = m.wspd  != null ? m.wspd  : null;
+  const wgst  = m.wgst  != null ? m.wgst  : null;
+  const wdir  = m.wdir  != null ? m.wdir  : null;
+  const visib = m.visib != null ? m.visib : null;
+  // altim from aviationweather.gov JSON is hPa — convert to inHg
+  const altimInHg = m.altim != null ? (m.altim / 33.8639).toFixed(2) : null;
+  const wxStr = m.wxString || m.wx_string || '';
+  const flCat = m.flightCategory || m.flight_category || '';
+  const obsTime = m.reportTime || m.obsTime || '';
 
-  // Age string
+  // Clouds: lowest BKN/OVC ceiling — base in hundreds of feet AGL
+  const clouds = m.clouds || [];
+  let ceilCover = null, ceilFtAGL = null;
+  for (const c of clouds) {
+    if (c.cover === 'CLR' || c.cover === 'SKC' || c.cover === 'CAVOK') {
+      if (!ceilCover) ceilCover = c.cover;
+    } else if (c.base != null && (c.cover === 'BKN' || c.cover === 'OVC') && ceilFtAGL === null) {
+      ceilFtAGL = c.base * 100; ceilCover = c.cover;
+    } else if (!ceilCover && c.base != null) {
+      ceilFtAGL = c.base * 100; ceilCover = c.cover;
+    }
+  }
+  if (!ceilCover && clouds.length) ceilCover = clouds[0].cover;
+
+  // Age
   let ageStr = '';
   if (obsTime) {
-    const obs = new Date(obsTime);
-    const diffMin = Math.round((Date.now() - obs) / 60000);
-    ageStr = diffMin < 60 ? `${diffMin} MIN AGO` : `${Math.round(diffMin/60)}H AGO`;
+    const t = typeof obsTime === 'number' ? new Date(obsTime * 1000) : new Date(obsTime);
+    const dm = Math.round((Date.now() - t) / 60000);
+    ageStr = isNaN(dm) ? '' : (dm < 60 ? dm + ' MIN AGO' : Math.round(dm/60) + 'H AGO');
   }
 
-  // Temp/dewpoint with C and F
-  const fmtTemp = c => c != null ? `${c}°` : '--';
-  const toF = c => c != null ? Math.round(c * 9/5 + 32) : null;
-
-  // Wind
+  const fmtT   = c => c != null ? c + '\u00b0C' : '--';
+  const toF    = c => c != null ? Math.round(c * 9/5 + 32) + '\u00b0F' : '';
+  const catCls = {VFR:'cat-vfr',MVFR:'cat-mvfr',IFR:'cat-ifr',LIFR:'cat-lifr'}[flCat] || '';
   const windStr = wdir != null && wspd != null
-    ? (wdir === 0 && wspd === 0 ? 'CALM' : `${String(wdir).padStart(3,'0')}/${wspd}`)
+    ? (wdir === 0 && wspd === 0 ? 'CALM' : String(wdir).padStart(3,'0') + '\u00b0/' + wspd + (wgst ? 'G'+wgst : '') + 'KT')
+    : '--';
+  const ceilStr = ceilCover
+    ? (ceilFtAGL != null ? ceilCover + ' ' + ceilFtAGL.toLocaleString() + 'FT' : ceilCover)
     : '--';
 
-  // Visibility
-  const visStr = visib != null ? (visib >= 10 ? '10+' : visib) : '--';
-
-  // Altimeter
-  const altStr = altim != null ? altim.toFixed(2) : '--';
-
-  // Sky / ceiling
-  const skyStr = cover || '--';
-
-  // Flight category CSS class
-  const catClass = {VFR:'cat-vfr', MVFR:'cat-mvfr', IFR:'cat-ifr', LIFR:'cat-lifr'}[flCat] || '';
-
-  const el = document.getElementById('metarContent');
-  el.innerHTML = `
-    <div class="metar-grid">
-      <div class="metar-cell ${catClass}">
-        <div class="metar-cell-label">CATEGORY</div>
-        <div class="metar-cell-value">${flCat || '--'}</div>
-        <div class="metar-cell-unit">FLIGHT CAT</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">WIND</div>
-        <div class="metar-cell-value" style="font-size:13px">${windStr}</div>
-        <div class="metar-cell-unit">DIR°/KTS</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">VISIBILITY</div>
-        <div class="metar-cell-value">${visStr}</div>
-        <div class="metar-cell-unit">STAT MILES</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">TEMP</div>
-        <div class="metar-cell-value">${fmtTemp(temp)}C</div>
-        <div class="metar-cell-unit">${toF(temp) != null ? toF(temp)+'°F' : ''}</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">DEWPOINT</div>
-        <div class="metar-cell-value">${fmtTemp(dewp)}C</div>
-        <div class="metar-cell-unit">${toF(dewp) != null ? toF(dewp)+'°F' : ''}</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">ALTIMETER</div>
-        <div class="metar-cell-value" style="font-size:17px">${altStr}</div>
-        <div class="metar-cell-unit">IN HG</div>
-      </div>
-      <div class="metar-cell">
-        <div class="metar-cell-label">SKY</div>
-        <div class="metar-cell-value" style="font-size:16px">${skyStr}</div>
-        <div class="metar-cell-unit">COVERAGE</div>
-      </div>
-      ${wxStr ? `<div class="metar-cell" style="grid-column:2/-1">
-        <div class="metar-cell-label">WX</div>
-        <div class="metar-cell-value" style="font-size:14px">${wxStr}</div>
-        <div class="metar-cell-unit">PRESENT WX</div>
-      </div>` : ''}
-    </div>
-    <div class="metar-raw">${raw}</div>
-    ${ageStr ? `<div class="metar-age">${ageStr}</div>` : ''}
-  `;
+  document.getElementById('metarContent').innerHTML =
+    '<div class="metar-grid">' +
+    '<div class="metar-cell ' + catCls + '">' +
+      '<div class="metar-cell-label">CATEGORY</div>' +
+      '<div class="metar-cell-value">' + (flCat||'--') + '</div>' +
+      '<div class="metar-cell-unit">FLIGHT CAT</div>' +
+    '</div>' +
+    '<div class="metar-cell">' +
+      '<div class="metar-cell-label">WIND</div>' +
+      '<div class="metar-cell-value" style="font-size:11px">' + windStr + '</div>' +
+      '<div class="metar-cell-unit">&nbsp;</div>' +
+    '</div>' +
+    '<div class="metar-cell">' +
+      '<div class="metar-cell-label">VISIBILITY</div>' +
+      '<div class="metar-cell-value">' + (visib!=null?visib:'--') + '</div>' +
+      '<div class="metar-cell-unit">STAT MI</div>' +
+    '</div>' +
+    '<div class="metar-cell">' +
+      '<div class="metar-cell-label">TEMP</div>' +
+      '<div class="metar-cell-value" style="font-size:17px">' + fmtT(temp) + '</div>' +
+      '<div class="metar-cell-unit">' + toF(temp) + '</div>' +
+    '</div>' +
+    '<div class="metar-cell">' +
+      '<div class="metar-cell-label">DEWPOINT</div>' +
+      '<div class="metar-cell-value" style="font-size:17px">' + fmtT(dewp) + '</div>' +
+      '<div class="metar-cell-unit">' + toF(dewp) + '</div>' +
+    '</div>' +
+    '<div class="metar-cell">' +
+      '<div class="metar-cell-label">ALTIMETER</div>' +
+      '<div class="metar-cell-value" style="font-size:16px">' + (altimInHg||'--') + '</div>' +
+      '<div class="metar-cell-unit">IN HG</div>' +
+    '</div>' +
+    '<div class="metar-cell" style="grid-column:1/-1">' +
+      '<div class="metar-cell-label">CEILING / SKY</div>' +
+      '<div class="metar-cell-value" style="font-size:13px">' + ceilStr + '</div>' +
+      '<div class="metar-cell-unit">' + (ceilFtAGL!=null?'LOWEST BKN/OVC AGL':'COVERAGE') + '</div>' +
+    '</div>' +
+    (wxStr ? '<div class="metar-cell" style="grid-column:1/-1"><div class="metar-cell-label">PRESENT WX</div><div class="metar-cell-value" style="font-size:13px">' + wxStr + '</div></div>' : '') +
+    '</div>' +
+    '<div class="metar-raw">' + raw + '</div>' +
+    (ageStr ? '<div class="metar-age">' + ageStr + '</div>' : '');
 }
 
 // Auto-fetch on load, refresh every 5 minutes
