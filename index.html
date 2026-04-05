@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.40</title>
+<title>WRadio v2.41</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -169,10 +169,6 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <body>
 
 <audio id="audio" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
-<!-- Second audio element used ONLY for Web Audio FFT analysis.
-     Main audio plays directly through browser (background-safe).
-     This clone plays at volume 0 just to feed the analyser. -->
-<audio id="audioFFT" preload="none" playsinline muted style="display:none"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- iOS install prompt — only shows in Safari, not when running as PWA -->
@@ -206,7 +202,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.40</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.41</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -390,7 +386,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -407,7 +403,13 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Real FFT for all sources — single audio through Web Audio<br>
+        Background: silent buffer inside audioCtx keeps it alive<br>
+        AudioContext resumed every 800ms — no more suspension
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Dual audio: main plays direct (background-safe), clone feeds FFT<br>
         Stations viz now works (FFT clone plays stream silently)<br>
@@ -626,12 +628,17 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.40  (2026-04-04)
+//  Version : v2.41  (2026-04-04)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.40 - DUAL AUDIO ARCHITECTURE: separate <audio> element for FFT only
+//  v2.41 - Single audio element routed through Web Audio for real FFT
+//          connectFFT() called on first tap (audio.src empty = no CORS)
+//          Silent looping buffer INSIDE main audioCtx keeps it alive
+//          AudioContext resumed aggressively every 800ms in background
+//          Background + real FFT now work simultaneously
+//  v2.40 - Dual audio attempt (removed — CORS blocked FFT clone)
 //          Main audio plays DIRECTLY (no Web Audio routing) = background-safe
 //          FFT clone plays same URL at volume=0 for analyser data only
 //          Stations: FFT clone started after play() succeeds
@@ -1085,8 +1092,7 @@ function play(station) {
     ensureKeepAlive();
     updateMediaSession(station.name);
     startBufferWatchdog();
-    // Start silent FFT clone for real viz — main audio untouched
-    startFFTClone(station.url);
+    connectFFT(); // real FFT — connected to main audio element
   }).catch((e) => {
     console.warn('[play] Failed:', e.message);
     document.getElementById('npMeta').textContent = 'Tap to retry';
@@ -1159,18 +1165,26 @@ function seekMp3(val) {
 }
 
 // ============================================================
-//  WEB AUDIO — real FFT via a separate silent audio clone
+//  WEB AUDIO — real FFT from main audio element
 //
-//  KEY INSIGHT: Routing the MAIN audio element through Web Audio
-//  causes iOS to suspend it when app goes to background.
-//  Solution: keep main audio element completely untouched for
-//  direct browser playback (background-safe). A SECOND hidden
-//  <audio> element plays the same URL at volume=0, routed through
-//  createMediaElementSource → analyser. It's used ONLY for FFT.
-//  The user hears nothing from it — main audio does all the sound.
+//  ARCHITECTURE:
+//  audio → gainNode → analyser → destination
+//                  ↘ destination (direct bypass for reliability)
+//
+//  The gainNode lets us control volume independently of audio.volume.
+//  The AudioContext is kept alive aggressively so iOS doesn't suspend it.
+//  createMediaElementSource() is called ONCE, before src is ever set,
+//  so there is no CORS check — it connects to an empty element.
+//  From that point, any src change (stream or blob) flows through.
+//
+//  Background audio: we keep the AudioContext running via a looping
+//  silent BufferSource in the SAME context. When iOS suspends the
+//  context, we resume it immediately. The audio element itself
+//  continues outputting through the destination regardless.
 // ============================================================
-const audioFFT = document.getElementById('audioFFT');
+const audioFFT = null; // removed — single audio architecture
 let fftConnected = false;
+let gainNode = null;
 
 function connectFFT() {
   if (fftConnected) {
@@ -1180,45 +1194,40 @@ function connectFFT() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-    if (!analyser) {
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.82;
-    }
-    // Connect the FFT element (NOT main audio) — no background audio impact
-    const fftSource = audioCtx.createMediaElementSource(audioFFT);
-    fftSource.connect(analyser);
-    // Do NOT connect to destination — we want silence from this element
-    // audioFFT is already muted via HTML attribute, but don't output to speakers
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.82;
+
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 1.0;
+
+    // Connect graph: audio → gain → analyser → destination
+    waSource = audioCtx.createMediaElementSource(audio);
+    waSource.connect(gainNode);
+    gainNode.connect(analyser);
+    gainNode.connect(audioCtx.destination);
+
+    // Keep AudioContext alive with a silent looping buffer in same context
+    const silentBuf = audioCtx.createBuffer(1, audioCtx.sampleRate, audioCtx.sampleRate);
+    const silentSrc = audioCtx.createBufferSource();
+    silentSrc.buffer = silentBuf;
+    silentSrc.loop = true;
+    silentSrc.connect(audioCtx.destination); // tiny silent signal keeps context active
+    silentSrc.start(0);
+
     fftConnected = true;
     liveAudio = true;
-    console.log('[FFT] Analysis element connected');
+    console.log('[FFT] Connected — real FFT active');
   } catch(e) {
     console.warn('[FFT] Failed:', e.message);
     liveAudio = false;
   }
 }
 
-// Start FFT clone playing the same src as main audio
-function startFFTClone(src) {
-  if (!src || src === window.location.href) return;
-  connectFFT();
-  if (!fftConnected) return;
-  // Reset and play clone
-  audioFFT.pause();
-  audioFFT.crossOrigin = 'anonymous';
-  audioFFT.src = src;
-  audioFFT.volume = 0;
-  audioFFT.muted = true;
-  audioFFT.play().catch(()=>{}); // silent — just for FFT data
-}
-
-function stopFFTClone() {
-  audioFFT.pause();
-  audioFFT.src = '';
-}
-
-// Keep legacy name so existing call sites work
+// No-op shims for removed dual-audio functions
+function startFFTClone(src) { /* single audio — FFT reads main element */ }
+function stopFFTClone() {}
 function tryLiveAudio() { connectFFT(); }
 
 // ============================================================
@@ -2263,8 +2272,7 @@ function playMp3(i) {
     document.getElementById('seekDur').textContent = '0:00';
     ensureKeepAlive();
     updateMediaSession(t.name);
-    // FFT clone for MP3: blob URL works cross-origin-free
-    startFFTClone(t.url);
+    connectFFT(); // real FFT for MP3
   }).catch(() => {
     isPlaying = false;
     document.getElementById('npMeta').textContent = 'Tap again to play';
@@ -2458,80 +2466,46 @@ function setGStatus(msg, color) {
 }
 
 // ============================================================
-//  iOS BACKGROUND AUDIO
-//  The ONLY reliable way to keep audio playing on iOS when the
-//  app goes to background or screen locks is:
-//  1. The audio element must be the direct playback source
-//     (NOT routed through Web Audio API createMediaElementSource)
-//  2. A separate Web Audio context with a looping silent buffer
-//     keeps the audio session "active" so iOS doesn't suspend it
-//  3. The Media Session API tells iOS this is a music app
-//  4. On visibilitychange (returning), restart if interrupted
+//  iOS BACKGROUND AUDIO + WEB AUDIO KEEPALIVE
+//
+//  Single AudioContext handles both FFT analysis AND keepalive.
+//  The silent looping buffer INSIDE the main audioCtx keeps iOS
+//  from suspending it. We also resume aggressively every 800ms.
+//  Audio element routes through Web Audio → real FFT works.
+//  Background: audioCtx stays alive via silent loop + resume.
 // ============================================================
-let keepAliveCtx    = null;
-let keepAliveNode   = null;
-
-function startKeepAlive() {
-  if (keepAliveNode) return;
-  try {
-    keepAliveCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const buf  = keepAliveCtx.createBuffer(1, keepAliveCtx.sampleRate, keepAliveCtx.sampleRate);
-    const gain = keepAliveCtx.createGain();
-    gain.gain.value = 0.001;
-    gain.connect(keepAliveCtx.destination);
-    const src = keepAliveCtx.createBufferSource();
-    src.buffer = buf;
-    src.loop   = true;
-    src.connect(gain);
-    src.start(0);
-    keepAliveNode = src;
-    console.log('[KeepAlive] Started');
-  } catch(e) { console.warn('[KeepAlive]', e.message); }
-}
 
 function ensureKeepAlive() {
-  if (!keepAliveCtx) { startKeepAlive(); return; }
-  if (keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
 }
 
-// Resume keepAlive context every second — setInterval still fires briefly
-// even when suspended, enough to trigger resume
+// Aggressively resume AudioContext — iOS suspends it in background
 setInterval(() => {
-  if (keepAliveCtx && keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
 }, 800);
 
-// When page becomes visible again (user returns from home screen / other app)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') return;
   ensureKeepAlive();
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
   if (isPlaying && !userPaused && audio.paused && audio.src) {
     audio.play().catch(()=>{});
   }
-  // Resume FFT clone too
-  if (isPlaying && audioFFT.src && audioFFT.paused) {
-    audioFFT.play().catch(()=>{});
-  }
 });
 
-// pageshow fires when returning from bfcache (iOS Safari back navigation)
 window.addEventListener('pageshow', e => {
   if (!e.persisted) return;
   ensureKeepAlive();
   if (isPlaying && audio.paused && audio.src) audio.play().catch(()=>{});
 });
 
-// Heartbeat: audio 'pause' event fires when iOS interrupts playback
-// Restart immediately if it was not user-initiated
+// Restart if iOS pauses audio without user request
 audio.addEventListener('pause', () => {
-  if (!isPlaying) return; // user stopped it, don't restart
-  const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
-  if (userPaused) return;
-  // Small delay to distinguish CarPlay/system pause from network stall
+  if (!isPlaying) return;
+  if (document.getElementById('btnStop')?.innerHTML?.includes('RESUME')) return;
   setTimeout(() => {
     if (isPlaying && audio.paused && audio.src) {
-      console.log('[Pause event] Restarting interrupted audio');
+      ensureKeepAlive();
       audio.play().catch(()=>{});
     }
   }, 500);
@@ -2539,12 +2513,9 @@ audio.addEventListener('pause', () => {
 
 window.addEventListener('load', buildUI);
 
-// Start keep-alive AND pre-connect FFT element on first user interaction
+// Connect FFT on very first tap — audio.src is still empty → no CORS check
 ['touchstart','mousedown','keydown'].forEach(evt =>
-  document.addEventListener(evt, () => {
-    ensureKeepAlive();
-    connectFFT(); // connect FFT element while audioFFT.src is empty — no CORS
-  }, {once:true})
+  document.addEventListener(evt, () => connectFFT(), {once:true})
 );
 </script>
 </body>
