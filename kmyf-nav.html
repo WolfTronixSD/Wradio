@@ -241,6 +241,67 @@
     pointer-events: none;
   }
 
+  /* ── Frequency buttons ── */
+  .freq-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: left;
+  }
+  .freq-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
+  }
+  .freq-btn:active {
+    background: rgba(255,179,0,0.12);
+    border-color: var(--amber);
+  }
+  .freq-btn-socal {
+    border-color: rgba(0,255,136,0.25);
+  }
+  .freq-btn-socal::before {
+    background: linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent);
+  }
+  .freq-btn-socal:active {
+    background: rgba(0,255,136,0.08);
+    border-color: var(--green);
+  }
+  .freq-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--amber-dim);
+    margin-bottom: 3px;
+  }
+  .freq-btn-socal .freq-label { color: #004422; }
+  .freq-hz {
+    font-family: 'Orbitron', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,179,0,0.4);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .freq-btn-socal .freq-hz { color: var(--green); text-shadow: 0 0 8px rgba(0,255,136,0.4); }
+  .freq-sub {
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: var(--amber-dim);
+    margin-top: 3px;
+  }
+  .freq-btn-socal .freq-sub { color: #004422; }
+
   @keyframes pulse {
     0%,100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -326,6 +387,69 @@
         <div class="coord-val" id="lonVal">---.------</div>
       </div>
     </div>
+  </div>
+
+  <!-- Frequency buttons -->
+  <div style="width:100%;padding:0 18px 10px;">
+    <div style="font-size:9px;letter-spacing:2px;color:#7a5500;margin-bottom:7px;padding-top:6px;border-top:1px solid rgba(255,179,0,0.1);">FREQUENCIES</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+
+      <button class="freq-btn" onclick="openLiveATC('KMYF ATIS','https://www.liveatc.net/search/?icao=kmyf')">
+        <span class="freq-label">ATIS</span>
+        <span class="freq-hz">126.900</span>
+        <span class="freq-sub">KMYF</span>
+      </button>
+
+      <button class="freq-btn" onclick="openLiveATC('KMYF TWR','https://www.liveatc.net/search/?icao=kmyf')">
+        <span class="freq-label">TOWER</span>
+        <span class="freq-hz">119.200</span>
+        <span class="freq-sub">KMYF · 125.7 ALT</span>
+      </button>
+
+      <button class="freq-btn" onclick="openLiveATC('KMYF GND','https://www.liveatc.net/search/?icao=kmyf')">
+        <span class="freq-label">GROUND</span>
+        <span class="freq-hz">118.225</span>
+        <span class="freq-sub">KMYF · CLR 123.72</span>
+      </button>
+
+      <button class="freq-btn freq-btn-socal" onclick="openLiveATC('SOCAL APP','https://www.liveatc.net/search/?icao=ksan')">
+        <span class="freq-label">SOCAL APP</span>
+        <span class="freq-hz">124.350</span>
+        <span class="freq-sub">DEP 119.600</span>
+      </button>
+
+    </div>
+    <div id="freq-toast" style="display:none;text-align:center;font-size:9px;letter-spacing:2px;color:#00FF88;margin-top:6px;"></div>
+  </div>
+
+  <!-- Version history -->
+  <div id="ver-bar" onclick="toggleHistory()" style="width:100%;padding:5px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-top:1px solid rgba(255,179,0,0.1);">
+    <span style="font-size:9px;letter-spacing:2px;color:#7a5500;">VER HISTORY</span>
+    <span style="font-family:'Orbitron',monospace;font-size:11px;color:#FFB300;letter-spacing:2px;">v1.4 <span id="ver-arrow" style="font-size:9px;">▼</span></span>
+  </div>
+  <div id="ver-history" style="display:none;width:100%;padding:4px 18px 8px;max-height:160px;overflow-y:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.8;">
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.4</td>
+        <td style="color:#7a5500;">Corrected all frequencies: ATIS 126.9, TWR 119.2 (alt 125.7), GND 118.225 (CLR 123.72), SoCal App 124.35 (Dep 119.6). LiveATC buttons open KMYF/KSAN feed pages.</td>
+      </tr>
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.3</td>
+        <td style="color:#7a5500;">Added frequency buttons: KMYF ATIS 135.025, TWR 132.175, GND 121.600, SoCal Approach 124.350. Tap opens LiveATC feed.</td>
+      </tr>
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.2</td>
+        <td style="color:#7a5500;">Manual coords fallback when GPS blocked on file:// origin. Auto pre-fills San Diego center.</td>
+      </tr>
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.1</td>
+        <td style="color:#7a5500;">GPS watchPosition with high accuracy. Compass permission button for iOS 13+. Absolute orientation preferred over deviceorientation.</td>
+      </tr>
+      <tr>
+        <td style="color:#FFB300;font-family:'Orbitron',monospace;white-space:nowrap;padding-right:10px;vertical-align:top;">v1.0</td>
+        <td style="color:#7a5500;">Initial release. Rotating compass rose, great-circle bearing &amp; haversine distance to KMYF. Green needle, bearing/distance/heading/rel-bearing panels.</td>
+      </tr>
+    </table>
   </div>
 
   <div class="status blink" id="statusMsg">AWAITING PERMISSION...</div>
@@ -532,6 +656,22 @@ function setStatus(msg, type) {
   el.textContent = msg;
   el.className = 'status' + (type ? ' ' + type : ' blink');
 }
+
+window.openLiveATC = function(label, url) {
+  window.open(url, '_blank');
+  const toast = document.getElementById('freq-toast');
+  toast.textContent = '▶ LIVEATC · ' + label;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+};
+
+window.toggleHistory = function() {
+  const el = document.getElementById('ver-history');
+  const arrow = document.getElementById('ver-arrow');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  arrow.textContent = open ? '▲' : '▼';
+};
 
 // Start
 startCompass();
