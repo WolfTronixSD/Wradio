@@ -1,0 +1,19 @@
+name: Check streams
+# Plays a few seconds of every station from GitHub's servers and reports which ones answer.
+on:
+  push:
+    paths: ["index.html", "scripts/check_streams.py", ".github/workflows/check-streams.yml"]
+  schedule:
+    - cron: "17 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      extra:
+        description: "Extra stream URLs to test, separated by spaces"
+        required: false
+        default: ""
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/check_streams.py ${{ github.event.inputs.extra }}
