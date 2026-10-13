@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.41</title>
+<title>WRadio v2.42</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -203,6 +203,82 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 .card-title{font-size:0.9em}
 .lbl{font-size:0.9em}
 @media (max-width:360px){.stn-name,.sec-german .stn-name{font-size:1.25em}}
+
+/* ============================================================
+   FANCY LOOK (v2.42): aurora background, glass panels, icon
+   badges, gradient tiles and a dancing equalizer on the
+   station that is playing
+   ============================================================ */
+:root{--bg:#07070d;--surface:rgba(22,24,38,0.72);--border:rgba(255,255,255,0.08)}
+html,body{background:var(--bg)}
+body::after{content:'';position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(40% 35% at 20% 15%,rgba(123,47,247,0.35),transparent 70%),
+    radial-gradient(35% 30% at 85% 25%,rgba(0,212,255,0.28),transparent 70%),
+    radial-gradient(45% 40% at 70% 90%,rgba(255,94,98,0.22),transparent 70%),
+    radial-gradient(35% 35% at 10% 85%,rgba(57,255,130,0.16),transparent 70%);
+  filter:blur(20px);animation:aurora 24s ease-in-out infinite alternate}
+@keyframes aurora{0%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-4%,3%) rotate(6deg)}100%{transform:translate(3%,-3%) rotate(-5deg)}}
+body::before{background:none}
+header{background:rgba(9,9,18,0.94);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4)}
+.logo{font-weight:bold;background:linear-gradient(90deg,#00d4ff,#a46bff,#ff5e9c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo::first-letter{color:#00d4ff}
+.now-playing{border-radius:18px;padding:12px 14px;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+.np-head{display:flex;align-items:center;gap:14px}
+.np-text{flex:1;min-width:0}
+.np-icon{--c1:#00d4ff;--c2:#7b2ff7;flex:0 0 auto;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  font-size:2em;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 18px color-mix(in srgb,var(--c1) 50%,transparent);
+  position:relative;filter:saturate(0.6) brightness(0.8);transition:filter 0.3s}
+.np-icon.on{filter:none;animation:bob 2.4s ease-in-out infinite}
+.np-icon.on::before,.np-icon.on::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--c1);
+  animation:ring 2s ease-out infinite;pointer-events:none}
+.np-icon.on::after{animation-delay:1s;border-color:var(--c2)}
+@keyframes ring{0%{transform:scale(1);opacity:0.8}100%{transform:scale(1.55);opacity:0}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.btn-stop{background:linear-gradient(135deg,#ff4466,#ff7a45);color:#fff;border:none;box-shadow:0 6px 18px rgba(255,68,102,0.35)}
+.btn-stop:active{transform:scale(0.96)}
+input[type=range]{background:linear-gradient(90deg,#00d4ff,#a46bff)}
+input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgba(0,212,255,0.5),0 4px 12px rgba(0,0,0,0.4)}
+.tabs{background:rgba(9,9,18,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.08)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px 8px;font-size:0.72em;border-bottom:3px solid transparent}
+.tab-ic{font-size:1.9em;line-height:1;filter:grayscale(0.7) opacity(0.7);transition:transform 0.2s,filter 0.2s}
+.tab.active{color:#fff;border-image:linear-gradient(90deg,#00d4ff,#a46bff) 1}
+.tab.active .tab-ic{filter:none;transform:scale(1.15) translateY(-1px)}
+.section-label::before{display:none}
+.section-label[data-icon]::before{content:attr(data-icon);display:inline-block;width:auto;height:auto;background:none;box-shadow:none;font-size:1.3em;margin-right:4px}
+.section-label{font-family:var(--sans);font-weight:bold;letter-spacing:3px;font-size:1.05em;color:#fff;align-items:center}
+.stn-btn,.sec-german .stn-btn{--c1:#00d4ff;--c2:#7b2ff7;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 16%,rgba(20,22,34,0.85)),color-mix(in srgb,var(--c2) 12%,rgba(14,14,24,0.85)));
+  border:1px solid color-mix(in srgb,var(--c1) 30%,transparent);border-radius:18px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.08);
+  gap:12px;transition:transform 0.12s,box-shadow 0.25s,border-color 0.25s}
+.stn-btn::after{display:none}
+.stn-btn:active{opacity:1;transform:scale(0.97)}
+.stn-ic{flex:0 0 auto;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:1.75em;
+  background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 4px 12px color-mix(in srgb,var(--c1) 40%,transparent),inset 0 1px 0 rgba(255,255,255,0.35)}
+.stn-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.stn-txt .stn-name{flex:none;overflow:hidden;text-overflow:ellipsis;font-size:1.3em}
+.stn-tag{font-size:0.95em;color:color-mix(in srgb,var(--c1) 55%,#e8edf7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stn-eq{display:none;position:absolute;top:10px;right:12px;height:18px;gap:3px;align-items:flex-end}
+.stn-eq i{display:block;width:4px;border-radius:2px;background:linear-gradient(var(--c1),var(--c2));animation:eq 0.9s ease-in-out infinite}
+.stn-eq i:nth-child(2){animation-delay:-0.3s}.stn-eq i:nth-child(3){animation-delay:-0.6s}.stn-eq i:nth-child(4){animation-delay:-0.15s}
+@keyframes eq{0%,100%{height:4px}50%{height:18px}}
+.stn-btn.active,.sec-music .stn-btn.active,.sec-german .stn-btn.active,.sec-atc .stn-btn.active{
+  border:2px solid var(--c1);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 34%,#151726),color-mix(in srgb,var(--c2) 30%,#10101c));
+  box-shadow:0 0 0 1px var(--c2),0 0 26px color-mix(in srgb,var(--c1) 55%,transparent),0 8px 22px rgba(0,0,0,0.4)}
+.stn-btn.active .stn-eq{display:flex}
+.stn-btn.active .stn-ic{animation:bob 1.6s ease-in-out infinite}
+.sec-atc .stn-ic{width:42px;height:42px;font-size:1.4em;border-radius:13px}
+.sec-atc .stn-tag{font-size:0.85em}
+.atc-hdr{border-bottom:1px solid rgba(255,255,255,0.1)}
+.card{background:var(--surface);border-radius:16px;border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.pill{border-radius:999px}
+.pill.active{background:linear-gradient(135deg,rgba(0,212,255,0.25),rgba(123,47,247,0.25));color:#fff}
+#vizCanvas{border-radius:16px}
+@media (prefers-reduced-motion:reduce){body::after,.np-icon.on,.np-icon.on::before,.np-icon.on::after,.stn-eq i,.stn-btn.active .stn-ic{animation:none}}
+@media (max-width:380px){.stn-ic{width:42px;height:42px;font-size:1.4em}.stn-btn,.sec-german .stn-btn{gap:8px;padding:10px}}
 </style>
 </head>
 <body>
@@ -245,7 +321,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.41</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.42</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -263,8 +339,13 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
     </div>
   </div>
   <div class="now-playing">
-    <div class="np-station idle" id="npStation">Select a station</div>
-    <div class="np-meta" id="npMeta">&nbsp;</div>
+    <div class="np-head">
+      <div class="np-icon" id="npIcon" aria-hidden="true">📻</div>
+      <div class="np-text">
+        <div class="np-station idle" id="npStation">Select a station</div>
+        <div class="np-meta" id="npMeta">&nbsp;</div>
+      </div>
+    </div>
     <div class="np-controls">
       <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
       <div class="vol-wrap">
@@ -289,12 +370,12 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('stations',this)">STATIONS</div>
-  <div class="tab" onclick="switchTab('mp3',this)">MP3</div>
-  <div class="tab" onclick="switchTab('viz',this)">VIZ</div>
-  <div class="tab" onclick="switchTab('timer',this)">TIMER</div>
-  <div class="tab" onclick="switchTab('alarm',this)">ALARM</div>
-  <div class="tab" onclick="switchTab('info',this)">INFO</div>
+  <div class="tab active" onclick="switchTab('stations',this)"><span class="tab-ic">📻</span>STATIONS</div>
+  <div class="tab" onclick="switchTab('mp3',this)"><span class="tab-ic">💿</span>MP3</div>
+  <div class="tab" onclick="switchTab('viz',this)"><span class="tab-ic">🌈</span>VIZ</div>
+  <div class="tab" onclick="switchTab('timer',this)"><span class="tab-ic">⏳</span>TIMER</div>
+  <div class="tab" onclick="switchTab('alarm',this)"><span class="tab-ic">⏰</span>ALARM</div>
+  <div class="tab" onclick="switchTab('info',this)"><span class="tab-ic">ℹ️</span>INFO</div>
 </div>
 
 <!-- STATIONS -->
@@ -430,7 +511,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.42 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -446,6 +527,14 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.42 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Fixed: old station kept playing after switching (e.g. radio then ATIS)<br>
+        iPhone: visualizer is simulated so only one stream ever plays<br>
+        New look: icons on every button, gradient tiles, aurora background<br>
+        Dancing equalizer on the playing station, glowing now-playing badge
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -678,11 +767,13 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.41  (2026-10-13)
+//  Version : v2.42  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.42 - Fix double audio on station switch (stop FFT clone first, none on iOS),
+//          icons, gradient tiles, aurora background, equalizer
 //  v2.41 - Car mode (big buttons), 5 German stations, https streams,
 //          main audio no longer requests CORS, FFT clone unmuted + silent sink
 //  v2.40 - DUAL AUDIO ARCHITECTURE: separate <audio> element for FFT only
@@ -838,6 +929,39 @@ const STATIONS = [
   {n:22, name:"KRNM Tower",           url:"https://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
 ];
 
+// Look of each station tile: icon, short tag line, two gradient colors
+const LOOK = {
+  1:['🕺','80s hits · ad-free','#ff3cac','#784ba0'],   2:['🌃','Synthpop · new wave','#2b86c5','#784ba0'],
+  3:['🥨','Munich · hits','#ff9a3c','#ff3c6e'],        4:['⚡','Cologne · young','#00e0ff','#0061ff'],
+  5:['🎧','Baden-Baden · pop','#ff4d4d','#f9cb28'],    6:['🏔️','Bavaria · pop','#4facfe','#00f2fe'],
+  7:['🌲','Stuttgart · classics','#43e97b','#38a169'], 23:['📰','News · culture','#a18cd1','#5b6cff'],
+  24:['⚓','Hamburg · pop','#1e90ff','#00c6a7'],       25:['🌆','Frankfurt · hits','#f857a6','#ff5858'],
+  26:['🍺','Bavaria · oldies','#f6d365','#fda085'],     27:['🤘','Rock · metal','#ff512f','#8e0e00'],
+  8:['🌬️','Weather & runway','#00d4ff','#0072ff'],     9:['🗼','Tower 119.2','#00d4ff','#2b5876'],
+  10:['🛞','Ground','#00d4ff','#2b5876'],                11:['📡','Tower, both','#00d4ff','#2b5876'],
+  12:['🛰️','SoCal approach','#00d4ff','#2b5876'],       13:['🗼','Tower','#00d4ff','#2b5876'],
+  14:['🛞','Ground','#00d4ff','#2b5876'],               15:['📝','Clearance','#00d4ff','#2b5876'],
+  16:['🛰️','SoCal east','#00d4ff','#2b5876'],           17:['🛰️','SoCal west','#00d4ff','#2b5876'],
+  18:['📡','Everything','#00d4ff','#2b5876'],           19:['🗼','Ground & tower','#00d4ff','#2b5876'],
+  20:['🛞','Ground','#00d4ff','#2b5876'],               21:['📡','Ground & tower','#00d4ff','#2b5876'],
+  22:['🗼','Tower','#00d4ff','#2b5876'],
+};
+const look = s => LOOK[s.n] || ['📻','','#00d4ff','#7b2ff7'];
+function tileHTML(s, label) {
+  const [ic, tag] = look(s);
+  return '<span class="stn-ic">'+ic+'</span>'
+    +'<span class="stn-txt"><span class="stn-name">'+(label||s.name)+'</span>'
+    +(tag ? '<span class="stn-tag">'+tag+'</span>' : '')+'</span>'
+    +'<span class="stn-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
+}
+function setNowIcon(ic, c1, c2) {
+  const el = document.getElementById('npIcon');
+  if (!el) return;
+  el.textContent = ic;
+  el.style.setProperty('--c1', c1); el.style.setProperty('--c2', c2);
+  el.classList.toggle('on', ic !== '📻');
+}
+
 // ============================================================
 //  STATE
 //  All runtime variables — reset on page reload
@@ -876,7 +1000,7 @@ function buildUI() {
   // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
   // Music and German sections built normally
-  [{key:'german',label:'German Radio'},{key:'music',label:'Music'}]
+  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'music',label:'Music',icon:'🎶'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
@@ -884,13 +1008,14 @@ function buildUI() {
     sec.className = 'sec-' + cat.key;
     const lbl = document.createElement('div');
     lbl.className = 'section-label'; lbl.textContent = cat.label;
+    lbl.dataset.icon = cat.icon;
     sec.appendChild(lbl);
     stns.forEach(s => {
       const b = document.createElement('button');
       b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
-      b.innerHTML = '<span class="stn-num">'+s.n+'</span>'
-        +'<span class="stn-name">'+s.name+'</span>'
-        +'<span class="stn-live"><span class="live-dot"></span>LIVE</span>';
+      const [, , c1, c2] = look(s);
+      b.style.setProperty('--c1', c1); b.style.setProperty('--c2', c2);
+      b.innerHTML = tileHTML(s);
       sec.appendChild(b);
     });
     list.appendChild(sec);
@@ -909,6 +1034,7 @@ function buildUI() {
   const atcLbl = document.createElement('div');
   atcLbl.className = 'section-label';
   atcLbl.textContent = 'ATC \u2014 San Diego';
+  atcLbl.dataset.icon = '✈️';
   atcSec.appendChild(atcLbl);
 
   airports.forEach(apt => {
@@ -930,8 +1056,9 @@ function buildUI() {
       const shortName = s.name.replace(/^K[A-Z]{3}\s*/,'');
       const b = document.createElement('button');
       b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
-      b.innerHTML = '<span class="stn-name">'+shortName+'</span>'
-        +'<span class="stn-live"><span class="live-dot"></span>▶</span>';
+      const [, , c1, c2] = look(s);
+      b.style.setProperty('--c1', c1); b.style.setProperty('--c2', c2);
+      b.innerHTML = tileHTML(s, shortName);
       grid.appendChild(b);
     });
     atcSec.appendChild(grid);
@@ -1114,11 +1241,13 @@ function play(station) {
 
   curIdx = STATIONS.indexOf(station);
   isPlaying = true; // set BEFORE play() so viz activates immediately
+  stopFFTClone(); // never let the previous station's analysis copy keep running
   connectFFT(); // create/resume the AudioContext during the tap, which iOS requires
 
   // Update UI instantly — don't wait for audio to start
   document.getElementById('npStation').textContent = station.name;
   document.getElementById('npStation').classList.remove('idle');
+  { const [ic, , c1, c2] = look(station); setNowIcon(ic, c1, c2); }
   document.getElementById('npMeta').textContent = 'Connecting...';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('stn-'+station.n)?.classList.add('active');
@@ -1186,6 +1315,7 @@ function stopPlay() {
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
   document.getElementById('npStation').textContent = 'Select a station';
   document.getElementById('npStation').classList.add('idle');
+  setNowIcon('📻', '#00d4ff', '#7b2ff7');
   document.getElementById('npMeta').textContent = '\u00a0';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('btnStop').innerHTML = '&#9632; STOP';
@@ -1260,8 +1390,13 @@ function connectFFT() {
 }
 
 // Start FFT clone playing the same src as main audio
+// On iPhone/iPad, WebKit can let the analysis copy play out loud next to the main
+// audio (heard as two stations at once), so iOS uses the simulated visualizer instead.
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
 function startFFTClone(src) {
   if (!src || src === window.location.href) return;
+  if (IS_IOS) return;
   connectFFT();
   if (!fftConnected) return;
   // Reset and play clone
@@ -1385,7 +1520,7 @@ function startSynthViz() {
     if (gotRealFFT !== vizLive) {
       vizLive = gotRealFFT;
       const src = document.getElementById('vizSrc');
-      if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS' : '○ SIMULATED (this station blocks audio analysis)';
+      if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS' : IS_IOS ? '○ SIMULATED (iPhone plays one stream only)' : '○ SIMULATED (this station blocks audio analysis)';
     }
 
     // ── SYNTHETIC FALLBACK ────────────────────────────────────
@@ -2310,10 +2445,12 @@ function playMp3(i) {
   if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
   mp3CurIdx = i;
   isPlaying = true; // set immediately so viz activates
+  stopFFTClone();
   const t = mp3Tracks[i];
   document.getElementById('mp3-'+i)?.classList.add('active');
   document.getElementById('npStation').textContent = t.name;
   document.getElementById('npStation').classList.remove('idle');
+  setNowIcon('💿', '#b465da', '#cf6cc9');
   document.getElementById('npMeta').textContent = 'Local MP3';
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('btnStop').innerHTML = '&#9632; STOP';
@@ -2391,6 +2528,7 @@ audio.addEventListener('ended', () => {
     mp3CurIdx = -1;
     document.getElementById('npStation').textContent = 'Select a station';
     document.getElementById('npStation').classList.add('idle');
+    setNowIcon('📻', '#00d4ff', '#7b2ff7');
     document.getElementById('npMeta').textContent = '\u00a0';
     document.getElementById('sigbars').classList.remove('active');
   }
@@ -2577,7 +2715,7 @@ document.addEventListener('visibilitychange', () => {
     audio.play().catch(()=>{});
   }
   // Resume FFT clone too
-  if (isPlaying && audioFFT.src && audioFFT.paused) {
+  if (!IS_IOS && isPlaying && audioFFT.src && audioFFT.paused) {
     audioFFT.play().catch(()=>{});
   }
 });
