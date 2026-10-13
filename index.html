@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.44</title>
+<title>WRadio v2.45</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -270,6 +270,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   box-shadow:0 0 0 1px var(--c2),0 0 26px color-mix(in srgb,var(--c1) 55%,transparent),0 8px 22px rgba(0,0,0,0.4)}
 .stn-btn.active .stn-eq{display:flex}
 .stn-btn.active .stn-txt{padding-right:30px}
+.atc-hdr{--c1:#00d4ff;--c2:#0062ff;border-bottom:2px solid var(--c1)!important;margin-top:14px;border-radius:0}
+.atc-hdr .icao{color:var(--c1);text-shadow:0 0 12px color-mix(in srgb,var(--c1) 60%,transparent)}
+.sec-atc .stn-tag{color:color-mix(in srgb,var(--c1) 70%,#e8edf7)}
+/* the moving level bar on the main screen was distracting (v2.45) */
+#vuWrap{display:none}
+.vol-ios{display:none;flex:1;font-size:1.05em;color:var(--text);line-height:1.2}
+.ios .vol-wrap input,.ios .vol-wrap .vol-val{display:none}
+.ios .vol-ios{display:block}
 .stn-btn.active .stn-ic{animation:bob 1.6s ease-in-out infinite}
 .sec-atc .stn-ic{width:42px;height:42px;font-size:1.4em;border-radius:13px}
 .sec-atc .stn-tag{font-size:0.85em}
@@ -322,7 +330,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.44</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.45</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -354,6 +362,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
         <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
           oninput="setVolume(this.value)">
         <span class="vol-val" id="volVal">80</span>
+        <span class="vol-ios">Use the iPhone volume buttons</span>
       </div>
     </div>
     <!-- Seek bar — only visible during MP3 playback -->
@@ -512,7 +521,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.44 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.45 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -528,6 +537,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.45 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Each airport has its own color: KMYF blue, KSAN orange, KSDM green, KRNM purple<br>
+        Removed the moving level bar from the main screen<br>
+        iPhone: back to normal playback (Web Audio gave silence for live radio); volume via side buttons
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.44 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -782,11 +798,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.44  (2026-10-13)
+//  Version : v2.45  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.45 - Airport colors, no VU bar on main screen, iPhone live mode off (WebKit silence)
 //  v2.44 - Workout section (bigFM Workout, 80s Hi‑NRG, 80s Rock, Techno)
 //  v2.43 - iPhone live mode (Web Audio: volume + real FFT, direct playback when locked),
 //          4 ad-free 80s stations, lazy Google scripts, lighter VU/viz loops
@@ -977,6 +994,14 @@ const LOOK = {
   20:['🛞','Ground','#00d4ff','#2b5876'],               21:['📡','Ground & tower','#00d4ff','#2b5876'],
   22:['🗼','Tower','#00d4ff','#2b5876'],
 };
+// Each airport has its own colors so the ATC groups are easy to tell apart
+const AIRPORT_COLORS = {
+  KMYF:['#00d4ff','#0062ff', [8,9,10,11,12]],      // blue
+  KSAN:['#ff9a3c','#ff3c6e', [13,14,15,16,17,18]], // orange
+  KSDM:['#43e97b','#0f9b8e', [19]],                // green
+  KRNM:['#c471f5','#7f3cf7', [20,21,22]],          // purple
+};
+Object.values(AIRPORT_COLORS).forEach(([c1, c2, ns]) => ns.forEach(n => { if (LOOK[n]) { LOOK[n][2] = c1; LOOK[n][3] = c2; } }));
 const look = s => LOOK[s.n] || ['📻','','#00d4ff','#7b2ff7'];
 function tileHTML(s, label) {
   const [ic, tag] = look(s);
@@ -1089,6 +1114,8 @@ function buildUI() {
     // Airport sub-header
     const aptHdr = document.createElement('div');
     aptHdr.className = 'atc-hdr';
+    const ac = AIRPORT_COLORS[apt.icao];
+    if (ac) { aptHdr.style.setProperty('--c1', ac[0]); aptHdr.style.setProperty('--c2', ac[1]); }
     aptHdr.innerHTML = '<span class="icao">'+apt.icao+'</span>'
       +'<span class="apt">'+apt.name+'</span>'
       +'<span class="freq">'+apt.freq+'</span>';
@@ -1179,7 +1206,6 @@ function buildUI() {
   }
 
   setInterval(tickClock, 1000); tickClock();
-  startVUMeter();
 
   // Show "Add to Home Screen" banner if running in Safari (not as installed PWA)
   // When installed as PWA, navigator.standalone = true and audio survives lock screen
@@ -1483,8 +1509,11 @@ function stopFFTClone() {
 }
 
 // ── iPhone live mode helpers ───────────────────────────────
+// Off since v2.45: on real iPhones WebKit hands Web Audio only silence for live
+// streams (WebKit bug 180696), so this mode never gave sound, volume or a real FFT.
+const IOS_LIVE_MODE = false;
 function useRouted() {
-  if (!IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
+  if (!IOS_LIVE_MODE || !IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
   connectFFT();
   return fftConnected && !!audioCtx;
 }
@@ -1675,7 +1704,7 @@ function startSynthViz() {
       vizLive = gotRealFFT;
       const src = document.getElementById('vizSrc');
       if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS'
-        : IS_IOS && !waMode ? '○ SIMULATED (iPhone direct mode)' : '○ SIMULATED (waiting for sound)';
+        : IS_IOS ? '○ SIMULATED (iPhone does not let web pages read live radio sound)' : '○ SIMULATED (waiting for sound)';
     }
 
     // ── SYNTHETIC FALLBACK ────────────────────────────────────
@@ -2936,6 +2965,7 @@ onAudible('pause', () => {
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
 
 window.addEventListener('load', buildUI);
+if (IS_IOS) document.documentElement.classList.add('ios');
 
 // Start keep-alive AND pre-connect FFT element on first user interaction
 ['touchstart','mousedown','keydown'].forEach(evt =>
