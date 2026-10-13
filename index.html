@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.43</title>
+<title>WRadio v2.44</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -182,8 +182,8 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 .panel{padding:12px 12px 90px}
 .section-label{font-size:0.95em;letter-spacing:2px;color:var(--text);padding:16px 4px 8px;margin-bottom:10px}
 .section-label::before{width:10px;height:10px}
-.sec-german,.sec-music{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sec-german .section-label,.sec-music .section-label{grid-column:1/-1;margin-bottom:0}
+.sec-german,.sec-music,.sec-workout{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-german .section-label,.sec-music .section-label,.sec-workout .section-label{grid-column:1/-1;margin-bottom:0}
 .stn-btn,.sec-german .stn-btn{min-height:84px;padding:12px 14px;margin:0;border-width:2px;border-radius:14px;gap:8px}
 .stn-btn::after{width:6px}
 .stn-name,.sec-german .stn-name{font-size:1.45em;font-weight:700;line-height:1.1}
@@ -322,7 +322,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.43</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.44</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -512,7 +512,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.43 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.44 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -528,6 +528,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.44 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        New Workout section: bigFM Workout, 80s Hi‑NRG, 80s Rock, Techno
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.43 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -777,11 +782,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.43  (2026-10-13)
+//  Version : v2.44  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.44 - Workout section (bigFM Workout, 80s Hi‑NRG, 80s Rock, Techno)
 //  v2.43 - iPhone live mode (Web Audio: volume + real FFT, direct playback when locked),
 //          4 ad-free 80s stations, lazy Google scripts, lighter VU/viz loops
 //  v2.42 - Fix double audio on station switch (stop FFT clone first, none on iOS),
@@ -914,6 +920,11 @@ const STATIONS = [
   {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
   {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
   {n:31, name:"Nostalgie New Wave",   url:"https://n03.rcs.revma.com/52g2hx43ehuvv",                                cat:"music"},
+  // --- Workout ---
+  {n:32, name:"bigFM Workout",        url:"https://streams.bigfm.de/bigfm-workout-128-mp3",                         cat:"workout"},
+  {n:33, name:"80s Hi‑NRG",           url:"https://italo.live-streams.nl/fantasy",                                  cat:"workout"},
+  {n:34, name:"80s Rock",             url:"https://stream.0nlineradio.com/80s-rock",                                cat:"workout"},
+  {n:35, name:"Techno",               url:"https://stream.technolovers.fm/techno",                                  cat:"workout"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
   {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
@@ -949,6 +960,8 @@ const STATIONS = [
 const LOOK = {
   1:['🕺','80s pop hits','#ff3cac','#784ba0'],   2:['🌃','Synthpop · no ads','#2b86c5','#784ba0'],
   28:['📼','Swiss · rare 80s · no ads','#f7971e','#ff3cac'],   29:['🥐','French · 80s hits · no ads','#4facfe','#f093fb'],
+  32:['💪','Pop hits for training','#f83600','#f9d423'],   33:['🪩','80s Italo disco · Hi-NRG','#ff0844','#ffb199'],
+  34:['🎸','80s rock · power','#e53935','#8e24aa'],          35:['⚡','Techno · Technolovers','#00f260','#0575e6'],
   30:['🌊','New wave · non-profit','#00c9ff','#92fe9d'],      31:['🎹','Belgian · non-stop · no ads','#a18cd1','#fbc2eb'],
   3:['🥨','Munich · hits','#ff9a3c','#ff3c6e'],        4:['⚡','Cologne · young','#00e0ff','#0061ff'],
   5:['🎧','Baden-Baden · pop','#ff4d4d','#f9cb28'],    6:['🏔️','Bavaria · pop','#4facfe','#00f2fe'],
@@ -1035,7 +1048,7 @@ function buildUI() {
   // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
   // Music and German sections built normally
-  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'music',label:'80s Radio',icon:'🎶'}]
+  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'workout',label:'Workout',icon:'🏋️'},{key:'music',label:'80s Radio',icon:'🎶'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
