@@ -12,10 +12,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.42</title>
+<title>WRadio v2.43</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js" async defer></script>
 <style>
 :root {
   --bg:#0a0a0f; --surface:#12121a; --border:#1e1e2e;
@@ -269,6 +269,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 34%,#151726),color-mix(in srgb,var(--c2) 30%,#10101c));
   box-shadow:0 0 0 1px var(--c2),0 0 26px color-mix(in srgb,var(--c1) 55%,transparent),0 8px 22px rgba(0,0,0,0.4)}
 .stn-btn.active .stn-eq{display:flex}
+.stn-btn.active .stn-txt{padding-right:30px}
 .stn-btn.active .stn-ic{animation:bob 1.6s ease-in-out infinite}
 .sec-atc .stn-ic{width:42px;height:42px;font-size:1.4em;border-radius:13px}
 .sec-atc .stn-tag{font-size:0.85em}
@@ -321,7 +322,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.42</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.43</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -511,7 +512,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.42 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.43 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -527,6 +528,15 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.43 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        iPhone: volume slider works and the visualizer shows the real sound<br>
+        iPhone: hands over to normal playback when locked, back on unlock<br>
+        4 new ad-free 80s stations: 80s Forever, Made in 80, 80s New Wave Radio, Nostalgie New Wave<br>
+        SomaFM Underground 80s now in 256k quality<br>
+        Faster: Google scripts load only for Drive, lighter meter and visualizer
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.42 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -767,11 +777,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.42  (2026-10-13)
+//  Version : v2.43  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.43 - iPhone live mode (Web Audio: volume + real FFT, direct playback when locked),
+//          4 ad-free 80s stations, lazy Google scripts, lighter VU/viz loops
 //  v2.42 - Fix double audio on station switch (stop FFT clone first, none on iOS),
 //          icons, gradient tiles, aurora background, equalizer
 //  v2.41 - Car mode (big buttons), 5 German stations, https streams,
@@ -897,7 +909,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
   {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-256-mp3",                                   cat:"music"},
+  {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/256.mp3",              cat:"music"},
+  {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
+  {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
+  {n:31, name:"Nostalgie New Wave",   url:"https://n03.rcs.revma.com/52g2hx43ehuvv",                                cat:"music"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
   {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
@@ -931,7 +947,9 @@ const STATIONS = [
 
 // Look of each station tile: icon, short tag line, two gradient colors
 const LOOK = {
-  1:['🕺','80s hits · ad-free','#ff3cac','#784ba0'],   2:['🌃','Synthpop · new wave','#2b86c5','#784ba0'],
+  1:['🕺','80s pop hits','#ff3cac','#784ba0'],   2:['🌃','Synthpop · no ads','#2b86c5','#784ba0'],
+  28:['📼','Swiss · rare 80s · no ads','#f7971e','#ff3cac'],   29:['🥐','French · 80s hits · no ads','#4facfe','#f093fb'],
+  30:['🌊','New wave · non-profit','#00c9ff','#92fe9d'],      31:['🎹','Belgian · non-stop · no ads','#a18cd1','#fbc2eb'],
   3:['🥨','Munich · hits','#ff9a3c','#ff3c6e'],        4:['⚡','Cologne · young','#00e0ff','#0061ff'],
   5:['🎧','Baden-Baden · pop','#ff4d4d','#f9cb28'],    6:['🏔️','Bavaria · pop','#4facfe','#00f2fe'],
   7:['🌲','Stuttgart · classics','#43e97b','#38a169'], 23:['📰','News · culture','#a18cd1','#5b6cff'],
@@ -978,6 +996,23 @@ let isPlaying = false;   // explicit flag set by play()/stop() — more reliable
 let audioCtx = null, analyser = null, waSource = null;
 let liveAudio = false; // true once Web Audio graph is built
 
+// iPhone live mode (v2.43): iOS ignores audio.volume and won't let a second hidden copy
+// feed the visualizer, so on iPhone the station plays through Web Audio instead
+// (audioFFT → analyser → outGain → speakers). That gives a working volume slider and the
+// real visualizer. When the screen locks, playback hands over to the plain <audio>
+// element, which iOS keeps playing in the background, and comes back on unlock.
+let waMode = false;    // true while audioFFT (through Web Audio) is what you hear
+let outGain = null;    // volume for the Web Audio path; 0 when it only feeds the analyser
+let waBroken = false;  // set if this phone gave silence through Web Audio once
+try { waBroken = localStorage.getItem('wradio_wa_broken') === '1'; } catch(e) {}
+function out() { return waMode ? audioFFT : audio; }   // the element you hear
+function curVol() { return parseFloat(document.getElementById('volSlider').value); }
+function applyVolume(v) {
+  audio.volume = v; // iOS ignores this, the gain below handles iPhone
+  if (outGain) outGain.gain.value = waMode ? v : 0;
+}
+function userPausedNow() { return (document.getElementById('btnStop')?.innerHTML || '').includes('RESUME'); }
+
 // Sleep timer
 let sleepEnd    = null;  // timestamp (ms) when audio should stop
 let fadeEnabled = true;  // if true, fade out volume before stopping
@@ -1000,7 +1035,7 @@ function buildUI() {
   // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
   // Music and German sections built normally
-  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'music',label:'Music',icon:'🎶'}]
+  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'music',label:'80s Radio',icon:'🎶'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
@@ -1166,9 +1201,10 @@ function buildUI() {
   setInterval(() => {
     const btnLabel = document.getElementById('btnStop')?.innerHTML || '';
     const userPaused = btnLabel.includes('RESUME');
-    if (isPlaying && !userPaused && audio.paused && audio.src) {
+    const el = out();
+    if (isPlaying && !userPaused && el.paused && el.src) {
       console.log('[Heartbeat] Restarting interrupted audio');
-      audio.play().catch(() => {});
+      el.play().catch(() => {});
     }
   }, 5000);
 }
@@ -1256,32 +1292,44 @@ function play(station) {
 
   // Speed optimization: set src then immediately call play() — no load()
   audio.pause();
-  // Main audio plays directly (not through Web Audio), so it doesn't need CORS.
-  // Asking for CORS made stations without CORS headers fail to play at all.
-  audio.removeAttribute('crossorigin');
-  audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
-  audio.src = station.url;
-  audio.volume = parseFloat(document.getElementById('volSlider').value);
+  const routed = useRouted();
+  waMode = routed;
+  applyVolume(curVol());
+  let el = audio;
+  if (routed) {
+    // iPhone: play through Web Audio so volume and the real visualizer work
+    unlockMain();
+    el = startRoutedEl(station.url);
+  } else {
+    // Main audio plays directly (not through Web Audio), so it doesn't need CORS.
+    // Asking for CORS made stations without CORS headers fail to play at all.
+    audio.removeAttribute('crossorigin');
+    audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
+    audio.src = station.url;
+  }
 
-  audio.play().then(() => {
+  el.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
     ensureKeepAlive();
     updateMediaSession(station.name);
     startBufferWatchdog();
     // Start silent FFT clone for real viz — main audio untouched
-    startFFTClone(station.url);
+    if (routed) checkRoutedSound(station); else startFFTClone(station.url);
   }).catch((e) => {
     console.warn('[play] Failed:', e.message);
+    if (routed && curIdx === STATIONS.indexOf(station)) { toDirectNow(); return; }
     document.getElementById('npMeta').textContent = 'Tap to retry';
     isPlaying = false;
   });
 }
 
 function toggleStop() {
+  const audio = out(); // the element you hear (Web Audio copy on iPhone)
   if (isPlaying && !audio.paused) {
     // Pause
     audio.pause();
+    if (!waMode) audioFFT.pause(); // the silent analysis copy doesn't need to keep downloading
     isPlaying = false;
     document.getElementById('sigbars').classList.remove('active');
     document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
@@ -1293,10 +1341,11 @@ function toggleStop() {
       document.getElementById('sigbars').classList.add('active');
       document.getElementById('btnStop').innerHTML = '&#9632; STOP';
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+      if (!waMode && curIdx >= 0) startFFTClone(STATIONS[curIdx].url);
     }).catch(() => {
       isPlaying = false;
       // Stale stream — reload
-      if (curIdx >= 0) { audio.src = STATIONS[curIdx].url; audio.play().catch(()=>{}); }
+      if (curIdx >= 0) { if (waMode) audio.crossOrigin = 'anonymous'; audio.src = STATIONS[curIdx].url; audio.play().catch(()=>{}); }
     });
   } else {
     stopPlay();
@@ -1307,10 +1356,11 @@ function stopPlay() {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
   reconnectDelay = 2000; frozenCount = 0;
+  isPlaying = false;
+  waMode = false;
   audio.pause();
   audio.src = '';
   stopFFTClone(); // stop silent FFT clone too
-  isPlaying = false;
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
   document.getElementById('npStation').textContent = 'Select a station';
@@ -1325,9 +1375,15 @@ function stopPlay() {
 }
 
 function setVolume(v) {
-  audio.volume = parseFloat(v);
+  applyVolume(parseFloat(v));
+  if (IS_IOS && !waMode && isPlaying && !volHintShown) {
+    volHintShown = true;
+    showToast(mp3CurIdx >= 0 ? 'iPhone: use the side buttons for MP3 volume' : 'iPhone: use the side buttons while locked', 'ok');
+  }
   document.getElementById('volVal').textContent = Math.round(v*100);
 }
+
+let volHintShown = false;
 
 // Format seconds → m:ss
 function fmtTime(s) {
@@ -1373,13 +1429,12 @@ function connectFFT() {
     // Connect the FFT element (NOT main audio) — no background audio impact
     const fftSource = audioCtx.createMediaElementSource(audioFFT);
     fftSource.connect(analyser);
-    // Silent sink: some browsers only process nodes that lead to the speakers
-    const silent = audioCtx.createGain();
-    silent.gain.value = 0;
-    analyser.connect(silent);
-    silent.connect(audioCtx.destination);
-    // Do NOT connect to destination — we want silence from this element
-    // audioFFT is already muted via HTML attribute, but don't output to speakers
+    // outGain is 0 while this element only feeds the analyser (silent clone), and is
+    // the volume control when it is the station you hear (iPhone live mode)
+    outGain = audioCtx.createGain();
+    outGain.gain.value = waMode ? curVol() : 0;
+    analyser.connect(outGain);
+    outGain.connect(audioCtx.destination);
     fftConnected = true;
     liveAudio = true;
     console.log('[FFT] Analysis element connected');
@@ -1412,6 +1467,92 @@ function startFFTClone(src) {
 function stopFFTClone() {
   audioFFT.pause();
   audioFFT.src = '';
+}
+
+// ── iPhone live mode helpers ───────────────────────────────
+function useRouted() {
+  if (!IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
+  connectFFT();
+  return fftConnected && !!audioCtx;
+}
+
+function startRoutedEl(url) {
+  if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(()=>{});
+  audioFFT.pause();
+  audioFFT.crossOrigin = 'anonymous';
+  audioFFT.muted = false;
+  audioFFT.preload = 'auto';
+  audioFFT.src = url;
+  return audioFFT;
+}
+
+// iOS only lets an element start without a tap once it has played from a tap.
+// Play a tiny silent clip on the main element during the tap, so it can take
+// over later (screen lock) without one.
+const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+let mainUnlocked = false;
+function unlockMain() {
+  if (mainUnlocked) return;
+  mainUnlocked = true;
+  try {
+    audio.src = SILENT_WAV;
+    const p = audio.play();
+    if (p) p.then(() => { if (waMode) audio.pause(); }).catch(() => { mainUnlocked = false; });
+  } catch(e) { mainUnlocked = false; }
+}
+
+// If Web Audio gives only silence on this phone, remember it and play directly instead
+function checkRoutedSound(station) {
+  const buf = new Uint8Array(analyser.fftSize);
+  let tries = 0;
+  const iv = setInterval(() => {
+    if (!waMode || curIdx !== STATIONS.indexOf(station) || !isPlaying) { clearInterval(iv); return; }
+    if (audioFFT.paused) return; // still buffering
+    analyser.getByteTimeDomainData(buf);
+    let dev = 0; for (let i = 0; i < buf.length; i += 8) dev = Math.max(dev, Math.abs(buf[i] - 128));
+    if (dev > 0) { clearInterval(iv); return; }
+    if (++tries >= 16) { // ~4 s of pure silence while "playing"
+      clearInterval(iv);
+      console.warn('[iPhone] Web Audio path is silent, switching to direct playback');
+      waBroken = true; try { localStorage.setItem('wradio_wa_broken', '1'); } catch(e) {}
+      toDirectNow();
+    }
+  }, 250);
+}
+
+// Hand over from the Web Audio copy to the plain element (screen lock, or a failure)
+function toDirectNow() {
+  if (!waMode) return;
+  const url = curIdx >= 0 ? STATIONS[curIdx].url : '';
+  if (!url || !isPlaying || userPausedNow()) { waMode = false; stopFFTClone(); applyVolume(curVol()); return; }
+  audio.removeAttribute('crossorigin');
+  audio.preload = 'auto';
+  audio.src = url;
+  audio.play().then(() => {
+    if (curIdx < 0 || STATIONS[curIdx].url !== url) return;
+    waMode = false;
+    applyVolume(curVol());
+    stopFFTClone();
+    startBufferWatchdog();
+  }).catch(e => console.warn('[iPhone] direct handover failed:', e.message));
+}
+
+// Back from the lock screen: return to the Web Audio path for volume + real visualizer
+function toRoutedNow() {
+  if (waMode || curIdx < 0 || !isPlaying || userPausedNow() || !useRouted()) return;
+  const url = STATIONS[curIdx].url;
+  outGain.gain.value = 0;
+  startRoutedEl(url).play().then(() => {
+    if (curIdx < 0 || STATIONS[curIdx].url !== url || !isPlaying) { stopFFTClone(); return; }
+    waMode = true;
+    // short fade so the switch doesn't click
+    const now = audioCtx.currentTime;
+    outGain.gain.setValueAtTime(0, now);
+    outGain.gain.linearRampToValueAtTime(curVol(), now + 0.25);
+    audio.pause();
+    audio.removeAttribute('src'); audio.load(); // stop downloading the stream twice
+    startBufferWatchdog();
+  }).catch(() => {});
 }
 
 // Keep legacy name so existing call sites work
@@ -1499,11 +1640,11 @@ function startSynthViz() {
 
     if (liveAudio && analyser) {
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-      const freqData = new Uint8Array(analyser.frequencyBinCount);
-      const timeData = new Uint8Array(analyser.fftSize);
+      if (!bands._freq) { bands._freq = new Uint8Array(analyser.frequencyBinCount); bands._time = new Uint8Array(analyser.fftSize); }
+      const freqData = bands._freq, timeData = bands._time;
       analyser.getByteFrequencyData(freqData);
       analyser.getByteTimeDomainData(timeData);
-      const maxVal = freqData.reduce((a,b) => Math.max(a,b), 0);
+      let maxVal = 0; for (let k = 0; k < freqData.length; k++) if (freqData[k] > maxVal) maxVal = freqData[k];
       if (maxVal > 3) {
         gotRealFFT = true;
         const bc = analyser.frequencyBinCount;
@@ -1520,7 +1661,8 @@ function startSynthViz() {
     if (gotRealFFT !== vizLive) {
       vizLive = gotRealFFT;
       const src = document.getElementById('vizSrc');
-      if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS' : IS_IOS ? '○ SIMULATED (iPhone plays one stream only)' : '○ SIMULATED (this station blocks audio analysis)';
+      if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS'
+        : IS_IOS && !waMode ? '○ SIMULATED (iPhone direct mode)' : '○ SIMULATED (waiting for sound)';
     }
 
     // ── SYNTHETIC FALLBACK ────────────────────────────────────
@@ -1972,19 +2114,23 @@ function startVUMeter() {
   const bars = document.querySelectorAll('.vu-bar');
   const n = bars.length;
   let vuPhase = 0;
+  let vuBuf = null;
+  const lastH = new Array(n).fill(-1);
+  const COLORS = [...bars].map((b, i) => i < n*0.6 ? 'var(--green)' : i < n*0.85 ? 'var(--amber)' : 'var(--red)');
 
   function tick() {
     vuRAF = requestAnimationFrame(tick);
-    const playing = curIdx >= 0 && !audio.paused;
+    const playing = isPlaying && !out().paused;
     vuPhase += 0.05;
 
     let level = 0;
     if (playing) {
       if (liveAudio && analyser) {
-        const d = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(d);
-        let sum = 0; d.forEach(v => sum += v);
-        level = sum / d.length / 255;
+        if (!vuBuf) vuBuf = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(vuBuf);
+        let sum = 0; for (let k = 0; k < vuBuf.length; k++) sum += vuBuf[k];
+        level = sum / vuBuf.length / 255;
+        if (level === 0 && !waMode) level = 0.3 + 0.3 * Math.abs(Math.sin(vuPhase * 1.8)); // clone not running
       } else {
         // synthetic VU
         level = 0.3 + 0.35 * Math.abs(Math.sin(vuPhase * 1.8))
@@ -1995,14 +2141,15 @@ function startVUMeter() {
       }
     }
 
-    bars.forEach((b, i) => {
-      const thresh = i / n;
-      const active = level > thresh * 0.7;
-      b.style.height = active ? (2 + level * 16) + 'px' : '2px';
-      b.style.background = i < n*0.6 ? (active ? 'var(--green)' : 'var(--border)')
-        : i < n*0.85 ? (active ? 'var(--amber)' : 'var(--border)')
-        : (active ? 'var(--red)' : 'var(--border)');
-    });
+    // only touch the DOM when a bar actually changes (idle = no work at all)
+    for (let i = 0; i < n; i++) {
+      const active = level > (i / n) * 0.7;
+      const h = active ? Math.round(2 + level * 16) : 2;
+      if (h === lastH[i]) continue;
+      lastH[i] = h;
+      bars[i].style.height = h + 'px';
+      bars[i].style.background = active ? COLORS[i] : 'var(--border)';
+    }
   }
   tick();
 }
@@ -2038,12 +2185,12 @@ function checkSleepTimer() {
 }
 
 function fadeOut() {
-  const startVol = audio.volume;
+  const startVol = curVol();
   let i = 0;
   const iv = setInterval(() => {
     i++;
-    audio.volume = Math.max(0, startVol * (1 - i/60));
-    if (i >= 60) { clearInterval(iv); stopPlay(); audio.volume = startVol; }
+    applyVolume(Math.max(0, startVol * (1 - i/60)));
+    if (i >= 60) { clearInterval(iv); stopPlay(); applyVolume(startVol); }
   }, 50);
 }
 
@@ -2245,10 +2392,12 @@ function hardReconnect(reason) {
     reconnectTimer = null;
     if (curIdx < 0 || !isPlaying) return;
     const url = STATIONS[curIdx].url;
+    const audio = out();   // reconnect whichever element you hear
     audio.pause();
     audio.src = '';
     audio.load();          // reset internal state fully
     audio.preload = 'auto'; // tell browser to buffer aggressively
+    if (waMode) audio.crossOrigin = 'anonymous';
     audio.src = url;
     // Play immediately — no artificial delay
     // preload=auto gives CarPlay the buffer it needs before consuming
@@ -2270,6 +2419,7 @@ function startBufferWatchdog() {
   let lastCurrentTime = -1;
   let frozenCount = 0;
   bufferWatchdog = setInterval(() => {
+    const audio = out();
     if (curIdx < 0 || !isPlaying || audio.paused || reconnectTimer) {
       lastCurrentTime = -1; frozenCount = 0; return;
     }
@@ -2297,12 +2447,16 @@ function startBufferWatchdog() {
   }, 2000);
 }
 
-audio.addEventListener('waiting', () => {
+function onAudible(type, fn) {
+  [audio, audioFFT].forEach(el => el.addEventListener(type, e => { if (e.target === out()) fn(e); }));
+}
+
+onAudible('waiting', () => {
   document.getElementById('npMeta').textContent = 'Buffering...';
   document.getElementById('sigbars').classList.remove('active');
 });
 
-audio.addEventListener('playing', () => {
+onAudible('playing', () => {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   reconnectDelay = 2000;
   frozenCount = 0;
@@ -2314,13 +2468,15 @@ audio.addEventListener('playing', () => {
   }
 });
 
-audio.addEventListener('error', () => {
+onAudible('error', () => {
   if (curIdx < 0 || !isPlaying) return;
   console.warn('[Audio] Error');
+  // On iPhone a Web Audio error can mean the station refused cross-origin access
+  if (waMode) { toDirectNow(); return; }
   hardReconnect('Error');
 });
 
-audio.addEventListener('stalled', () => {
+onAudible('stalled', () => {
   if (curIdx < 0 || !isPlaying) return;
   console.log('[Audio] Stalled');
   hardReconnect('Stalled');
@@ -2445,7 +2601,9 @@ function playMp3(i) {
   if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
   mp3CurIdx = i;
   isPlaying = true; // set immediately so viz activates
+  waMode = false; // MP3s play on the plain element
   stopFFTClone();
+  applyVolume(curVol());
   const t = mp3Tracks[i];
   document.getElementById('mp3-'+i)?.classList.add('active');
   document.getElementById('npStation').textContent = t.name;
@@ -2546,10 +2704,15 @@ const GDRIVE_SCOPE     = 'https://www.googleapis.com/auth/drive.readonly';
 let gAccessToken = null;
 let gapiReady    = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const gapiScript = document.querySelector('script[src*="apis.google.com/js/api"]');
-  if (gapiScript) gapiScript.onload = () => gapi.load('picker', () => { gapiReady = true; });
-});
+// Google's scripts are loaded only when the Drive button is used, so they don't slow down startup
+function loadScript(src) {
+  return new Promise((ok, fail) => {
+    if (document.querySelector('script[src="'+src+'"]')) return ok();
+    const el = document.createElement('script');
+    el.src = src; el.async = true; el.onload = ok; el.onerror = fail;
+    document.head.appendChild(el);
+  });
+}
 
 function openGDrivePicker() {
   if (GDRIVE_CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com') {
@@ -2557,6 +2720,12 @@ function openGDrivePicker() {
     return;
   }
   setGStatus('Signing in to Google...', 'var(--accent)');
+  Promise.all([loadScript('https://accounts.google.com/gsi/client'), loadScript('https://apis.google.com/js/api.js')])
+    .then(openGDrivePickerReady)
+    .catch(() => setGStatus('Could not load Google sign-in', 'var(--red)'));
+}
+
+function openGDrivePickerReady() {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GDRIVE_CLIENT_ID,
     scope: GDRIVE_SCOPE,
@@ -2707,13 +2876,20 @@ setInterval(() => {
 
 // When page becomes visible again (user returns from home screen / other app)
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') return;
+  if (document.visibilityState === 'hidden') {
+    // iPhone: hand over to the plain element, which keeps playing on the lock screen
+    if (waMode) toDirectNow();
+    return;
+  }
   ensureKeepAlive();
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-  const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
-  if (isPlaying && !userPaused && audio.paused && audio.src) {
-    audio.play().catch(()=>{});
+  const userPaused = userPausedNow();
+  const el = out();
+  if (isPlaying && !userPaused && el.paused && el.src) {
+    el.play().catch(()=>{});
   }
+  // iPhone: back to Web Audio for the volume slider and the real visualizer
+  if (IS_IOS && !waMode) toRoutedNow();
   // Resume FFT clone too
   if (!IS_IOS && isPlaying && audioFFT.src && audioFFT.paused) {
     audioFFT.play().catch(()=>{});
@@ -2724,23 +2900,27 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pageshow', e => {
   if (!e.persisted) return;
   ensureKeepAlive();
-  if (isPlaying && audio.paused && audio.src) audio.play().catch(()=>{});
+  const el = out();
+  if (isPlaying && el.paused && el.src) el.play().catch(()=>{});
 });
 
 // Heartbeat: audio 'pause' event fires when iOS interrupts playback
 // Restart immediately if it was not user-initiated
-audio.addEventListener('pause', () => {
+onAudible('pause', () => {
   if (!isPlaying) return; // user stopped it, don't restart
-  const userPaused = document.getElementById('btnStop')?.innerHTML?.includes('RESUME');
-  if (userPaused) return;
+  if (userPausedNow()) return;
   // Small delay to distinguish CarPlay/system pause from network stall
   setTimeout(() => {
-    if (isPlaying && audio.paused && audio.src) {
+    const el = out();
+    if (isPlaying && el.paused && el.src) {
       console.log('[Pause event] Restarting interrupted audio');
-      audio.play().catch(()=>{});
+      el.play().catch(()=>{});
     }
   }, 500);
 });
+
+// iPhone: let Web Audio play even with the ring/silent switch on, like normal media
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
 
 window.addEventListener('load', buildUI);
 
