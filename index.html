@@ -164,6 +164,45 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.error{border-color:var(--red);color:var(--red)}
 .toast.ok{border-color:var(--green);color:var(--green)}
+
+/* ============================================================
+   CAR MODE (v2.41): big, high-contrast buttons that are easy to
+   hit while driving and readable without glasses
+   ============================================================ */
+:root{--text:#e8edf7;--muted:#8d97ab}
+.np-station{font-size:1.45em}
+.np-meta{font-size:0.85em}
+.np-controls{gap:12px;margin-top:10px}
+.btn-stop{font-size:1.05em;font-weight:bold;padding:12px 18px;min-height:54px;border-width:2px;border-radius:10px}
+.vol-icon{font-size:1.3em}
+.vol-val{font-size:0.95em;width:36px}
+input[type=range]{height:8px;border-radius:4px}
+input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
+.tab{font-size:0.82em;letter-spacing:0;padding:16px 2px;font-weight:bold}
+.panel{padding:12px 12px 90px}
+.section-label{font-size:0.95em;letter-spacing:2px;color:var(--text);padding:16px 4px 8px;margin-bottom:10px}
+.section-label::before{width:10px;height:10px}
+.sec-german,.sec-music{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-german .section-label,.sec-music .section-label{grid-column:1/-1;margin-bottom:0}
+.stn-btn,.sec-german .stn-btn{min-height:84px;padding:12px 14px;margin:0;border-width:2px;border-radius:14px;gap:8px}
+.stn-btn::after{width:6px}
+.stn-name,.sec-german .stn-name{font-size:1.45em;font-weight:700;line-height:1.1}
+.stn-num,.sec-german .stn-num{font-size:0.95em;min-width:24px}
+.stn-btn.active{box-shadow:0 0 0 2px var(--green) inset}
+.stn-btn .stn-live{font-size:0.8em}
+.sec-atc .stn-btn{min-height:64px;margin-bottom:0}
+.sec-atc .stn-btn .stn-name{font-size:1.2em}
+.atc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.atc-hdr{display:flex;align-items:baseline;justify-content:space-between;padding:12px 4px 6px;margin-top:4px;border-bottom:1px solid rgba(0,212,255,0.2)}
+.atc-hdr .icao{font-family:var(--mono);font-size:1.05em;color:var(--accent);letter-spacing:2px;font-weight:bold}
+.atc-hdr .apt{font-size:1.15em;color:var(--text);flex:1;margin:0 10px}
+.atc-hdr .freq{font-family:var(--mono);font-size:0.85em;color:var(--muted)}
+.viz-btn{font-size:0.95em;padding:12px 16px;border-radius:10px;min-height:48px}
+.viz-note{font-size:0.85em}
+.pill{font-size:0.95em;padding:12px 16px}
+.card-title{font-size:0.9em}
+.lbl{font-size:0.9em}
+@media (max-width:360px){.stn-name,.sec-german .stn-name{font-size:1.25em}}
 </style>
 </head>
 <body>
@@ -172,7 +211,7 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
 <!-- Second audio element used ONLY for Web Audio FFT analysis.
      Main audio plays directly through browser (background-safe).
      This clone plays at volume 0 just to feed the analyser. -->
-<audio id="audioFFT" preload="none" playsinline muted style="display:none"></audio>
+<audio id="audioFFT" preload="none" playsinline style="display:none"></audio>
 <div class="toast" id="toast"></div>
 
 <!-- iOS install prompt — only shows in Safari, not when running as PWA -->
@@ -315,9 +354,10 @@ select{background:var(--bg);border:1px solid var(--border);border-radius:6px;col
     <button class="viz-btn" onclick="setVizMode('bounce',this)">BOUNCE</button>
     <button class="viz-btn" onclick="setVizMode('matrix',this)">MATRIX</button>
   </div>
+  <div class="viz-note" id="vizSrc" style="color:var(--green);font-size:0.95em"></div>
   <div class="viz-note">
-    Real FFT audio analysis — tap a station to start.<br>
-    First tap connects Web Audio. Falls back to simulated if CORS blocks.
+    Real audio analysis needs the station to allow it (CORS). Stations that don't
+    still play normally and show a simulated visualizer.
   </div>
 </div>
 
@@ -855,20 +895,15 @@ function buildUI() {
   airports.forEach(apt => {
     // Airport sub-header
     const aptHdr = document.createElement('div');
-    aptHdr.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;'
-      +'padding:8px 4px 4px;margin-top:4px;border-bottom:1px solid rgba(0,212,255,0.1)';
-    aptHdr.innerHTML =
-      '<span style="font-family:var(--mono);font-size:0.72em;color:var(--accent);letter-spacing:2px;font-weight:bold">'
-      +apt.icao+'</span>'
-      +'<span style="font-family:var(--sans);font-size:0.75em;color:var(--text);flex:1;margin:0 8px">'
-      +apt.name+'</span>'
-      +'<span style="font-family:var(--mono);font-size:0.58em;color:var(--muted)">'
-      +apt.freq+'</span>';
+    aptHdr.className = 'atc-hdr';
+    aptHdr.innerHTML = '<span class="icao">'+apt.icao+'</span>'
+      +'<span class="apt">'+apt.name+'</span>'
+      +'<span class="freq">'+apt.freq+'</span>';
     atcSec.appendChild(aptHdr);
 
     // Stations for this airport — compact 2-column grid
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:6px';
+    grid.className = 'atc-grid';
     apt.stns.forEach(n => {
       const s = STATIONS.find(x => x.n === n);
       if (!s) return;
@@ -876,8 +911,7 @@ function buildUI() {
       const shortName = s.name.replace(/^K[A-Z]{3}\s*/,'');
       const b = document.createElement('button');
       b.className = 'stn-btn'; b.id = 'stn-'+s.n; b.onclick = () => play(s);
-      b.style.cssText = 'padding:7px 10px;margin-bottom:0;font-size:0.9em';
-      b.innerHTML = '<span class="stn-name" style="font-size:0.85em">'+shortName+'</span>'
+      b.innerHTML = '<span class="stn-name">'+shortName+'</span>'
         +'<span class="stn-live"><span class="live-dot"></span>▶</span>';
       grid.appendChild(b);
     });
@@ -891,14 +925,14 @@ function buildUI() {
     { href:'https://flightaware.com/',        color:'#7a3a8a', bg:'rgba(122,58,138,0.1)',   icon:'🛫', label:'FLIGHTAWARE' },
   ];
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:6px;margin-top:8px';
+  row.style.cssText = 'display:flex;gap:8px;margin-top:12px';
   links.forEach(l => {
     const a = document.createElement('a');
     a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
     a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
-      +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
-      +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
-      +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+      +'padding:14px 4px;min-height:76px;border:2px solid '+l.color+';border-radius:12px;'
+      +'background:'+l.bg+';color:var(--text);font-family:var(--mono);font-weight:bold;'
+      +'font-size:0.85em;letter-spacing:1px;text-decoration:none;text-align:center';
     a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
     row.appendChild(a);
   });
@@ -909,14 +943,14 @@ function buildUI() {
     { href:'https://my.schedulemaster.com/', color:'#206060', bg:'rgba(32,96,96,0.1)',   icon:'📅', label:'SCHEDULEMASTER' },
   ];
   const row2 = document.createElement('div');
-  row2.style.cssText = 'display:flex;gap:6px;margin-top:6px';
+  row2.style.cssText = 'display:flex;gap:8px;margin-top:8px';
   links2.forEach(l => {
     const a = document.createElement('a');
     a.href = l.href; a.target = '_blank'; a.rel = 'noopener';
     a.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;'
-      +'padding:10px 4px;border:1px solid '+l.color+';border-radius:6px;'
-      +'background:'+l.bg+';color:'+l.color+';font-family:var(--mono);'
-      +'font-size:0.65em;letter-spacing:1px;text-decoration:none;text-align:center';
+      +'padding:14px 4px;min-height:76px;border:2px solid '+l.color+';border-radius:12px;'
+      +'background:'+l.bg+';color:var(--text);font-family:var(--mono);font-weight:bold;'
+      +'font-size:0.85em;letter-spacing:1px;text-decoration:none;text-align:center';
     a.innerHTML = '<span style="font-size:1.4em">'+l.icon+'</span>'+l.label;
     row2.appendChild(a);
   });
@@ -1061,6 +1095,7 @@ function play(station) {
 
   curIdx = STATIONS.indexOf(station);
   isPlaying = true; // set BEFORE play() so viz activates immediately
+  connectFFT(); // create/resume the AudioContext during the tap, which iOS requires
 
   // Update UI instantly — don't wait for audio to start
   document.getElementById('npStation').textContent = station.name;
@@ -1073,8 +1108,9 @@ function play(station) {
 
   // Speed optimization: set src then immediately call play() — no load()
   audio.pause();
+  // Main audio plays directly (not through Web Audio), so it doesn't need CORS.
+  // Asking for CORS made stations without CORS headers fail to play at all.
   audio.removeAttribute('crossorigin');
-  audio.crossOrigin = 'anonymous';
   audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
   audio.src = station.url;
   audio.volume = parseFloat(document.getElementById('volSlider').value);
@@ -1188,6 +1224,11 @@ function connectFFT() {
     // Connect the FFT element (NOT main audio) — no background audio impact
     const fftSource = audioCtx.createMediaElementSource(audioFFT);
     fftSource.connect(analyser);
+    // Silent sink: some browsers only process nodes that lead to the speakers
+    const silent = audioCtx.createGain();
+    silent.gain.value = 0;
+    analyser.connect(silent);
+    silent.connect(audioCtx.destination);
     // Do NOT connect to destination — we want silence from this element
     // audioFFT is already muted via HTML attribute, but don't output to speakers
     fftConnected = true;
@@ -1208,9 +1249,10 @@ function startFFTClone(src) {
   audioFFT.pause();
   audioFFT.crossOrigin = 'anonymous';
   audioFFT.src = src;
-  audioFFT.volume = 0;
-  audioFFT.muted = true;
-  audioFFT.play().catch(()=>{}); // silent — just for FFT data
+  // Not muted: a muted element sends silence to the analyser. It is still silent,
+  // because after createMediaElementSource its sound only reaches the zero-gain node.
+  audioFFT.muted = false;
+  audioFFT.play().catch(()=>{}); // just for FFT data
 }
 
 function stopFFTClone() {
@@ -1231,6 +1273,7 @@ function setVizMode(mode, btn) {
 }
 
 let vizDrawActive = false; // guard — only one draw loop ever
+let vizLive = null;        // last shown state of the LIVE / SIMULATED label
 
 function startSynthViz() {
   // Cancel any existing loop
@@ -1319,6 +1362,11 @@ function startSynthViz() {
         }
         bands._timeData = timeData;
       }
+    }
+    if (gotRealFFT !== vizLive) {
+      vizLive = gotRealFFT;
+      const src = document.getElementById('vizSrc');
+      if (src) src.textContent = vizLive ? '● LIVE AUDIO ANALYSIS' : '○ SIMULATED (this station blocks audio analysis)';
     }
 
     // ── SYNTHETIC FALLBACK ────────────────────────────────────

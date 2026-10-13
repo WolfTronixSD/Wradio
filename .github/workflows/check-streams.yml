@@ -16,4 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 scripts/check_streams.py ${{ github.event.inputs.extra }}
+      - run: python3 scripts/check_streams.py $EXTRA
+        env:
+          EXTRA: ${{ github.event.inputs.extra }}
