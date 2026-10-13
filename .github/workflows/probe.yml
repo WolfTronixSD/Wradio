@@ -1,0 +1,10 @@
+name: Probe 80s
+on:
+  push:
+    branches: [probe-80s]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/probe80s.py
