@@ -2,7 +2,8 @@
 
 Usage: python3 scripts/check_streams.py [extra URL ...]
 For each URL it reports the HTTP status, content type, whether the server
-allows cross-origin reads (needed for the real FFT visualizer) and how many
+allows cross-origin reads on every redirect hop (needed for the real FFT
+visualizer; 'end' means only the final hop allows it, which browsers reject) and how many
 bytes arrived in a few seconds. Exits 1 if a music or German station fails; ATC feeds that are offline are only listed.
 """
 import re, subprocess, sys
@@ -26,11 +27,14 @@ def probe(url):
     heads = text.split("\n__BYTES__")[0].lower()
     ctype = re.findall(r"^content-type:\s*([^\r\n;]+)", heads, re.M)
     acao = re.findall(r"^access-control-allow-origin:\s*([^\r\n]+)", heads, re.M)
+    # A browser needs the CORS header on every hop of a redirect chain, not just the last one
+    hops = [h for h in re.split(r"\r?\n\r?\n", heads) if h.strip().startswith("http")]
+    every_hop = all(re.search(r"^access-control-allow-origin:\s*(\*|" + re.escape(ORIGIN) + ")", h, re.M) for h in hops) if hops else False
     return {
         "code": code.group(1) if code else "000",
         "bytes": int(size.group(1)) if size else 0,
         "type": ctype[-1].strip() if ctype else "-",
-        "cors": "yes" if acao and (acao[-1].strip() in ("*", ORIGIN)) else "no",
+        "cors": ("yes" if every_hop else "end") if acao and (acao[-1].strip() in ("*", ORIGIN)) else "no",
         "final": final.group(1) if final else url,
     }
 
