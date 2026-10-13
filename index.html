@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.46</title>
+<title>WRadio v2.47</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -330,7 +330,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.46</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.47</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -496,7 +496,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div class="card-title">WAKE ALARM</div>
     <span class="lbl">Alarm time</span>
     <input type="time" id="alarmTimeInput">
-    <span class="lbl" style="margin-top:10px">Play station</span>
+    <span class="lbl" style="margin-top:10px">Wake up with (beeper or station)</span>
     <select id="alarmStation"></select>
     <button class="btn-full btn-set" onclick="setAlarm()">SET ALARM</button>
     <button class="btn-full btn-clear" onclick="clearAlarm()">CLEAR ALARM</button>
@@ -521,7 +521,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.46 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.47 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -537,6 +537,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.47 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Alarm can wake you with 3 beepers: classic alarm clock, gentle chime, siren<br>
+        Picking a beeper plays a 2-second preview
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.46 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -806,11 +812,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.46  (2026-10-13)
+//  Version : v2.47  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.47 - 3 alarm beepers (classic, chime, siren) besides stations
 //  v2.46 - Alarm auto-plays, egg timer beep fixed on iPhone, screen wake lock
 //  v2.45 - Airport colors, no VU bar on main screen, iPhone live mode off (WebKit silence)
 //  v2.44 - Workout section (bigFM Workout, 80s Hi‑NRG, 80s Rock, Techno)
@@ -1189,11 +1196,19 @@ function buildUI() {
 
   // alarm station select
   const sel = document.getElementById('alarmStation');
+  const grpB = document.createElement('optgroup'); grpB.label = 'Beeper';
+  Object.entries(BEEPERS).forEach(([k, b]) => {
+    const o = document.createElement('option'); o.value = k; o.textContent = b.label; grpB.appendChild(o);
+  });
+  const grpS = document.createElement('optgroup'); grpS.label = 'Radio';
   STATIONS.forEach(s => {
     const o = document.createElement('option');
     o.value = s.n; o.textContent = s.n + '  ' + s.name;
-    sel.appendChild(o);
+    grpS.appendChild(o);
   });
+  sel.appendChild(grpB); sel.appendChild(grpS);
+  sel.value = 25; // hr3 stays the default
+  sel.addEventListener('change', () => { if (BEEPERS[sel.value]) previewBeeper(sel.value); });
 
   // VU bars
   const vu = document.getElementById('vuWrap');
@@ -2321,15 +2336,36 @@ function eggFire() {
 // and stays silent, so the beeper reuses the keep-alive context that was
 // started from a tap, plus a looping <audio> beep as a backup.
 let alertAudio = null;
-function beepWavUrl() {
+// Alarm and timer sounds, made in code as 2-second loops (no files to download)
+const BEEPERS = {
+  b1: { label: '🔔 Beeper: classic alarm clock' },
+  b2: { label: '🎐 Beeper: gentle chime' },
+  b3: { label: '🚨 Beeper: siren' },
+};
+const beepUrls = {};
+function beepWavUrl(kind) {
+  kind = kind || 'b2';
+  if (beepUrls[kind]) return beepUrls[kind];
   const sr = 22050, len = sr * 2, data = new Int16Array(len);
-  [[0,880],[0.3,1046],[0.6,1318],[1.0,880],[1.3,1046],[1.6,1318]].forEach(([t, f]) => {
-    const st = Math.floor(t * sr), n = Math.floor(0.2 * sr);
-    for (let i = 0; i < n; i++) {
-      const env = Math.min(1, i / 200, (n - i) / 400);
-      data[st + i] = Math.round(Math.sin(2 * Math.PI * f * i / sr) * env * 26000);
+  const tone = (t, dur, f, amp, decay) => {
+    const st = Math.floor(t * sr), n = Math.floor(dur * sr);
+    for (let i = 0; i < n && st + i < len; i++) {
+      const env = Math.min(1, i / 150, (n - i) / 300) * (decay ? Math.exp(-i / (sr * decay)) : 1);
+      data[st + i] += Math.round(Math.sin(2 * Math.PI * f * i / sr) * env * amp);
     }
-  });
+  };
+  if (kind === 'b1') {        // beep-beep-beep-beep, like a digital clock
+    [0, 0.18, 0.36, 0.54].forEach(t => tone(t, 0.1, 2000, 22000));
+  } else if (kind === 'b3') { // siren sweeping up and down
+    let ph = 0;
+    for (let i = 0; i < len; i++) {
+      const x = (i / sr) % 1, f = 650 + 650 * (x < 0.5 ? x * 2 : 2 - x * 2);
+      ph += 2 * Math.PI * f / sr;
+      data[i] = Math.round(Math.sin(ph) * 20000 * Math.min(1, i / 300, (len - i) / 300));
+    }
+  } else {                    // rising chime (also the egg timer)
+    [[0,880],[0.3,1046],[0.6,1318],[1.0,880],[1.3,1046],[1.6,1318]].forEach(([t, f]) => tone(t, 0.35, f, 24000, 0.12));
+  }
   const buf = new ArrayBuffer(44 + len * 2), v = new DataView(buf);
   const str = (o, x) => [...x].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
   str(0, 'RIFF'); v.setUint32(4, 36 + len * 2, true); str(8, 'WAVEfmt ');
@@ -2337,13 +2373,36 @@ function beepWavUrl() {
   v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
   str(36, 'data'); v.setUint32(40, len * 2, true);
   new Int16Array(buf, 44).set(data);
-  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  return (beepUrls[kind] = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
 }
+
+// Looping <audio> for an alarm beeper; unlocked when the alarm is set (a tap)
+let alarmAudio = null;
+function prepareAlarmBeeper(kind) {
+  if (!alarmAudio) { alarmAudio = new Audio(); alarmAudio.loop = true; alarmAudio.setAttribute('playsinline', ''); }
+  alarmAudio.src = beepWavUrl(kind);
+  alarmAudio.muted = true;
+  const p = alarmAudio.play();
+  if (p) p.then(() => { alarmAudio.pause(); alarmAudio.currentTime = 0; alarmAudio.muted = false; }).catch(() => { alarmAudio.muted = false; });
+}
+let previewTimer = null;
+function previewBeeper(kind) {
+  if (!alarmAudio) { alarmAudio = new Audio(); alarmAudio.loop = true; alarmAudio.setAttribute('playsinline', ''); }
+  clearTimeout(previewTimer);
+  alarmAudio.src = beepWavUrl(kind); alarmAudio.muted = false; alarmAudio.currentTime = 0;
+  alarmAudio.play().catch(() => {});
+  previewTimer = setTimeout(() => alarmAudio.pause(), 2000);
+}
+function stopAlarmBeeper() {
+  clearTimeout(previewTimer);
+  if (alarmAudio) { alarmAudio.pause(); alarmAudio.currentTime = 0; }
+}
+
 function prepareAlertSound() {
   ensureKeepAlive();
   try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
   if (!alertAudio) {
-    alertAudio = new Audio(beepWavUrl());
+    alertAudio = new Audio(beepWavUrl('b2'));
     alertAudio.loop = true;
     alertAudio.setAttribute('playsinline', '');
   }
@@ -2437,14 +2496,16 @@ document.addEventListener('visibilitychange', () => {
 // ============================================================
 function setAlarm() {
   const t = document.getElementById('alarmTimeInput').value;
-  const s = parseInt(document.getElementById('alarmStation').value);
+  const v = document.getElementById('alarmStation').value;
+  const s = BEEPERS[v] ? v : parseInt(v);
   if (!t) { showToast('Set a time first', 'error'); return; }
   localStorage.setItem('radioAlarm', JSON.stringify({time:t, station:s}));
   showAlarmStatus(t, s);
   alarmActive = true;
   alarmFiredOn = '';
   // unlock playback now (this is a tap) so the radio can start by itself later
-  unlockMain(); ensureKeepAlive(); connectFFT();
+  if (BEEPERS[s]) prepareAlarmBeeper(s); else { unlockMain(); connectFFT(); }
+  ensureKeepAlive();
   keepScreenOn(true, 'alarm');
   showToast('Alarm set: ' + t, 'ok');
 }
@@ -2460,8 +2521,9 @@ function clearAlarm() {
 
 function showAlarmStatus(time, stationN) {
   const stn = STATIONS.find(s => s.n === parseInt(stationN));
+  const what = BEEPERS[stationN] ? BEEPERS[stationN].label.replace('Beeper: ', '') : stn ? stn.name : '?';
   document.getElementById('alarmStatus').textContent =
-    'ALARM ' + time + ' \u2014 ' + (stn ? stn.name : '?');
+    'ALARM ' + time + ' \u2014 ' + what;
   document.getElementById('alarmStatus').className = 'alarm-status';
 }
 
@@ -2483,6 +2545,16 @@ function checkAlarmFire(now, hh, mm, ss) {
 
 // Start the alarm station by itself; only if the phone blocks that, show the PLAY button
 function fireAlarm(a) {
+  if (BEEPERS[a.station]) {
+    // Beeper alarm: loud loop + full-screen DISMISS, stops by itself after 10 min
+    if (!alarmAudio) prepareAlarmBeeper(a.station);
+    alarmAudio.src = beepWavUrl(a.station); alarmAudio.muted = false; alarmAudio.currentTime = 0;
+    alarmAudio.play().catch(() => {});
+    if (navigator.vibrate) navigator.vibrate([500,200,500,200,500]);
+    showWakeOverlay(a);
+    setTimeout(stopAlarmBeeper, 10 * 60000);
+    return;
+  }
   const stn = STATIONS.find(s => s.n === parseInt(a.station));
   if (!stn) return;
   if (navigator.vibrate) navigator.vibrate([500,200,500,200,500]);
@@ -2499,14 +2571,17 @@ function fireAlarm(a) {
 function showWakeOverlay(a) {
   const stn = STATIONS.find(s => s.n === parseInt(a.station));
   document.getElementById('wakeTime').textContent = a.time;
-  document.getElementById('wakeStation').textContent = stn ? stn.name : '';
+  const beeper = BEEPERS[a.station];
+  document.getElementById('wakeStation').textContent = beeper ? beeper.label.replace('Beeper: ', '') : stn ? stn.name : '';
+  document.getElementById('wakePlayBtn').style.display = beeper ? 'none' : '';
   document.getElementById('wakeOverlay').classList.add('show');
-  alarmPending = stn;
+  alarmPending = beeper ? null : stn;
   // vibrate if supported
   if (navigator.vibrate) navigator.vibrate([500,200,500,200,500]);
 }
 
 function wakePlay() {
+  stopAlarmBeeper();
   document.getElementById('wakeOverlay').classList.remove('show');
   if (alarmPending) {
     play(alarmPending);
@@ -2519,6 +2594,7 @@ function wakePlay() {
 }
 
 function wakeDismiss() {
+  stopAlarmBeeper();
   document.getElementById('wakeOverlay').classList.remove('show');
   alarmPending = null;
 }
