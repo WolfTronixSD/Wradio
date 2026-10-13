@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.47</title>
+<title>WRadio v2.48</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -278,6 +278,19 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .vol-ios{display:none;flex:1;font-size:1.05em;color:var(--text);line-height:1.2}
 .ios .vol-wrap input,.ios .vol-wrap .vol-val{display:none}
 .ios .vol-ios{display:block}
+/* WEATHER (v2.48) */
+.wx-card[hidden]{display:none}
+.wx-card{display:flex;align-items:stretch;gap:10px;margin:4px 0 6px}
+.wx-main{flex:1;display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;text-decoration:none;color:var(--text);
+  background:linear-gradient(135deg,rgba(255,200,80,0.16),rgba(0,212,255,0.12));border:1px solid rgba(255,255,255,0.12);min-width:0}
+.wx-ic{font-size:2.8em;line-height:1}
+.wx-body{min-width:0;flex:1}
+.wx-temp{font-size:2em;font-weight:700;color:#fff;line-height:1}
+.wx-temp small{font-size:0.6em;color:var(--muted);font-weight:500;margin-left:6px}
+.wx-line{font-size:1.05em;margin-top:4px}
+.wx-sun{font-size:1.05em;margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 14px;color:#fff}
+.wx-loc{flex:0 0 52px;border-radius:18px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);font-size:1.7em;cursor:pointer}
+.wx-loc.on{background:linear-gradient(135deg,#00d4ff55,#7b2ff755);border-color:#00d4ff}
 .stn-btn.active .stn-ic{animation:bob 1.6s ease-in-out infinite}
 .sec-atc .stn-ic{width:42px;height:42px;font-size:1.4em;border-radius:13px}
 .sec-atc .stn-tag{font-size:0.85em}
@@ -330,7 +343,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.47</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.48</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -390,6 +403,10 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 
 <!-- STATIONS -->
 <div class="panel active" id="panel-stations">
+  <div class="wx-card" id="wxCard" hidden>
+    <a class="wx-main" id="wxMain" target="_blank" rel="noopener"></a>
+    <button class="wx-loc" id="wxLoc" onclick="wxUseGps()" title="Use my exact location">📍</button>
+  </div>
   <div id="stationList"></div>
 </div>
 
@@ -521,7 +538,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.47 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.48 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -537,6 +554,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.48 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Weather card: current weather in °F and °C, high/low, wind<br>
+        Sunrise, sunset and moon phase<br>
+        Location from your connection, or tap 📍 for exact GPS
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.47 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -812,11 +836,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.47  (2026-10-13)
+//  Version : v2.48  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.48 - Weather card (F/C), sunrise/sunset, moon phase, GPS button
 //  v2.47 - 3 alarm beepers (classic, chime, siren) besides stations
 //  v2.46 - Alarm auto-plays, egg timer beep fixed on iPhone, screen wake lock
 //  v2.45 - Airport colors, no VU bar on main screen, iPhone live mode off (WebKit silence)
@@ -1530,7 +1555,8 @@ function startFFTClone(src) {
 
 function stopFFTClone() {
   audioFFT.pause();
-  audioFFT.src = '';
+  audioFFT.removeAttribute('src'); // src='' would raise a media error
+  audioFFT.load();
 }
 
 // ── iPhone live mode helpers ───────────────────────────────
@@ -2492,6 +2518,99 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ============================================================
+//  WEATHER — current weather, sunrise/sunset, moon phase
+//  Location: GPS when 📍 is on, otherwise a guess from the internet
+//  connection. Data: Open-Meteo (free, no key).
+// ============================================================
+const WX = {0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly cloudy'],3:['☁️','Cloudy'],45:['🌫️','Fog'],48:['🌫️','Fog'],
+  51:['🌦️','Drizzle'],53:['🌦️','Drizzle'],55:['🌦️','Drizzle'],56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],
+  61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],
+  71:['🌨️','Light snow'],73:['🌨️','Snow'],75:['❄️','Heavy snow'],77:['🌨️','Snow'],80:['🌦️','Showers'],81:['🌧️','Showers'],
+  82:['⛈️','Heavy showers'],85:['🌨️','Snow showers'],86:['🌨️','Snow showers'],95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm, hail'],99:['⛈️','Thunderstorm, hail']};
+const fToC = f => Math.round((f - 32) * 5 / 9);
+const wxGet = (k, maxAge) => { try { const v = JSON.parse(localStorage.getItem(k)); if (v && (maxAge == null || Date.now() - v.t < maxAge)) return v.d; } catch(e) {} return null; };
+const wxSet = (k, d) => { try { localStorage.setItem(k, JSON.stringify({ t: Date.now(), d })); } catch(e) {} };
+function wxJSON(url) {
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 7000);
+  return fetch(url, { signal: ctl.signal }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).finally(() => clearTimeout(tm));
+}
+async function wxIpLocation() {
+  const hit = wxGet('wr_ipLoc', 6 * 3600e3); if (hit) return hit;
+  for (const [url, pick] of [['https://get.geojs.io/v1/ip/geo.json', j => ({ name: j.city || j.region, lat: +j.latitude, lon: +j.longitude })],
+                             ['https://ipapi.co/json/', j => ({ name: j.city || j.region, lat: +j.latitude, lon: +j.longitude })]]) {
+    try { const l = pick(await wxJSON(url)); if (isFinite(l.lat) && isFinite(l.lon) && (l.lat || l.lon)) { l.name = l.name || 'Your area'; wxSet('wr_ipLoc', l); return l; } } catch(e) {}
+  }
+  return wxGet('wr_ipLoc');
+}
+// Sunrise/sunset arrive as local clock times ("2026-10-13T06:52")
+const wxClock = iso => { const m = /T(\d\d):(\d\d)/.exec(iso || ''); if (!m) return '–'; const h = +m[1]; return (h % 12 || 12) + ':' + m[2] + (h < 12 ? ' AM' : ' PM'); };
+// Moon phase from the mean synodic month, counted from the new moon of 6 Jan 2000 18:14 UTC
+function moonPhase(when) {
+  const len = 29.530588853;
+  const age = ((((when || Date.now()) - Date.UTC(2000, 0, 6, 18, 14)) / 864e5 % len) + len) % len;
+  const lit = Math.round((1 - Math.cos(2 * Math.PI * age / len)) / 2 * 100);
+  const q = age / len * 4, near = Math.abs(q - Math.round(q)) * len / 4 < 1;
+  const [icon, name] = near ? [['🌑','New moon'],['🌓','First quarter'],['🌕','Full moon'],['🌗','Last quarter'],['🌑','New moon']][Math.round(q)]
+    : [['🌒','Waxing crescent'],['🌔','Waxing gibbous'],['🌖','Waning gibbous'],['🌘','Waning crescent']][Math.floor(q)];
+  return { icon, name, lit };
+}
+async function wxPlaceName(lat, lon) {
+  try { const j = await wxJSON('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=en');
+        return j.city || j.locality || j.principalSubdivision || 'My location'; } catch(e) { return 'My location'; }
+}
+function wxUseGps() {
+  const btn = document.getElementById('wxLoc');
+  if (wxGet('wr_gpsLoc')) { localStorage.removeItem('wr_gpsLoc'); btn.classList.remove('on'); wxRefresh(); return; } // tap again = automatic
+  if (!navigator.geolocation) return;
+  btn.textContent = '⏳';
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = +pos.coords.latitude.toFixed(3), lon = +pos.coords.longitude.toFixed(3);
+    wxSet('wr_gpsLoc', { name: await wxPlaceName(lat, lon), lat, lon, gps: true });
+    btn.textContent = '📍'; wxRefresh();
+  }, () => {
+    btn.textContent = '📍';
+    showToast('Location is off for this site (iPhone: Settings › Privacy › Location Services › Safari Websites)', 'error');
+  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 30 * 60e3 });
+}
+async function wxRefresh() {
+  let loc = wxGet('wr_gpsLoc');
+  if (loc && navigator.geolocation) {
+    // quietly follow the phone when it moves (no prompt once allowed)
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = +pos.coords.latitude.toFixed(3), lon = +pos.coords.longitude.toFixed(3);
+      if (Math.abs(lat - loc.lat) + Math.abs(lon - loc.lon) > 0.05) wxPlaceName(lat, lon).then(name => { wxSet('wr_gpsLoc', { name, lat, lon, gps: true }); wxRefresh(); });
+    }, () => {}, { timeout: 10000, maximumAge: 30 * 60e3 });
+  }
+  loc = loc || (await wxIpLocation()) || { name: 'San Diego', lat: 32.7157, lon: -117.1611 };
+  document.getElementById('wxLoc').classList.toggle('on', !!loc.gps);
+  const key = 'wr_wx:' + loc.lat.toFixed(2) + ',' + loc.lon.toFixed(2);
+  let d = wxGet(key, 20 * 60e3);
+  if (!d) {
+    try {
+      d = await wxJSON('https://api.open-meteo.com/v1/forecast?latitude=' + loc.lat + '&longitude=' + loc.lon
+        + '&current=temperature_2m,weather_code,wind_speed_10m,is_day&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset'
+        + '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=1');
+      if (!d.current || !d.daily) throw new Error('bad data');
+      wxSet(key, d);
+    } catch(e) { d = wxGet(key); if (!d) return; }
+  }
+  const c = d.current, dy = d.daily, mo = moonPhase();
+  let [ic, txt] = WX[c.weather_code] || ['🌡️', ''];
+  if (c.weather_code <= 1 && !c.is_day) [ic, txt] = ['🌙', c.weather_code === 0 ? 'Clear night' : txt];
+  const t = Math.round(c.temperature_2m), hi = dy.temperature_2m_max[0], lo = dy.temperature_2m_min[0];
+  const a = document.getElementById('wxMain');
+  a.href = 'https://forecast.weather.gov/MapClick.php?lat=' + loc.lat + '&lon=' + loc.lon;
+  a.innerHTML = '<span class="wx-ic">' + ic + '</span><span class="wx-body">'
+    + '<div class="wx-temp">' + t + '°F <small>' + fToC(c.temperature_2m) + '°C</small></div>'
+    + '<div class="wx-line"><b>' + (loc.gps ? '📍 ' : '≈ ') + escHtml(loc.name) + '</b> · ' + txt + '</div>'
+    + '<div class="wx-line" style="color:var(--muted)">H ' + Math.round(hi) + '°/' + fToC(hi) + '° · L ' + Math.round(lo) + '°/' + fToC(lo) + '° · 💨 ' + Math.round(c.wind_speed_10m) + ' mph</div>'
+    + '<div class="wx-sun"><span>🌅 ' + wxClock(dy.sunrise[0]) + '</span><span>🌇 ' + wxClock(dy.sunset[0]) + '</span><span>' + mo.icon + ' ' + mo.name + ' ' + mo.lit + '%</span></div>'
+    + '</span>';
+  a.setAttribute('aria-label', 'Weather in ' + loc.name + ': ' + t + ' degrees, ' + txt + '. Open forecast');
+  document.getElementById('wxCard').hidden = false;
+}
+
+// ============================================================
 //  ALARM
 // ============================================================
 function setAlarm() {
@@ -3149,6 +3268,7 @@ onAudible('pause', () => {
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
 
 window.addEventListener('load', buildUI);
+window.addEventListener('load', () => { wxRefresh(); setInterval(wxRefresh, 20 * 60000); });
 if (IS_IOS) document.documentElement.classList.add('ios');
 
 // Start keep-alive AND pre-connect FFT element on first user interaction
