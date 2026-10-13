@@ -3,7 +3,7 @@
 Usage: python3 scripts/check_streams.py [extra URL ...]
 For each URL it reports the HTTP status, content type, whether the server
 allows cross-origin reads (needed for the real FFT visualizer) and how many
-bytes arrived in a few seconds. Exits 1 if a station in index.html fails.
+bytes arrived in a few seconds. Exits 1 if a music or German station fails; ATC feeds that are offline are only listed.
 """
 import re, subprocess, sys
 
@@ -11,8 +11,8 @@ ORIGIN = "https://wolftronixsd.github.io"
 # Some servers send a "player not supported" clip to non-browser clients
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 html = open("index.html", encoding="utf-8").read()
-stations = re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)"', html)
-extra = [("+", u, u) for u in sys.argv[1:]]
+stations = re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)",\s*cat:"(\w+)"', html)
+extra = [("+", u, u, "extra") for u in sys.argv[1:]]
 
 def probe(url):
     out = subprocess.run(
@@ -34,15 +34,19 @@ def probe(url):
         "final": final.group(1) if final else url,
     }
 
-bad = 0
+bad, offline = 0, []
 print(f"{'#':>3} {'name':<26} {'code':>4} {'KB':>6} {'cors':>4} type / url")
-for n, name, url in [(n, name, url) for n, name, url in stations] + extra:
+for n, name, url, cat in stations + extra:
     for u in ([url, url.replace("http://", "https://", 1)] if url.startswith("http://") else [url]):
         r = probe(u)
         # ATC feeds are low bitrate and quiet between calls, so a few KB is enough to prove they're live
         ok = r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000 and "alert.mp3" not in r["final"]
         if n != "+" and u == url and not ok:
-            bad += 1
+            # LiveATC feeds go offline when a volunteer's receiver is down; report, don't fail
+            if cat == "atc": offline.append(name)
+            else: bad += 1
         print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {r['cors']:>4} {'OK ' if ok else 'BAD'} {r['type']} {u}"
               + (f" -> {r['final']}" if r["final"] != u else ""))
+if offline:
+    print("\nATC feeds offline right now (often temporary): " + ", ".join(offline))
 sys.exit(1 if bad else 0)

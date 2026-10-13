@@ -453,6 +453,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
         Bigger STOP, volume, tabs, ATC and link buttons<br>
         5 new German stations: Deutschlandfunk, NDR 2, hr3, Bayern 1, Rock Antenne<br>
         All streams use https (phones block plain http audio)<br>
+        Fixed: SomaFM played an error clip (new server), KMYF ATIS link<br>
         Fixed: stations without CORS could fail to play<br>
         Fixed: visualizer always fell back to simulated (muted clone)<br>
         VIZ tab shows LIVE or SIMULATED<br>
@@ -805,7 +806,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
   {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
   {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
@@ -818,7 +819,7 @@ const STATIONS = [
   {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german"},
   {n:27, name:"Rock Antenne",         url:"https://stream.rockantenne.de/rockantenne/stream/mp3",                   cat:"german"},
   // --- ATC San Diego (KMYF = Montgomery Field) ---
-  {n:8,  name:"KMYF ATIS",            url:"https://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
+  {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
   {n:10, name:"KMYF Ground",          url:"https://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
   {n:11, name:"KMYF All (Twr)",       url:"https://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
