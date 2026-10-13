@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.40</title>
+<title>WRadio v2.41</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js" async defer></script>
@@ -187,7 +187,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 .stn-btn,.sec-german .stn-btn{min-height:84px;padding:12px 14px;margin:0;border-width:2px;border-radius:14px;gap:8px}
 .stn-btn::after{width:6px}
 .stn-name,.sec-german .stn-name{font-size:1.45em;font-weight:700;line-height:1.1}
-.stn-num,.sec-german .stn-num{font-size:0.95em;min-width:24px}
+.stn-num,.sec-german .stn-num{display:none}
 .stn-btn.active{box-shadow:0 0 0 2px var(--green) inset}
 .stn-btn .stn-live{font-size:0.8em}
 .sec-atc .stn-btn{min-height:64px;margin-bottom:0}
@@ -245,7 +245,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.40</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.41</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -430,7 +430,7 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></span>
+        <span style="color:var(--accent)">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -447,7 +447,18 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.41 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Car mode: big, high-contrast station buttons, 2 per row<br>
+        Bigger STOP, volume, tabs, ATC and link buttons<br>
+        5 new German stations: Deutschlandfunk, NDR 2, hr3, Bayern 1, Rock Antenne<br>
+        All streams use https (phones block plain http audio)<br>
+        Fixed: stations without CORS could fail to play<br>
+        Fixed: visualizer always fell back to simulated (muted clone)<br>
+        VIZ tab shows LIVE or SIMULATED<br>
+        Weekly stream check on GitHub (Actions → Check streams)
+      </div>
+      <div style="color:var(--accent);margin-top:10px">v2.40 <span style="color:var(--muted);font-size:0.85em">2026-04-04</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Dual audio: main plays direct (background-safe), clone feeds FFT<br>
         Stations viz now works (FFT clone plays stream silently)<br>
@@ -666,11 +677,13 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.40  (2026-04-04)
+//  Version : v2.41  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.41 - Car mode (big buttons), 5 German stations, https streams,
+//          main audio no longer requests CORS, FFT clone unmuted + silent sink
 //  v2.40 - DUAL AUDIO ARCHITECTURE: separate <audio> element for FFT only
 //          Main audio plays DIRECTLY (no Web Audio routing) = background-safe
 //          FFT clone plays same URL at volume=0 for analyser data only
@@ -791,32 +804,37 @@ input[type=range]::-webkit-slider-thumb{width:34px;height:34px}
 // ============================================================
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
-  {n:1,  name:"181.FM Awesome 80s",    url:"http://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"http://ice1.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice1.somafm.com/u80s-128-mp3",                                   cat:"music"},
   // --- German Radio ---
-  {n:3,  name:"Antenne Bayern",       url:"http://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
-  {n:4,  name:"1LIVE WDR",            url:"http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:5,  name:"SWR3",                 url:"http://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
-  {n:6,  name:"Bayern 3",             url:"http://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
-  {n:7,  name:"SWR1",                 url:"http://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
+  {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
+  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
+  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
+  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
+  {n:23, name:"Deutschlandfunk",      url:"https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3",                cat:"german"},
+  {n:24, name:"NDR 2",                url:"https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3",       cat:"german"},
+  {n:25, name:"hr3",                  url:"https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high",                     cat:"german"},
+  {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german"},
+  {n:27, name:"Rock Antenne",         url:"https://stream.rockantenne.de/rockantenne/stream/mp3",                   cat:"german"},
   // --- ATC San Diego (KMYF = Montgomery Field) ---
-  {n:8,  name:"KMYF ATIS",            url:"http://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
-  {n:9,  name:"KMYF Tower",           url:"http://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
-  {n:10, name:"KMYF Ground",          url:"http://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
-  {n:11, name:"KMYF All (Twr)",       url:"http://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
-  {n:12, name:"KMYF SoCal Del Mar",   url:"http://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
+  {n:8,  name:"KMYF ATIS",            url:"https://s1-fmt2.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
+  {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
+  {n:10, name:"KMYF Ground",          url:"https://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
+  {n:11, name:"KMYF All (Twr)",       url:"https://d.liveatc.net/ksan_kmyf_twr_both",                                cat:"atc"},
+  {n:12, name:"KMYF SoCal Del Mar",   url:"https://d.liveatc.net/ksan_app_delmar",                                   cat:"atc"},
   // --- ATC San Diego (KSAN = Lindbergh Field) ---
-  {n:13, name:"KSAN Tower",           url:"http://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
-  {n:14, name:"KSAN Ground",          url:"http://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
-  {n:15, name:"KSAN Clearance Del",   url:"http://d.liveatc.net/ksan1_del",                                         cat:"atc"},
-  {n:16, name:"KSAN SoCal East",      url:"http://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
-  {n:17, name:"KSAN SoCal West",      url:"http://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
-  {n:18, name:"KSAN All",             url:"http://d.liveatc.net/ksan1_all",                                         cat:"atc"},
+  {n:13, name:"KSAN Tower",           url:"https://d.liveatc.net/ksan1_twr",                                         cat:"atc"},
+  {n:14, name:"KSAN Ground",          url:"https://d.liveatc.net/ksan1_gnd",                                         cat:"atc"},
+  {n:15, name:"KSAN Clearance Del",   url:"https://d.liveatc.net/ksan1_del",                                         cat:"atc"},
+  {n:16, name:"KSAN SoCal East",      url:"https://d.liveatc.net/ksan_app_east",                                     cat:"atc"},
+  {n:17, name:"KSAN SoCal West",      url:"https://d.liveatc.net/ksan_app_west",                                     cat:"atc"},
+  {n:18, name:"KSAN All",             url:"https://d.liveatc.net/ksan1_all",                                         cat:"atc"},
   // --- ATC San Diego (KSDM = Brown Field, KRNM = Ramona) ---
-  {n:19, name:"KSDM Ground/Tower",    url:"http://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
-  {n:20, name:"KRNM Ground",          url:"http://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
-  {n:21, name:"KRNM Ground/Tower",    url:"http://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
-  {n:22, name:"KRNM Tower",           url:"http://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
+  {n:19, name:"KSDM Ground/Tower",    url:"https://d.liveatc.net/ksdm_twr",                                          cat:"atc"},
+  {n:20, name:"KRNM Ground",          url:"https://d.liveatc.net/krnm2_gnd",                                         cat:"atc"},
+  {n:21, name:"KRNM Ground/Tower",    url:"https://d.liveatc.net/krnm2_gnd_twr",                                     cat:"atc"},
+  {n:22, name:"KRNM Tower",           url:"https://d.liveatc.net/krnm2_twr",                                         cat:"atc"},
 ];
 
 // ============================================================
