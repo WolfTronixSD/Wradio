@@ -8,13 +8,15 @@ bytes arrived in a few seconds. Exits 1 if a station in index.html fails.
 import re, subprocess, sys
 
 ORIGIN = "https://wolftronixsd.github.io"
+# Some servers send a "player not supported" clip to non-browser clients
+UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 html = open("index.html", encoding="utf-8").read()
 stations = re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)"', html)
 extra = [("+", u, u) for u in sys.argv[1:]]
 
 def probe(url):
     out = subprocess.run(
-        ["curl", "-sS", "-L", "--max-time", "6", "-H", f"Origin: {ORIGIN}", "-H", "Icy-MetaData: 0",
+        ["curl", "-sS", "-L", "--max-time", "6", "-H", f"Origin: {ORIGIN}", "-H", "Icy-MetaData: 0", "-A", UA,
          "-D", "-", "-o", "/dev/null", "-w", "\n__BYTES__%{size_download} __CODE__%{http_code} __URL__%{url_effective}", url],
         capture_output=True, text=True)
     text = out.stdout
@@ -37,7 +39,8 @@ print(f"{'#':>3} {'name':<26} {'code':>4} {'KB':>6} {'cors':>4} type / url")
 for n, name, url in [(n, name, url) for n, name, url in stations] + extra:
     for u in ([url, url.replace("http://", "https://", 1)] if url.startswith("http://") else [url]):
         r = probe(u)
-        ok = r["code"].startswith("2") and r["bytes"] > 8000
+        # ATC feeds are low bitrate and quiet between calls, so a few KB is enough to prove they're live
+        ok = r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000 and "alert.mp3" not in r["final"]
         if n != "+" and u == url and not ok:
             bad += 1
         print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {r['cors']:>4} {'OK ' if ok else 'BAD'} {r['type']} {u}"
