@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.45</title>
+<title>WRadio v2.46</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -330,7 +330,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.45</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.46</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -521,7 +521,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.45 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.46 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -537,6 +537,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.46 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Alarm starts the radio by itself (PLAY button only if the phone blocks it)<br>
+        Alarm still fires if the phone was busy, up to 10 min late, once a day<br>
+        Egg timer beeps on iPhone (sound unlocked when you tap START)<br>
+        Screen stays on while a timer or alarm is waiting
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.45 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -798,11 +806,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.45  (2026-10-13)
+//  Version : v2.46  (2026-10-13)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.46 - Alarm auto-plays, egg timer beep fixed on iPhone, screen wake lock
 //  v2.45 - Airport colors, no VU bar on main screen, iPhone live mode off (WebKit silence)
 //  v2.44 - Workout section (bigFM Workout, 80s Hi‑NRG, 80s Rock, Techno)
 //  v2.43 - iPhone live mode (Web Audio: volume + real FFT, direct playback when locked),
@@ -1202,6 +1211,7 @@ function buildUI() {
       document.getElementById('alarmStation').value   = a.station;
       showAlarmStatus(a.time, a.station);
       alarmActive = true;
+      keepScreenOn(true, 'alarm');
     } catch(e) {}
   }
 
@@ -1535,6 +1545,7 @@ const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAE
 let mainUnlocked = false;
 function unlockMain() {
   if (mainUnlocked) return;
+  if (isPlaying) { mainUnlocked = true; return; } // already playing from a tap, so it's unlocked
   mainUnlocked = true;
   try {
     audio.src = SILENT_WAV;
@@ -2255,6 +2266,8 @@ function eggStart() {
     eggReset(); return;
   }
   eggEnd = Date.now() + EGG_DURATION * 1000;
+  prepareAlertSound(); // iPhone only allows sound that was started from a tap, so unlock it now
+  keepScreenOn(true);
   document.getElementById('eggStartBtn').textContent = '■ STOP';
   document.getElementById('eggStartBtn').style.borderColor = 'var(--red)';
   document.getElementById('eggStartBtn').style.color = 'var(--red)';
@@ -2295,16 +2308,67 @@ function eggFire() {
   // Play beeper alarm using Web Audio API
   eggBeeping = true;
   eggBeep();
+  startAlertSound();
+  keepScreenOn(false);
   document.getElementById('eggStatus').textContent = '✓ Done!';
   document.getElementById('eggStartBtn').textContent = '▶ START';
   document.getElementById('eggStartBtn').style.borderColor = 'var(--amber)';
   document.getElementById('eggStartBtn').style.color = 'var(--amber)';
 }
 
+// ── Alert sound (egg timer) ─────────────────────────────────
+// A new AudioContext made when the timer ends starts "suspended" on iPhone
+// and stays silent, so the beeper reuses the keep-alive context that was
+// started from a tap, plus a looping <audio> beep as a backup.
+let alertAudio = null;
+function beepWavUrl() {
+  const sr = 22050, len = sr * 2, data = new Int16Array(len);
+  [[0,880],[0.3,1046],[0.6,1318],[1.0,880],[1.3,1046],[1.6,1318]].forEach(([t, f]) => {
+    const st = Math.floor(t * sr), n = Math.floor(0.2 * sr);
+    for (let i = 0; i < n; i++) {
+      const env = Math.min(1, i / 200, (n - i) / 400);
+      data[st + i] = Math.round(Math.sin(2 * Math.PI * f * i / sr) * env * 26000);
+    }
+  });
+  const buf = new ArrayBuffer(44 + len * 2), v = new DataView(buf);
+  const str = (o, x) => [...x].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF'); v.setUint32(4, 36 + len * 2, true); str(8, 'WAVEfmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, 'data'); v.setUint32(40, len * 2, true);
+  new Int16Array(buf, 44).set(data);
+  return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+}
+function prepareAlertSound() {
+  ensureKeepAlive();
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
+  if (!alertAudio) {
+    alertAudio = new Audio(beepWavUrl());
+    alertAudio.loop = true;
+    alertAudio.setAttribute('playsinline', '');
+  }
+  // play muted for a moment during the tap so it may play later without one
+  alertAudio.muted = true;
+  const p = alertAudio.play();
+  if (p) p.then(() => { alertAudio.pause(); alertAudio.currentTime = 0; alertAudio.muted = false; }).catch(() => { alertAudio.muted = false; });
+}
+function startAlertSound() {
+  // the radio keeps playing; the backup beep only plays when no station is on
+  if (alertAudio && !(isPlaying && !out().paused)) {
+    alertAudio.muted = false; alertAudio.currentTime = 0;
+    alertAudio.play().catch(() => {});
+  }
+}
+function stopAlertSound() {
+  if (alertAudio) { alertAudio.pause(); alertAudio.currentTime = 0; }
+}
+
 function eggBeep() {
   if (!eggBeeping) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ensureKeepAlive();
+    const ctx = keepAliveCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state !== 'running') ctx.resume().catch(()=>{});
     // Three rising tones — classic egg timer beep pattern
     const beepTimes = [0, 0.3, 0.6, 1.2, 1.5, 1.8]; // seconds
     const freqs     = [880, 1046, 1318, 880, 1046, 1318];
@@ -2329,6 +2393,7 @@ function eggBeep() {
 
 function eggDismiss() {
   eggBeeping = false;
+  stopAlertSound();
   document.getElementById('eggOverlay').classList.remove('show');
   eggReset();
 }
@@ -2338,6 +2403,8 @@ function eggReset() {
   eggInterval = null;
   eggEnd = null;
   eggBeeping = false;
+  stopAlertSound();
+  keepScreenOn(false);
   const el = document.getElementById('eggCountdown');
   el.textContent = '6:00';
   el.style.color = '';
@@ -2347,6 +2414,23 @@ function eggReset() {
   document.getElementById('eggStartBtn').style.color = 'var(--amber)';
   document.getElementById('eggStatus').textContent = '';
 }
+
+// Keep the screen on while a timer or alarm is waiting: when an iPhone locks,
+// the page is frozen and can't beep or start the radio
+let wakeLock = null, wakeWanted = { egg: false, alarm: false };
+function keepScreenOn(on, who) {
+  wakeWanted[who || 'egg'] = on;
+  const want = wakeWanted.egg || wakeWanted.alarm;
+  if (!('wakeLock' in navigator)) return;
+  if (want && !wakeLock) {
+    navigator.wakeLock.request('screen').then(l => { wakeLock = l; l.addEventListener('release', () => { wakeLock = null; }); }).catch(() => {});
+  } else if (!want && wakeLock) {
+    wakeLock.release().catch(() => {}); wakeLock = null;
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && (wakeWanted.egg || wakeWanted.alarm) && !wakeLock) keepScreenOn(true, wakeWanted.alarm ? 'alarm' : 'egg');
+});
 
 // ============================================================
 //  ALARM
@@ -2358,12 +2442,17 @@ function setAlarm() {
   localStorage.setItem('radioAlarm', JSON.stringify({time:t, station:s}));
   showAlarmStatus(t, s);
   alarmActive = true;
+  alarmFiredOn = '';
+  // unlock playback now (this is a tap) so the radio can start by itself later
+  unlockMain(); ensureKeepAlive(); connectFFT();
+  keepScreenOn(true, 'alarm');
   showToast('Alarm set: ' + t, 'ok');
 }
 
 function clearAlarm() {
   localStorage.removeItem('radioAlarm');
   alarmActive = false;
+  keepScreenOn(false, 'alarm');
   document.getElementById('alarmStatus').textContent = 'No alarm set';
   document.getElementById('alarmStatus').className = 'alarm-status off';
   showToast('Alarm cleared');
@@ -2376,16 +2465,35 @@ function showAlarmStatus(time, stationN) {
   document.getElementById('alarmStatus').className = 'alarm-status';
 }
 
+let alarmFiredOn = ''; // date the alarm last went off, so it fires once a day
+
 function checkAlarmFire(now, hh, mm, ss) {
   const saved = localStorage.getItem('radioAlarm');
   if (!saved) return;
   const a = JSON.parse(saved);
-  // fire in first 5 seconds of the alarm minute
-  if ((hh+':'+mm) === a.time && parseInt(ss) < 5) {
-    if (!document.getElementById('wakeOverlay').classList.contains('show')) {
-      showWakeOverlay(a);
-    }
-  }
+  const today = now.toDateString();
+  if (alarmFiredOn === today) return;
+  // fire at the alarm minute, or up to 10 minutes late if the phone was busy
+  const [ah, am] = a.time.split(':').map(Number);
+  const late = (now.getHours() * 60 + now.getMinutes()) - (ah * 60 + am);
+  if (late < 0 || late > 10) return;
+  alarmFiredOn = today;
+  fireAlarm(a);
+}
+
+// Start the alarm station by itself; only if the phone blocks that, show the PLAY button
+function fireAlarm(a) {
+  const stn = STATIONS.find(s => s.n === parseInt(a.station));
+  if (!stn) return;
+  if (navigator.vibrate) navigator.vibrate([500,200,500,200,500]);
+  play(stn);
+  setSleep(60); // auto-stop after 60 min
+  const tabs = document.querySelectorAll('.tab');
+  switchTab('stations', tabs[0]);
+  showToast('⏰ Alarm ' + a.time + ' — ' + stn.name, 'ok');
+  setTimeout(() => {
+    if (out().paused) showWakeOverlay(a); // blocked: one tap starts it
+  }, 4000);
 }
 
 function showWakeOverlay(a) {
