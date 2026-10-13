@@ -25,4 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
-      - run: node scripts/viz_check.mjs
+      - run: node scripts/viz_check.mjs $EXTRA
+        env:
+          EXTRA: ${{ github.event.inputs.extra }}
