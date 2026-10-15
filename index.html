@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.49</title>
+<title>WRadio v2.50</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -343,7 +343,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.49</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.50</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -538,7 +538,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.49 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></span>
+        <span style="color:var(--accent)">v2.50 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -554,6 +554,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.50 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay stutter fix: no extra audio running next to the station on iPhone<br>
+        Short network gaps no longer restart the stream
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.49 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -842,11 +848,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.49  (2026-10-15)
+//  Version : v2.50  (2026-10-15)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.50 - CarPlay stutter: iOS keep-alive paused while streaming, no Web Audio ctx on iOS,
+//          'stalled' no longer reconnects, watchdog uses real time (10 s)
 //  v2.49 - Weather defaults to Escondido; GPS only on 📍 tap, kept for the visit
 //  v2.48 - Weather card (F/C), sunrise/sunset, moon phase, GPS button
 //  v2.47 - 3 alarm beepers (classic, chime, siren) besides stations
@@ -1510,6 +1518,9 @@ const audioFFT = document.getElementById('audioFFT');
 let fftConnected = false;
 
 function connectFFT() {
+  // iPhone: live mode is off and the visualizer is simulated, so no Web Audio context
+  // is made. A running context next to the stream made CarPlay audio stutter.
+  if (IS_IOS && !IOS_LIVE_MODE) return;
   if (fftConnected) {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
     return;
@@ -2760,24 +2771,22 @@ function hardReconnect(reason) {
 function startBufferWatchdog() {
   if (bufferWatchdog) clearInterval(bufferWatchdog);
   let lastCurrentTime = -1;
-  let frozenCount = 0;
+  let lastAdvance = Date.now();
   bufferWatchdog = setInterval(() => {
     const audio = out();
     if (curIdx < 0 || !isPlaying || audio.paused || reconnectTimer) {
-      lastCurrentTime = -1; frozenCount = 0; return;
+      lastCurrentTime = -1; lastAdvance = Date.now(); return;
     }
-    // Check if playback is actually advancing
-    if (audio.currentTime === lastCurrentTime) {
-      frozenCount++;
-      if (frozenCount >= 2) { // frozen for 4s
-        frozenCount = 0;
-        console.log('[Watchdog] Playback frozen — reconnecting');
-        hardReconnect('Reconnecting');
-      }
-    } else {
-      frozenCount = 0;
+    // Check if playback is actually advancing. Uses the clock, not tick counts: on the
+    // lock screen (CarPlay) iOS bunches timer ticks together, which looked like a freeze
+    // and forced a reconnect in the middle of good audio.
+    if (audio.currentTime !== lastCurrentTime) {
+      lastCurrentTime = audio.currentTime; lastAdvance = Date.now();
+    } else if (Date.now() - lastAdvance > 10000) { // really frozen for 10 s
+      lastAdvance = Date.now();
+      console.log('[Watchdog] Playback frozen — reconnecting');
+      hardReconnect('Reconnecting');
     }
-    lastCurrentTime = audio.currentTime;
 
     // Check buffer ahead — if less than 0.8s buffered, warn
     // (can't force reconnect here as it would cause infinite loop)
@@ -2819,10 +2828,12 @@ onAudible('error', () => {
   hardReconnect('Error');
 });
 
+// 'stalled' only means no new data arrived for ~3 s, which happens all the time on
+// a phone in a moving car while plenty is still buffered. Reconnecting here threw the
+// buffer away and was heard as stutter, so the watchdog decides when playback is frozen.
 onAudible('stalled', () => {
   if (curIdx < 0 || !isPlaying) return;
-  console.log('[Audio] Stalled');
-  hardReconnect('Stalled');
+  console.log('[Audio] Stalled (waiting for data)');
 });
 
 audio.addEventListener('emptied', () => {
@@ -3206,16 +3217,33 @@ function startKeepAlive() {
   } catch(e) { console.warn('[KeepAlive]', e.message); }
 }
 
-function ensureKeepAlive() {
-  if (!keepAliveCtx) { startKeepAlive(); return; }
-  if (keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
+// iPhone/CarPlay: a second running audio source (this silent loop) mixed in next to the
+// stream made iOS keep re-routing the audio, heard as stutter in CarPlay. The playing
+// stream keeps the audio session alive by itself, so on iOS the loop is paused while a
+// station or MP3 plays fine, and runs again while buffering, paused, or for the
+// egg timer / alarm (which beep through this context).
+function keepAliveNeeded() {
+  if (!IS_IOS) return true;
+  if (alarmActive || eggBeeping || eggInterval) return true;
+  const el = out();
+  return !(isPlaying && !el.paused && el.readyState >= 3);
 }
 
-// Resume keepAlive context every second — setInterval still fires briefly
+function ensureKeepAlive() {
+  if (!keepAliveCtx) startKeepAlive(); // made during a tap so iOS allows it later
+  syncKeepAlive();
+}
+
+function syncKeepAlive() {
+  if (!keepAliveCtx) return;
+  const want = keepAliveNeeded();
+  if (want && keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
+  else if (!want && keepAliveCtx.state === 'running') keepAliveCtx.suspend().catch(()=>{});
+}
+
+// Check the keep-alive about every second — setInterval still fires briefly
 // even when suspended, enough to trigger resume
-setInterval(() => {
-  if (keepAliveCtx && keepAliveCtx.state === 'suspended') keepAliveCtx.resume().catch(()=>{});
-}, 800);
+setInterval(syncKeepAlive, 800);
 
 // When page becomes visible again (user returns from home screen / other app)
 document.addEventListener('visibilitychange', () => {
