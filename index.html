@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.48</title>
+<title>WRadio v2.49</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -343,7 +343,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.48</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.49</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -405,7 +405,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <div class="panel active" id="panel-stations">
   <div class="wx-card" id="wxCard" hidden>
     <a class="wx-main" id="wxMain" target="_blank" rel="noopener"></a>
-    <button class="wx-loc" id="wxLoc" onclick="wxUseGps()" title="Use my exact location">📍</button>
+    <button class="wx-loc" id="wxLoc" onclick="wxUseGps()" title="Use my phone's location (default Escondido)">📍</button>
   </div>
   <div id="stationList"></div>
 </div>
@@ -538,7 +538,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.48 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></span>
+        <span style="color:var(--accent)">v2.49 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -554,6 +554,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.49 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Weather starts at Escondido, no location popup on load<br>
+        Tap 📍 to use your phone's location (this visit only)
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.48 <span style="color:var(--muted);font-size:0.85em">2026-10-13</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -836,11 +842,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.48  (2026-10-13)
+//  Version : v2.49  (2026-10-15)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.49 - Weather defaults to Escondido; GPS only on 📍 tap, kept for the visit
 //  v2.48 - Weather card (F/C), sunrise/sunset, moon phase, GPS button
 //  v2.47 - 3 alarm beepers (classic, chime, siren) besides stations
 //  v2.46 - Alarm auto-plays, egg timer beep fixed on iPhone, screen wake lock
@@ -2519,8 +2526,10 @@ document.addEventListener('visibilitychange', () => {
 
 // ============================================================
 //  WEATHER — current weather, sunrise/sunset, moon phase
-//  Location: GPS when 📍 is on, otherwise a guess from the internet
-//  connection. Data: Open-Meteo (free, no key).
+//  Location: Escondido by default, no lookup and no popup on load.
+//  Tapping 📍 asks the phone once and keeps it for this visit only
+//  (sessionStorage), so the next load starts at Escondido again.
+//  Data: Open-Meteo (free, no key).
 // ============================================================
 const WX = {0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly cloudy'],3:['☁️','Cloudy'],45:['🌫️','Fog'],48:['🌫️','Fog'],
   51:['🌦️','Drizzle'],53:['🌦️','Drizzle'],55:['🌦️','Drizzle'],56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],
@@ -2530,17 +2539,13 @@ const WX = {0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly c
 const fToC = f => Math.round((f - 32) * 5 / 9);
 const wxGet = (k, maxAge) => { try { const v = JSON.parse(localStorage.getItem(k)); if (v && (maxAge == null || Date.now() - v.t < maxAge)) return v.d; } catch(e) {} return null; };
 const wxSet = (k, d) => { try { localStorage.setItem(k, JSON.stringify({ t: Date.now(), d })); } catch(e) {} };
+const WX_HOME = { name: 'Escondido', lat: 33.1192, lon: -117.0864 };
+const wxGpsGet = () => { try { return JSON.parse(sessionStorage.getItem('wr_gpsLoc')); } catch(e) { return null; } };
+const wxGpsSet = d => { try { if (d) sessionStorage.setItem('wr_gpsLoc', JSON.stringify(d)); else sessionStorage.removeItem('wr_gpsLoc'); } catch(e) {} };
+try { localStorage.removeItem('wr_gpsLoc'); localStorage.removeItem('wr_ipLoc'); } catch(e) {} // old v2.48 keys
 function wxJSON(url) {
   const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 7000);
   return fetch(url, { signal: ctl.signal }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).finally(() => clearTimeout(tm));
-}
-async function wxIpLocation() {
-  const hit = wxGet('wr_ipLoc', 6 * 3600e3); if (hit) return hit;
-  for (const [url, pick] of [['https://get.geojs.io/v1/ip/geo.json', j => ({ name: j.city || j.region, lat: +j.latitude, lon: +j.longitude })],
-                             ['https://ipapi.co/json/', j => ({ name: j.city || j.region, lat: +j.latitude, lon: +j.longitude })]]) {
-    try { const l = pick(await wxJSON(url)); if (isFinite(l.lat) && isFinite(l.lon) && (l.lat || l.lon)) { l.name = l.name || 'Your area'; wxSet('wr_ipLoc', l); return l; } } catch(e) {}
-  }
-  return wxGet('wr_ipLoc');
 }
 // Sunrise/sunset arrive as local clock times ("2026-10-13T06:52")
 const wxClock = iso => { const m = /T(\d\d):(\d\d)/.exec(iso || ''); if (!m) return '–'; const h = +m[1]; return (h % 12 || 12) + ':' + m[2] + (h < 12 ? ' AM' : ' PM'); };
@@ -2560,12 +2565,12 @@ async function wxPlaceName(lat, lon) {
 }
 function wxUseGps() {
   const btn = document.getElementById('wxLoc');
-  if (wxGet('wr_gpsLoc')) { localStorage.removeItem('wr_gpsLoc'); btn.classList.remove('on'); wxRefresh(); return; } // tap again = automatic
+  if (wxGpsGet()) { wxGpsSet(null); btn.classList.remove('on'); wxRefresh(); return; } // tap again = back to Escondido
   if (!navigator.geolocation) return;
   btn.textContent = '⏳';
   navigator.geolocation.getCurrentPosition(async pos => {
     const lat = +pos.coords.latitude.toFixed(3), lon = +pos.coords.longitude.toFixed(3);
-    wxSet('wr_gpsLoc', { name: await wxPlaceName(lat, lon), lat, lon, gps: true });
+    wxGpsSet({ name: await wxPlaceName(lat, lon), lat, lon, gps: true });
     btn.textContent = '📍'; wxRefresh();
   }, () => {
     btn.textContent = '📍';
@@ -2573,15 +2578,8 @@ function wxUseGps() {
   }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 30 * 60e3 });
 }
 async function wxRefresh() {
-  let loc = wxGet('wr_gpsLoc');
-  if (loc && navigator.geolocation) {
-    // quietly follow the phone when it moves (no prompt once allowed)
-    navigator.geolocation.getCurrentPosition(pos => {
-      const lat = +pos.coords.latitude.toFixed(3), lon = +pos.coords.longitude.toFixed(3);
-      if (Math.abs(lat - loc.lat) + Math.abs(lon - loc.lon) > 0.05) wxPlaceName(lat, lon).then(name => { wxSet('wr_gpsLoc', { name, lat, lon, gps: true }); wxRefresh(); });
-    }, () => {}, { timeout: 10000, maximumAge: 30 * 60e3 });
-  }
-  loc = loc || (await wxIpLocation()) || { name: 'San Diego', lat: 32.7157, lon: -117.1611 };
+  // never asks for location here: only a 📍 tap does (wxUseGps)
+  const loc = wxGpsGet() || WX_HOME;
   document.getElementById('wxLoc').classList.toggle('on', !!loc.gps);
   const key = 'wr_wx:' + loc.lat.toFixed(2) + ',' + loc.lon.toFixed(2);
   let d = wxGet(key, 20 * 60e3);
