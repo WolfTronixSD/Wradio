@@ -12,7 +12,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.50</title>
+<title>WRadio v2.51</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -343,7 +343,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.50</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.51</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -366,6 +366,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
       <div class="np-text">
         <div class="np-station idle" id="npStation">Select a station</div>
         <div class="np-meta" id="npMeta">&nbsp;</div>
+        <div class="np-meta" id="npDiag" style="font-size:0.75em;color:var(--amber);display:none"></div>
       </div>
     </div>
     <div class="np-controls">
@@ -538,7 +539,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.50 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></span>
+        <span style="color:var(--accent)">v2.51 <span style="color:var(--muted);font-size:0.85em">2026-10-17</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -554,6 +555,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.51 <span style="color:var(--muted);font-size:0.85em">2026-10-17</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay: visualizer much lighter on iPhone (only on its tab, 20 fps)<br>
+        Lighter 128k streams for the two 256k 80s stations<br>
+        Dropout counter under the station name (buffering / reconnect / paused)
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.50 <span style="color:var(--muted);font-size:0.85em">2026-10-15</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -848,11 +856,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.50  (2026-10-15)
+//  Version : v2.51  (2026-10-17)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.51 - CarPlay round 2: iOS viz only when its tab shows, ~20 fps; hidden VU does no work;
+//          128k streams instead of 256k; dropout counter (npDiag) under station name
 //  v2.50 - CarPlay stutter: iOS keep-alive paused while streaming, no Web Audio ctx on iOS,
 //          'stalled' no longer reconnects, watchdog uses real time (10 s)
 //  v2.49 - Weather defaults to Escondido; GPS only on 📍 tap, kept for the visit
@@ -988,8 +998,8 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
   {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-256-mp3",                                   cat:"music"},
-  {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/256.mp3",              cat:"music"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/128.mp3",              cat:"music"},
   {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
   {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
   {n:31, name:"Nostalgie New Wave",   url:"https://n03.rcs.revma.com/52g2hx43ehuvv",                                cat:"music"},
@@ -1376,6 +1386,7 @@ function play(station) {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
   reconnectDelay = 2000; frozenCount = 0;
+  resetDiag();
   // Deactivate MP3 if switching from it
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
 
@@ -1711,9 +1722,17 @@ function startSynthViz() {
   const myId = ++vizDrawActive; // unique id for this loop (not used as number, just truthy)
   vizDrawActive = true;
 
+  let lastDraw = 0;
   function draw() {
     if (!vizDrawActive) return; // killed by new startSynthViz call
     vizRAF = requestAnimationFrame(draw);
+    // iPhone: draw only while the visualizer tab is showing, at about 20 fps, so the
+    // phone's CPU goes to playing the stream (heavy drawing made CarPlay audio stutter)
+    if (IS_IOS) {
+      const now = performance.now();
+      if (now - lastDraw < 50 || panel.offsetParent === null) return;
+      lastDraw = now;
+    }
     const W = canvas.width / dpr, H = canvas.height / dpr;
     if (W < 10 || H < 10) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -2230,8 +2249,10 @@ function startVUMeter() {
   const lastH = new Array(n).fill(-1);
   const COLORS = [...bars].map((b, i) => i < n*0.6 ? 'var(--green)' : i < n*0.85 ? 'var(--amber)' : 'var(--red)');
 
+  const vuWrap = document.getElementById('vuWrap');
   function tick() {
     vuRAF = requestAnimationFrame(tick);
+    if (vuWrap.offsetParent === null) return; // meter is hidden: do no work at all
     const playing = isPlaying && !out().paused;
     vuPhase += 0.05;
 
@@ -2737,8 +2758,26 @@ const RECONNECT_MAX = 12000;
 let bufferWatchdog  = null;
 
 // Hard reconnect — fresh TCP connection, no src reuse
+// Dropout counter shown under the station name, so a stutter in the car can be told
+// apart: "waits" = the stream ran out of data (network), "restarts" = the app reconnected,
+// "pauses" = iPhone/CarPlay paused the audio (Siri, navigation, calls).
+const diag = { waits: 0, restarts: 0, pauses: 0, started: false };
+function resetDiag() { diag.waits = diag.restarts = diag.pauses = 0; diag.started = false; showDiag(); }
+function bumpDiag(k) { diag[k]++; showDiag(); }
+function showDiag() {
+  const el = document.getElementById('npDiag');
+  if (!el) return;
+  const parts = [];
+  if (diag.waits) parts.push(diag.waits + '× buffering');
+  if (diag.restarts) parts.push(diag.restarts + '× reconnect');
+  if (diag.pauses) parts.push(diag.pauses + '× paused by phone');
+  el.textContent = parts.length ? '⚠ ' + parts.join(' · ') : '';
+  el.style.display = parts.length ? '' : 'none';
+}
+
 function hardReconnect(reason) {
   if (curIdx < 0 || !isPlaying) return;
+  bumpDiag('restarts');
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   document.getElementById('npMeta').textContent = reason + '...';
   document.getElementById('sigbars').classList.remove('active');
@@ -2804,11 +2843,13 @@ function onAudible(type, fn) {
 }
 
 onAudible('waiting', () => {
+  if (isPlaying && curIdx >= 0 && diag.started) bumpDiag('waits'); // not the first load
   document.getElementById('npMeta').textContent = 'Buffering...';
   document.getElementById('sigbars').classList.remove('active');
 });
 
 onAudible('playing', () => {
+  diag.started = true;
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   reconnectDelay = 2000;
   frozenCount = 0;
@@ -3280,6 +3321,7 @@ window.addEventListener('pageshow', e => {
 onAudible('pause', () => {
   if (!isPlaying) return; // user stopped it, don't restart
   if (userPausedNow()) return;
+  bumpDiag('pauses');
   // Small delay to distinguish CarPlay/system pause from network stall
   setTimeout(() => {
     const el = out();
