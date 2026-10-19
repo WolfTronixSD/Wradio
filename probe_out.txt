@@ -1,0 +1,6 @@
+https://swr-radio.ard-mcdn.de/swr/radio/swr1bw/hls/master.m3u8 -> OK master bw=['102545', '101681', '200189', '199568'] target=4s seg=50948B
+https://swr-radio.ard-mcdn.de/swr/radio/swr1/hls/master.m3u8 -> NOT HLS
+https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2nds/hls/master.m3u8 -> OK master bw=['102545', '101815', '200566', '199617'] target=4s seg=50760B
+https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2_nds/hls/master.m3u8 -> NOT HLS
+https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2-niedersachsen/hls/master.m3u8 -> NOT HLS
+https://br-radio.ard-mcdn.de/br/radio/b3/hls/master.m3u8 -> OK master bw=['102168', '101584', '200189', '199544'] target=4s seg=50948B
