@@ -1,9 +1,18 @@
 name: Probe HLS
 on: push
+permissions:
+  contents: write
 jobs:
   probe:
-    if: github.ref == 'refs/heads/probe-hls'
+    if: github.ref == 'refs/heads/probe-hls' && !contains(github.event.head_commit.message, 'probe results')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 scripts/probe_hls.py
+      - run: |
+          python3 scripts/probe_hls.py > probe_out.txt 2>&1 || true
+          C=AAAA$(date +%s)BBBB; C=$(echo $C | tr '0-9' 'C-L' | cut -c1-16)
+          echo "== Ironman sync test code $C" >> probe_out.txt
+          curl -sS -i -X PUT -H 'content-type: application/json' --data '{"data":{"exercises":[],"logs":{}}}' "https://darling-kheer-93b7f4.netlify.app/api/sync?code=$C" | head -20 >> probe_out.txt 2>&1
+          curl -sS -i "https://darling-kheer-93b7f4.netlify.app/api/sync?code=$C" | head -20 >> probe_out.txt 2>&1
+          git config user.name probe; git config user.email probe@users.noreply.github.com
+          git add probe_out.txt; git commit -m "probe results"; git push
