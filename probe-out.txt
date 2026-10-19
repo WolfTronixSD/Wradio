@@ -1,79 +1,156 @@
-{"n": "1", "name": "181.FM Awesome 80s", "preflight_allow_headers": "last-event-id, x-das-sessionid, x-das-startfrom, icy-metadata", "preflight_status": "200", "metaint": 16000, "acao": ["https://wolftronixsd.github.io"], "expose": "allow, accept-ranges, content-disposition, x-das-sessionid, x-loudness, icy-br, icy-pub, icy-description, icy-url, icy-genre, icy-name, icy-metaint, icy-notice1, icy-notice2", "redirects": 0, "icy_meta": "StreamTitle='';StreamUrl='';StreamArtwork='';", "status_acao": ["https://wolftronixsd.github.io"], "status_title": null}
-{"n": "2", "name": "SomaFM Underground 80s", "preflight_allow_headers": "*", "preflight_status": "204", "metaint": 45000, "acao": ["*", "*"], "expose": "icy-br, icy-description, icy-genre, icy-metaint, icy-name, icy-pub, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Celebrate The Nun - Unattainable Love';StreamUrl='https://somafm.com/logos/512/u80s512.png';", "status_acao": ["*"], "status_title": null}
-{"n": "28", "name": "80s Forever", "preflight_allow_headers": null, "preflight_status": "-", "metaint": 16384, "acao": ["*"], "expose": null, "redirects": 0, "icy_meta": "StreamTitle='Utopia - Love With A Thinker {1983}';", "status_acao": [], "status_title": null}
-{"n": "29", "name": "Made in 80", "preflight_allow_headers": "origin, icy-metadata, range", "preflight_status": "204", "metaint": 16384, "acao": ["https://wolftronixsd.github.io"], "expose": "icy-br, icy-description, icy-genre, icy-metaint, icy-name, icy-pub, icy-url", "redirects": 0, "icy_meta": "StreamTitle='Miami Sound Machine - Dr. beat';", "status_acao": [], "status_title": null}
-{"n": "30", "name": "80s New Wave Radio", "preflight_allow_headers": "origin, accept, x-requested-with, content-type, icy-metadata", "preflight_status": "200", "metaint": 16000, "acao": ["https://wolftronixsd.github.io"], "expose": null, "redirects": 0, "icy_meta": "StreamTitle='The B‐52s - Channel Z';", "status_sources": 1, "status_acao": ["https://wolftronixsd.github.io"], "status_title": "The B‐52s - Channel Z"}
-{"n": "31", "name": "Nostalgie New Wave", "preflight_allow_headers": "x-requested-with, origin, content-type, accept, x-auth-token", "preflight_status": "200", "metaint": 16000, "acao": ["*", "*"], "expose": null, "redirects": 1, "icy_meta": "StreamTitle='Dave Stewart - What Becomes of the Broken Hearted';", "status_acao": ["*"], "status_title": null}
-{"n": "32", "name": "bigFM Workout", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 8192, "acao": ["*", "*"], "expose": "x-audalaxy-channelkey, x-audalaxy-session, x-audalaxy-listener, x-audalaxy-metalistener, x-audalaxy-skipping, x-audalaxy-timeshifting, x-timeshift-start, x-timeshift-window", "redirects": 2, "icy_meta": "StreamTitle='bigFM Deutschlands biggste Beats';", "status_acao": ["*", "*"], "status_title": null}
-{"n": "33", "name": "80s Hi‑NRG", "preflight_allow_headers": "*", "preflight_status": "204", "metaint": 16000, "acao": ["*"], "expose": null, "redirects": 0, "icy_meta": "StreamTitle='Fun Fun - Happy Station';StreamUrl='&artist=Fun%20Fun&title=Happy%20Station&album=&duration=435700&songtype=S&overlay=no&buycd=&website=&picture=';", "status_sources": 2, "status_acao": ["*"], "status_title": "Fun Fun - Happy Station"}
-{"n": "34", "name": "80s Rock", "preflight_allow_headers": "range", "preflight_status": "200", "metaint": 16000, "acao": ["https://wolftronixsd.github.io", "https://wolftronixsd.github.io"], "expose": null, "redirects": 1, "icy_meta": "StreamTitle='';StreamUrl='';", "status_sources": 155, "status_acao": ["https://wolftronixsd.github.io"], "status_title": null}
-{"n": "35", "name": "Techno", "preflight_allow_headers": "range", "preflight_status": "200", "metaint": 16000, "acao": ["https://wolftronixsd.github.io", "https://wolftronixsd.github.io"], "expose": null, "redirects": 1, "icy_meta": "StreamTitle='';StreamUrl='';", "status_sources": 155, "status_acao": ["https://wolftronixsd.github.io"], "status_title": null}
-{"n": "3", "name": "Antenne Bayern", "preflight_allow_headers": "icy-metadata", "preflight_status": "200", "metaint": 16000, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "sessionid, icy-name, icy-description, icy-pub, icy-genre, icy-url, icy-metaint, icy-audio-info, icy-br, x-websocket-url", "redirects": 1, "icy_meta": "StreamTitle='ANTENNE BAYERN - Wir lieben Bayern, wir lieben Musik';", "status_acao": ["*", "https://wolftronixsd.github.io"], "status_title": null}
-{"n": "4", "name": "1LIVE WDR", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Die junge Nacht der ARD';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "5", "name": "SWR3", "preflight_allow_headers": "accept, origin, x-requested-with, content-type", "preflight_status": "200", "metaint": 16384, "acao": ["*", "*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 2, "icy_meta": "StreamTitle='Rain on me / Lady Gaga & Ariana Grande';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "6", "name": "Bayern 3", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='*** Bayern 3 - Bayerns Hitradio Nummer 1 mit allen Hits von heute – und den meisten neuen!';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "7", "name": "SWR1", "preflight_allow_headers": "accept, origin, x-requested-with, content-type", "preflight_status": "200", "metaint": 16384, "acao": ["*", "*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 2, "icy_meta": "StreamTitle='Platz 863: Somewhere only we know / Keane';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "23", "name": "Deutschlandfunk", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Fazit - Kultur vom Tage, Marietta Schwarz';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "24", "name": "NDR 2", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Rain on me - Lady Gaga & Ariana Grande';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "25", "name": "hr3", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Lady Gaga & Ariana Grande - Rain on me';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "26", "name": "Bayern 1", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='*** Bayern 1 - Gehört ins Leben';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "27", "name": "Rock Antenne", "preflight_allow_headers": "icy-metadata", "preflight_status": "200", "metaint": 16000, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "sessionid, icy-name, icy-description, icy-pub, icy-genre, icy-url, icy-metaint, icy-audio-info, icy-br, x-websocket-url", "redirects": 1, "icy_meta": "StreamTitle='Nirvana - Smells like teen spirit';", "status_acao": ["*", "https://wolftronixsd.github.io"], "status_title": null}
-{"n": "36", "name": "BBC World Service", "preflight_allow_headers": null, "preflight_status": "405", "metaint": 16000, "acao": ["*"], "expose": null, "redirects": 0, "icy_meta": "StreamTitle='BBC World Service Online';", "status_acao": [], "status_title": null}
-{"n": "37", "name": "NPR News", "preflight_allow_headers": "origin, icy-metadata, range", "preflight_status": "204", "metaint": 8192, "acao": ["https://wolftronixsd.github.io"], "expose": "icy-br, icy-description, icy-genre, icy-metaint, icy-name, icy-pub, icy-url", "redirects": 1, "icy_meta": "StreamTitle='';StreamUrl='';", "status_acao": [], "status_title": null}
-{"n": "38", "name": "RFI English", "preflight_allow_headers": "origin, accept, x-requested-with, content-type", "preflight_status": "200", "metaint": 16000, "acao": ["*"], "expose": null, "redirects": 0, "icy_meta": "StreamTitle='';", "status_acao": [], "status_title": null}
-{"n": "39", "name": "NDR Info", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='Die ARD Infonacht - Gut informiert durch die Nacht';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "40", "name": "WDR 5", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='ARD Infonacht';json='{}';", "status_acao": ["*"], "status_title": null}
-{"n": "41", "name": "hr-info", "preflight_allow_headers": null, "preflight_status": "200", "metaint": 16384, "acao": ["*", "https://wolftronixsd.github.io"], "expose": "content-type, icy-metaint, icy-br, ice-audio-info, icy-description, icy-genre, icy-name, icy-samplerate, icy-url", "redirects": 1, "icy_meta": "StreamTitle='*** hriNFO - Wer's hört, hat mehr zu sagen.';json='{}';", "status_acao": ["*"], "status_title": null}
-== https://somafm.com/songs/u80s.json
-HTTP/1.1 200 OK
-Server: nginx
-Date: Mon, 19 Oct 2026 22:41:47 GMT
-Content-Type: application/json
-Content-Length: 2337
-Connection: keep-alive
-Last-Modified: Mon, 19 Oct 2026 22:38:35 GMT
-ETag: "921-65e392cacda83"
-X-Content-Type-Options: nosniff
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Expires: Mon, 19 Oct 2026 22:41:57 GMT
-Cache-Control: max-age=10
-X-Proxy-Cache: EXPIRED
-Access-Control-Allow-Origin: *
-X-SomaVersion: 202110181757
-Accept-Ranges: bytes
-
-{
-	"id": "u80s",
-	"songs":[
-		{
-			"title": "Promised You A Miracle [Edit]",
-			"artist": "Simple Minds",
-			"album": "New Gold Dream (81/82/83/84)",
-			"albumArt": "",
-			"da
-== https://api.somafm.com/channels.json
-HTTP/1.1 200 OK
-Server: nginx
-Date: Mon, 19 Oct 2026 22:41:47 GMT
-Content-Type: application/json
-Transfer-Encoding: chunked
-Connection: keep-alive
-X-Content-Type-Options: nosniff
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-X-Frame-Options: SAMEORIGIN
-Referrer-Policy: no-referrer-when-downgrade, strict-origin-when-cross-origin
-Expires: Mon, 19 Oct 2026 22:41:52 GMT
-Cache-Control: max-age=5
-X-Proxy-Cache: HIT
-Access-Control-Allow-Origin: *
-X-SomaVersion: 202110181757
-
-{"channels": [
-	{
-		"id": "beatblender",
-		"title": "Beat Blender",
-		"description": "A late night blend of deep-house and downtempo chill.",
-		"dj": "DJ Shawn",
-
+1 181.FM Awesome 80s 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:00 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+2 SomaFM Underground 80s 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:00 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+28 80s Forever 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:00 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+29 Made in 80 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+30 80s New Wave Radio 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+31 Nostalgie New Wave 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+32 bigFM Workout 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63V 
+33 80s Hi‑NRG 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+34 80s Rock 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+35 Techno 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+3 Antenne Bayern 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+4 1LIVE WDR 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+5 SWR3 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+6 Bayern 3 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:01 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+7 SWR1 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+23 Deutschlandfunk 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+24 NDR 2 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+25 hr3 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+26 Bayern 1 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+27 Rock Antenne 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+36 BBC World Service 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63W 
+37 NPR News 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63X 
+38 RFI English 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63X 
+39 NDR Info 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63X 
+40 WDR 5 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63X 
+41 hr-info 401 [] HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 22:57:02 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M5B63X 
