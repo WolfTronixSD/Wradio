@@ -57,3 +57,4 @@ for n, name, url, cat in st:
     print(json.dumps(r, ensure_ascii=False), flush=True)
 # rerun
 # rerun 2
+# 3

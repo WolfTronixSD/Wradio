@@ -3677,9 +3677,10 @@ function yieldToOtherApp() {
 // ============================================================
 //  RDS (v2.61): song and show info, like RDS text on a car radio
 //  Internet radio has no real RDS; stations send the same thing as "ICY" text inside the stream
-//  (StreamTitle='Artist - Song'). Every 30 s while a station plays, WRadio downloads a few KB of
-//  the stream with that text switched on, reads it and stops (the sound itself is untouched).
-//  Icecast servers that don't allow that get their status page read instead. Shown under the
+//  (StreamTitle='Artist - Song'). Every 30 s while a station plays, WRadio asks the relay on the
+//  Netlify site, which reads that text server-side (v2.63). v2.64: the phone itself never opens a
+//  second connection to the station any more: SomaFM and others limit connections per listener and
+//  cut the audio. If the relay is down, Icecast status pages are the only backup. Shown under the
 //  station name and on the lock screen / CarPlay. Stations that offer neither show nothing.
 // ============================================================
 const RDS = { timer: 0, ctl: null, gen: 0, text: '', how: {} };
@@ -3741,70 +3742,21 @@ async function rdsRelay(url) {
 async function rdsRead(station) {
   let how = RDS.how[station.n];
   if (how === 'none') return null;
+  let relayDown = false;
   if (!how || how === 'relay') {
     const t = await rdsRelay(station.url);
     if (typeof t === 'string') { RDS.how[station.n] = 'relay'; return rdsClean(t); }
     if (how === 'relay' && t === undefined) return null; // relay hiccup, keep using it
-    how = undefined; // relay says no text, or relay down: try reading directly
-  }
-  if (!how || how === 'icy') {
-    const t = await rdsIcy(station.url).catch(() => undefined);
-    if (t !== undefined) { RDS.how[station.n] = 'icy'; return rdsClean(t); }
-    if (how === 'icy') return null; // worked before, a hiccup now
+    relayDown = t === undefined;
+    how = undefined; // relay says no text, or relay down: try the station's status page
   }
   if (!how || how === 'status') {
     const t = await rdsStatus(station.url).catch(() => undefined);
     if (t !== undefined) { RDS.how[station.n] = 'status'; return rdsClean(t); }
     if (how === 'status') return null;
   }
-  RDS.how[station.n] = 'none';
+  if (!relayDown) RDS.how[station.n] = 'none'; // relay down: try again next time
   return null;
-}
-// Many station addresses forward to another server (Antenne Bayern, Rock Antenne, SomaFM, ARD).
-// A request that asks for the song text may not follow such a forward, so look up the final address
-// with a plain request first (stopped right after the headers), then ask for the text there.
-async function rdsFinalUrl(url) {
-  const ctl = new AbortController(); RDS.ctl = ctl;
-  const timer = setTimeout(() => ctl.abort(), 6000);
-  try {
-    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
-    return r.url || url;
-  } catch (e) { return url; } finally { clearTimeout(timer); try { ctl.abort(); } catch (e) {} }
-}
-// Read the ICY text from the stream itself. Resolves to the title, or undefined if the server doesn't allow it.
-async function rdsIcy(url) {
-  url = await rdsFinalUrl(url);
-  const ctl = new AbortController(); RDS.ctl = ctl;
-  const timer = setTimeout(() => ctl.abort(), 8000);
-  try {
-    const r = await fetch(url, { headers: { 'Icy-MetaData': '1' }, signal: ctl.signal, cache: 'no-store' });
-    const every = parseInt(r.headers.get('icy-metaint') || '', 10);
-    if (!r.ok || !every || !r.body) { ctl.abort(); return undefined; }
-    const rd = r.body.getReader();
-    let got = 0, need = every + 1, len = -1, meta = null, filled = 0;
-    while (true) {
-      const { value, done } = await rd.read();
-      if (done) break;
-      let i = 0;
-      if (len < 0) {
-        if (got + value.length < need) { got += value.length; continue; }
-        i = need - 1 - got; len = value[i] * 16; i++;
-        got = need;
-        if (len === 0) { ctl.abort(); return ''; }
-        meta = new Uint8Array(len); filled = 0;
-      }
-      const take = Math.min(len - filled, value.length - i);
-      meta.set(value.subarray(i, i + take), filled); filled += take;
-      if (filled >= len) break;
-    }
-    ctl.abort();
-    if (!meta) return undefined;
-    const txt = new TextDecoder('utf-8').decode(meta).replace(/\0+$/, '');
-    const m = /StreamTitle='([\s\S]*?)';/.exec(txt);
-    return m ? m[1] : '';
-  } catch (e) {
-    return undefined;
-  } finally { clearTimeout(timer); if (RDS.ctl === ctl) RDS.ctl = null; }
 }
 // Icecast status page: lists every stream on the server with its current title
 async function rdsStatus(url) {
