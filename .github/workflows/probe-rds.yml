@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          sleep 30
+          sleep 1
           python3 - > probe-out.txt 2>&1 <<'PY' || true
           import re, subprocess, urllib.parse
           html = open("index.html", encoding="utf-8").read()
