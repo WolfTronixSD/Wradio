@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.53</title>
+<title>WRadio v2.54</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -346,7 +346,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.53</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.54</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -542,7 +542,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></span>
+        <span style="color:var(--accent)">v2.54 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T06:30:00Z">2026-10-18</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -558,6 +558,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.54 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T06:30:00Z">2026-10-18</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay stutter fix: iPhone now plays sturdy streams like Spotify does<br>
+        HLS (small chunks, big buffer, auto retry): 1LIVE, SWR3, SWR1, Bayern 3, Bayern 1, NDR 2, hr3<br>
+        Lighter 64k AAC: Awesome 80s, Underground 80s, bigFM Workout; Deutschlandfunk in AAC<br>
+        Falls back to the old stream by itself if a sturdy one fails
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -869,11 +877,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.53  (2026-10-18)
+//  Version : v2.54  (2026-10-18)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.54 - Sturdy streams (hls: field, directUrl()): HLS / 64k AAC on the plain player, MP3 fallback on error
 //  v2.53 - Home screen icon (icons/icon-180.png, apple-touch-icon) and favicon
 //  v2.52 - Changelog dates show the release time too (data-at, shown 24-hour in local time)
 //  v2.51 - CarPlay round 2: iOS viz only when its tab shows, ~20 fps; hidden VU does no work;
@@ -1012,27 +1021,27 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 // ============================================================
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
-  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music", hls:"https://listen.181fm.com/181-awesome80s_64k.aac"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music", hls:"https://ice2.somafm.com/u80s-64-aac"},
   {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/128.mp3",              cat:"music"},
   {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
   {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
   {n:31, name:"Nostalgie New Wave",   url:"https://n03.rcs.revma.com/52g2hx43ehuvv",                                cat:"music"},
   // --- Workout ---
-  {n:32, name:"bigFM Workout",        url:"https://streams.bigfm.de/bigfm-workout-128-mp3",                         cat:"workout"},
+  {n:32, name:"bigFM Workout",        url:"https://streams.bigfm.de/bigfm-workout-128-mp3",                         cat:"workout", hls:"https://streams.bigfm.de/bigfm-workout-64-aac"},
   {n:33, name:"80s Hi‑NRG",           url:"https://italo.live-streams.nl/fantasy",                                  cat:"workout"},
   {n:34, name:"80s Rock",             url:"https://stream.0nlineradio.com/80s-rock",                                cat:"workout"},
   {n:35, name:"Techno",               url:"https://stream.technolovers.fm/techno",                                  cat:"workout"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
-  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
-  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
-  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
-  {n:23, name:"Deutschlandfunk",      url:"https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3",                cat:"german"},
-  {n:24, name:"NDR 2",                url:"https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3",       cat:"german"},
-  {n:25, name:"hr3",                  url:"https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high",                     cat:"german"},
-  {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german", hls:"https://wdr-radio.ard-mcdn.de/wdr/radio/1live/hls/master.m3u8"},
+  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german", hls:"https://swr-radio.ard-mcdn.de/swr/radio/swr3/hls/master.m3u8"},
+  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german", hls:"https://br-radio.ard-mcdn.de/br/radio/b3/hls/master.m3u8"},
+  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german", hls:"https://swr-radio.ard-mcdn.de/swr/radio/swr1bw/hls/master.m3u8"},
+  {n:23, name:"Deutschlandfunk",      url:"https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3",                cat:"german", hls:"https://st01.sslstream.dlf.de/dlf/01/high/aac/stream.aac"},
+  {n:24, name:"NDR 2",                url:"https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3",       cat:"german", hls:"https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2nds/hls/master.m3u8"},
+  {n:25, name:"hr3",                  url:"https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high",                     cat:"german", hls:"https://hlshr3.akamaized.net/hls/live/2016536/hr3rheinmain/master.m3u8"},
+  {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german", hls:"https://br-radio.ard-mcdn.de/br/radio/b1obb/hls/96/seglist.m3u8"},
   {n:27, name:"Rock Antenne",         url:"https://stream.rockantenne.de/rockantenne/stream/mp3",                   cat:"german"},
   // --- ATC San Diego (KMYF = Montgomery Field) ---
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
@@ -1435,7 +1444,7 @@ function play(station) {
     // Asking for CORS made stations without CORS headers fail to play at all.
     audio.removeAttribute('crossorigin');
     audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
-    audio.src = station.url;
+    audio.src = directUrl(station);
   }
 
   el.play().then(() => {
@@ -1475,7 +1484,7 @@ function toggleStop() {
     }).catch(() => {
       isPlaying = false;
       // Stale stream — reload
-      if (curIdx >= 0) { if (waMode) audio.crossOrigin = 'anonymous'; audio.src = STATIONS[curIdx].url; audio.play().catch(()=>{}); }
+      if (curIdx >= 0) { if (waMode) audio.crossOrigin = 'anonymous'; audio.src = waMode ? STATIONS[curIdx].url : directUrl(STATIONS[curIdx]); audio.play().catch(()=>{}); }
     });
   } else {
     stopPlay();
@@ -1607,6 +1616,17 @@ function stopFFTClone() {
 // Off since v2.45: on real iPhones WebKit hands Web Audio only silence for live
 // streams (WebKit bug 180696), so this mode never gave sound, volume or a real FFT.
 const IOS_LIVE_MODE = false;
+// v2.53: the plain player (lock screen / CarPlay) uses a sturdier stream when the station has one:
+// HLS (small 4 s chunks, ~30 s buffer and automatic retries, like Spotify/YouTube) or a lighter 64k AAC.
+// The original MP3 stays for the on-screen visualizer path, and is the fallback if the sturdy one fails.
+const sturdyBad = new Set();
+const CAN_HLS = !!document.createElement('audio').canPlayType('application/vnd.apple.mpegurl');
+function directUrl(st) {
+  if (!st || !st.hls || sturdyBad.has(st.n)) return st ? st.url : '';
+  if (st.hls.includes('.m3u8') && !CAN_HLS) return st.url;
+  return st.hls;
+}
+function isStationUrl(st, url) { return !!st && (url === st.url || url === st.hls); }
 function useRouted() {
   if (!IOS_LIVE_MODE || !IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
   connectFFT();
@@ -1661,13 +1681,13 @@ function checkRoutedSound(station) {
 // Hand over from the Web Audio copy to the plain element (screen lock, or a failure)
 function toDirectNow() {
   if (!waMode) return;
-  const url = curIdx >= 0 ? STATIONS[curIdx].url : '';
+  const url = curIdx >= 0 ? directUrl(STATIONS[curIdx]) : '';
   if (!url || !isPlaying || userPausedNow()) { waMode = false; stopFFTClone(); applyVolume(curVol()); return; }
   audio.removeAttribute('crossorigin');
   audio.preload = 'auto';
   audio.src = url;
   audio.play().then(() => {
-    if (curIdx < 0 || STATIONS[curIdx].url !== url) return;
+    if (curIdx < 0 || !isStationUrl(STATIONS[curIdx], url)) return;
     waMode = false;
     applyVolume(curVol());
     stopFFTClone();
@@ -2799,7 +2819,7 @@ function hardReconnect(reason) {
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null;
     if (curIdx < 0 || !isPlaying) return;
-    const url = STATIONS[curIdx].url;
+    const url = waMode ? STATIONS[curIdx].url : directUrl(STATIONS[curIdx]);
     const audio = out();   // reconnect whichever element you hear
     audio.pause();
     audio.src = '';
@@ -2881,6 +2901,13 @@ onAudible('error', () => {
   console.warn('[Audio] Error');
   // On iPhone a Web Audio error can mean the station refused cross-origin access
   if (waMode) { toDirectNow(); return; }
+  const st = STATIONS[curIdx];
+  if (st.hls && audio.src === st.hls && !sturdyBad.has(st.n)) {
+    // The sturdy stream refused: use the original MP3 for this station from now on (this session)
+    sturdyBad.add(st.n);
+    console.warn('[Audio] Sturdy stream failed, back to MP3 for', st.name);
+    reconnectDelay = 500;
+  }
   hardReconnect('Error');
 });
 
