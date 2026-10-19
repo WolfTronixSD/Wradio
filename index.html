@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.57</title>
+<title>WRadio v2.58</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -286,13 +286,17 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .arranging > .stn-btn{animation:jiggle .3s ease-in-out infinite alternate}
 .arranging > .stn-btn:nth-of-type(even){animation-delay:-.15s}
 @keyframes jiggle{from{transform:rotate(-.7deg)}to{transform:rotate(.7deg)}}
+.arranging > .stn-btn{min-height:96px}
 .arranging > .stn-btn .mv{display:grid;place-items:center;position:absolute;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;
   background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.35);color:#fff;font-size:15px;z-index:3}
 .arranging > .stn-btn .mv-l{left:4px}
 .arranging > .stn-btn .mv-r{right:4px}
-.arranging > .stn-btn:first-of-type .mv-l,.arranging > .stn-btn:last-of-type .mv-r{visibility:hidden}
+.arranging > .stn-btn .mv-u{top:3px;left:50%;margin:0 0 0 -17px}
+.arranging > .stn-btn .mv-d{top:auto;bottom:3px;left:50%;margin:0 0 0 -17px}
+.arranging > .stn-btn.no-l .mv-l,.arranging > .stn-btn.no-r .mv-r,.arranging > .stn-btn.no-u .mv-u,.arranging > .stn-btn.no-d .mv-d{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.arranging > .stn-btn{animation:none}}
 .sec-world.arranging > .stn-btn .mv,.sec-denews.arranging > .stn-btn .mv{width:26px;height:26px;margin-top:-13px;font-size:11px}
+.sec-world.arranging > .stn-btn .mv-u,.sec-world.arranging > .stn-btn .mv-d,.sec-denews.arranging > .stn-btn .mv-u,.sec-denews.arranging > .stn-btn .mv-d{margin:0 0 0 -13px}
 /* News sections (v2.56): small tiles, three in a row */
 .sec-world,.sec-denews{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
 .sec-world .section-label,.sec-denews .section-label{grid-column:1/-1;margin-bottom:0}
@@ -374,7 +378,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.57</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.58</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -570,7 +574,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.57 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:10:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.58 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:15:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -586,6 +590,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.58 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:15:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Arrange: ▲ ▼ move a button up or down a row, ◀ ▶ left or right
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.57 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:10:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -926,11 +935,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.57  (2026-10-19)
+//  Version : v2.58  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.58 - Arrange: up/down by one grid row (gridCols), markArrows hides dead arrows
 //  v2.57 - Arrange mode per section (localStorage wradio_order), stationTile()/moveTile()
 //  v2.56 - World News + Germany News sections (n 36-41); volume slider defaults to 1
 //  v2.55 - iPhone MP3 volume: audioMp3 element via Web Audio gain while visible; hands over to plain audio when hidden
@@ -1297,26 +1307,47 @@ function stationTile(s, label) {
   const [, , c1, c2] = look(s);
   b.style.setProperty('--c1', c1); b.style.setProperty('--c2', c2);
   b.innerHTML = tileHTML(s, label)
-    + '<span class="mv mv-l" aria-label="Move left">◀</span><span class="mv mv-r" aria-label="Move right">▶</span>';
+    + '<span class="mv mv-l" data-d="l" aria-label="Move left">◀</span><span class="mv mv-r" data-d="r" aria-label="Move right">▶</span>'
+    + '<span class="mv mv-u" data-d="u" aria-label="Move up">▲</span><span class="mv mv-d" data-d="d" aria-label="Move down">▼</span>';
   b.onclick = (e) => {
     if (b.parentElement.classList.contains('arranging')) {
       const mv = e.target.closest('.mv');
-      if (mv) moveTile(b, mv.classList.contains('mv-l') ? -1 : 1);
+      if (mv) {
+        const cols = gridCols(b.parentElement);
+        moveTile(b, { l: -1, r: 1, u: -cols, d: cols }[mv.dataset.d]);
+      }
       return; // while arranging, taps don't play
     }
     play(s);
   };
   return b;
 }
-function moveTile(b, dir) {
+function gridCols(box) {
+  const t = getComputedStyle(box).gridTemplateColumns;
+  return t && t !== 'none' ? t.split(' ').filter(Boolean).length : 1;
+}
+const tilesOf = box => [...box.children].filter(x => x.classList.contains('stn-btn'));
+// Hide the arrows that would go nowhere (first/last button, top/bottom row)
+function markArrows(box) {
+  const tiles = tilesOf(box), cols = gridCols(box);
+  tiles.forEach((t, i) => {
+    t.classList.toggle('no-l', i === 0);
+    t.classList.toggle('no-r', i === tiles.length - 1);
+    t.classList.toggle('no-u', i - cols < 0);
+    t.classList.toggle('no-d', i + cols >= tiles.length);
+  });
+}
+function moveTile(b, delta) {
   const box = b.parentElement;
-  const tiles = [...box.children].filter(x => x.classList.contains('stn-btn'));
-  const i = tiles.indexOf(b), j = i + dir;
-  if (j < 0 || j >= tiles.length) return;
-  if (dir < 0) box.insertBefore(b, tiles[j]); else box.insertBefore(tiles[j], b);
-  ORDER[box.dataset.orderKey] = [...box.children].filter(x => x.classList.contains('stn-btn')).map(x => +x.id.slice(4));
+  const tiles = tilesOf(box);
+  const i = tiles.indexOf(b), j = Math.max(0, Math.min(tiles.length - 1, i + delta));
+  if (j === i) return;
+  tiles.splice(i, 1); tiles.splice(j, 0, b);
+  tiles.forEach(t => box.appendChild(t)); // re-append in the new order (labels stay first)
+  ORDER[box.dataset.orderKey] = tiles.map(x => +x.id.slice(4));
   try { localStorage.setItem('wradio_order', JSON.stringify(ORDER)); } catch(e) {}
   try { navigator.vibrate && navigator.vibrate(10); } catch(e) {}
+  markArrows(box);
 }
 function arrangeButton(box) {
   const a = document.createElement('span');
@@ -1324,6 +1355,7 @@ function arrangeButton(box) {
   a.onclick = (e) => {
     e.stopPropagation();
     const on = box.classList.toggle('arranging');
+    if (on) markArrows(box);
     a.classList.toggle('on', on);
     a.textContent = on ? '✓ Done' : '↔ Arrange';
   };
