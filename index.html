@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.64</title>
+<title>WRadio v2.65</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -333,6 +333,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 #vizCanvas{border-radius:16px}
 @media (prefers-reduced-motion:reduce){body::after,.np-icon.on,.np-icon.on::before,.np-icon.on::after,.stn-eq i,.stn-btn.active .stn-ic{animation:none}}
 @media (max-width:380px){.stn-ic{width:42px;height:42px;font-size:1.4em}.stn-btn,.sec-german .stn-btn{gap:8px;padding:10px}}
+/* v2.65: smaller station icon and STOP button, bigger RDS song text */
+.np-head{gap:10px}
+.np-icon{width:46px;height:46px;font-size:1.45em}
+.np-icon.on::before,.np-icon.on::after{inset:-3px}
+.np-rds{font-size:1.05em;font-weight:600;margin-top:4px;line-height:1.3}
+.np-controls{gap:10px;margin-top:8px}
+.btn-stop{font-size:0.82em;padding:7px 12px;min-height:38px;border-radius:9px;box-shadow:0 3px 10px rgba(255,68,102,0.3)}
 </style>
 </head>
 <body>
@@ -375,7 +382,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.64</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.65</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -572,7 +579,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.64 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:55:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.65 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:05:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -588,6 +595,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.65 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:05:00Z">2026-10-20</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Smaller station icon and STOP button, bigger and bolder RDS song text
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.64 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:55:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -966,11 +978,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.64  (2026-10-19)
+//  Version : v2.65  (2026-10-20)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.65 - Now playing: smaller icon/STOP, bigger RDS text
 //  v2.64 - RDS: phone never opens extra stream connections (SomaFM went silent); relay only, status page backup
 //  v2.63 - RDS via Netlify relay /api/nowplaying (wolf-ironmen repo), direct ICY/status as fallback
 //  v2.62 - RDS: resolve stream redirects with a plain GET first (preflights can't follow redirects)
