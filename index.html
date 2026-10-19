@@ -8,11 +8,14 @@
 <meta name="apple-mobile-web-app-title" content="WolfRadio">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0f">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png?v=2.53">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <!-- Cache control: forces Safari to recheck on every visit -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.52</title>
+<title>WRadio v2.53</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -343,7 +346,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.52</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.53</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -539,7 +542,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.52 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-18T21:24:41Z">2026-10-18</span></span>
+        <span style="color:var(--accent)">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -555,6 +558,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        New home screen icon: a howling wolf radio (remove and re-add to Home Screen to see it)
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.52 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-18T21:24:41Z">2026-10-18</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -861,11 +869,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.52  (2026-10-18)
+//  Version : v2.53  (2026-10-18)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.53 - Home screen icon (icons/icon-180.png, apple-touch-icon) and favicon
 //  v2.52 - Changelog dates show the release time too (data-at, shown 24-hour in local time)
 //  v2.51 - CarPlay round 2: iOS viz only when its tab shows, ~20 fps; hidden VU does no work;
 //          128k streams instead of 256k; dropout counter (npDiag) under station name

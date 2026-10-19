@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a0f5c"/>
+      <stop offset="0.55" stop-color="#7b2ff7"/>
+      <stop offset="1" stop-color="#00d4ff"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb347"/>
+      <stop offset="1" stop-color="#e2711d"/>
+    </linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a7aec4"/>
+      <stop offset="1" stop-color="#6b7290"/>
+    </linearGradient>
+    <radialGradient id="mouth" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#5a1020"/>
+      <stop offset="1" stop-color="#1b0a10"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- stars + moon -->
+  <g fill="#fff">
+    <circle cx="60" cy="70" r="4"/><circle cx="140" cy="40" r="3"/><circle cx="460" cy="470" r="3"/><circle cx="40" cy="300" r="3"/>
+  </g>
+  <path d="M118 70 A44 44 0 1 0 128 150 A36 36 0 1 1 118 70 Z" fill="#fff6c8"/>
+
+  <!-- radio waves -->
+  <g fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" opacity="0.9">
+    <path d="M60 290 q-26 50 0 100"/><path d="M28 268 q-38 72 0 144" opacity="0.6"/>
+    <path d="M452 290 q26 50 0 100"/><path d="M484 268 q38 72 0 144" opacity="0.6"/>
+  </g>
+
+  <g stroke="#1b1d26" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+    <!-- antenna -->
+    <path d="M330 200 L420 52" fill="none"/>
+    <circle cx="420" cy="52" r="16" fill="#ff3b6b"/>
+    <!-- wolf ears -->
+    <path d="M112 230 L118 120 L200 196 Z" fill="url(#fur)"/>
+    <path d="M400 230 L394 120 L312 196 Z" fill="url(#fur)"/>
+    <path d="M128 206 L132 150 L178 192 Z" fill="#ff9fb0" stroke="none"/>
+    <path d="M384 206 L380 150 L334 192 Z" fill="#ff9fb0" stroke="none"/>
+    <!-- radio body -->
+    <rect x="86" y="190" width="340" height="270" rx="56" fill="url(#body)"/>
+    <!-- handle-ish top band / tuning strip -->
+    <rect x="130" y="214" width="252" height="36" rx="12" fill="#fff3d6"/>
+    <path d="M150 232 H362" fill="none" stroke-width="4"/>
+    <path d="M196 220 V244" fill="none" stroke="#ff3b6b" stroke-width="8"/>
+    <!-- howling mouth = speaker -->
+    <ellipse cx="256" cy="378" rx="62" ry="58" fill="url(#mouth)"/>
+    <!-- feet -->
+    <rect x="128" y="452" width="56" height="24" rx="10" fill="#1b1d26"/>
+    <rect x="328" y="452" width="56" height="24" rx="10" fill="#1b1d26"/>
+    <!-- knobs -->
+    <circle cx="138" cy="410" r="20" fill="#fff3d6"/>
+    <circle cx="374" cy="410" r="20" fill="#fff3d6"/>
+  </g>
+  <!-- speaker grille inside mouth -->
+  <g stroke="#ff6a8a" stroke-width="5" stroke-linecap="round" opacity="0.6">
+    <path d="M222 360 H290"/><path d="M214 378 H298"/><path d="M222 396 H290"/>
+  </g>
+  <!-- tongue -->
+  <path d="M232 420 Q256 396 280 420 Q268 434 256 434 Q244 434 232 420 Z" fill="#ff5a7a" stroke="#1b1d26" stroke-width="6"/>
+  <!-- happy closed singing eyes -->
+  <g fill="none" stroke="#1b1d26" stroke-width="11" stroke-linecap="round">
+    <path d="M168 308 q22 -26 44 0"/>
+    <path d="M300 308 q22 -26 44 0"/>
+  </g>
+  <!-- blush -->
+  <ellipse cx="164" cy="344" rx="20" ry="11" fill="#ff3b6b" opacity="0.5"/>
+  <ellipse cx="348" cy="344" rx="20" ry="11" fill="#ff3b6b" opacity="0.5"/>
+  <!-- knob ticks -->
+  <g stroke="#1b1d26" stroke-width="6" stroke-linecap="round">
+    <path d="M138 410 L138 396"/><path d="M374 410 L386 400"/>
+  </g>
+
+  <!-- flying music notes -->
+  <g fill="#fff" stroke="#1b1d26" stroke-width="5" stroke-linejoin="round">
+    <path d="M232 60 v60 a16 12 0 1 1 -10 -10 v-58 l40 -10 v14 z"/>
+    <path d="M304 120 v44 a13 10 0 1 1 -8 -8 v-42 l30 -8 v12 z"/>
+  </g>
+</svg>
