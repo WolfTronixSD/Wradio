@@ -2,8 +2,8 @@
 import json, re, subprocess, urllib.parse
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 def get(url, t=15):
-    r = subprocess.run(["curl", "-sSL", "--max-time", str(t), "-A", UA, url], capture_output=True, text=True)
-    return r.stdout
+    r = subprocess.run(["curl", "-sSL", "--max-time", str(t), "-A", UA, url], capture_output=True)
+    return r.stdout.decode("utf-8","replace")
 names = ["1LIVE", "SWR3", "SWR1", "Bayern 3", "Bayern 1", "Deutschlandfunk", "NDR 2", "hr3", "Antenne Bayern", "Rock Antenne", "bigFM",
          "SomaFM Underground 80s", "181.fm Awesome 80s", "Nostalgie New Wave", "80s Forever"]
 found = {}
@@ -17,8 +17,9 @@ for n in names:
                 found.setdefault(n, set()).add((s["name"], u, s.get("codec"), s.get("bitrate")))
 # ARD Audiothek: every ARD station's official livestreams
 ard = get("https://api.ardaudiothek.de/organizations", 30)
-for u in sorted(set(re.findall(r'https?://[^"\s]+?\.m3u8[^"\s]*', ard))):
-    found.setdefault("ARD", set()).add(("ard", u, "", ""))
+want = re.compile(r"1live/|swr3|swr1|br3|bayern3|bayern1|br1|dlf|deutschlandfunk|ndr2|hr3", re.I)
+for u in sorted(set(re.findall(r'https?://[^"\s]+?\.m3u8', ard))):
+    if want.search(u): found.setdefault("ARD", set()).add(("ard", u, "", ""))
 print("ARD bytes", len(ard))
 def test(u):
     pl = get(u)
@@ -39,5 +40,5 @@ def test(u):
     return f"OK media seg={size}B"
 for n, items in found.items():
     print(f"\n== {n}")
-    for name, u, codec, br in sorted(items)[:25]:
+    for name, u, codec, br in sorted(items)[:40]:
         print(f"  {name} | {codec} {br} | {u} -> {test(u)}")
