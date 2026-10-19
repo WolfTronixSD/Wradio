@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.58</title>
+<title>WRadio v2.59</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -276,27 +276,18 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .atc-hdr{--c1:#00d4ff;--c2:#0062ff;border-bottom:2px solid var(--c1)!important;margin-top:14px;border-radius:0}
 .atc-hdr .icao{color:var(--c1);text-shadow:0 0 12px color-mix(in srgb,var(--c1) 60%,transparent)}
 .sec-atc .stn-tag{color:color-mix(in srgb,var(--c1) 70%,#e8edf7)}
-/* Arrange (v2.57): reorder the buttons of each section with ◀ ▶ */
+/* Arrange (v2.59): hold to jiggle, drag to move, like the iPhone home screen */
 .section-label{display:flex}
 .arr-btn{margin-left:auto;font-family:var(--sans);font-size:0.72em;font-weight:700;letter-spacing:0;padding:7px 12px;border-radius:999px;
   border:1px solid rgba(255,255,255,0.18);color:var(--muted);background:rgba(255,255,255,0.04);cursor:pointer;white-space:nowrap;align-self:center}
 .atc-hdr .arr-btn{font-size:0.8em;align-self:center;margin-left:10px}
 .arr-btn.on{background:#22c55e;border-color:#22c55e;color:#04120a}
-.stn-btn .mv{display:none}
-.arranging > .stn-btn{animation:jiggle .3s ease-in-out infinite alternate}
-.arranging > .stn-btn:nth-of-type(even){animation-delay:-.15s}
-@keyframes jiggle{from{transform:rotate(-.7deg)}to{transform:rotate(.7deg)}}
-.arranging > .stn-btn{min-height:96px}
-.arranging > .stn-btn .mv{display:grid;place-items:center;position:absolute;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;
-  background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.35);color:#fff;font-size:15px;z-index:3}
-.arranging > .stn-btn .mv-l{left:4px}
-.arranging > .stn-btn .mv-r{right:4px}
-.arranging > .stn-btn .mv-u{top:3px;left:50%;margin:0 0 0 -17px}
-.arranging > .stn-btn .mv-d{top:auto;bottom:3px;left:50%;margin:0 0 0 -17px}
-.arranging > .stn-btn.no-l .mv-l,.arranging > .stn-btn.no-r .mv-r,.arranging > .stn-btn.no-u .mv-u,.arranging > .stn-btn.no-d .mv-d{visibility:hidden}
+.stn-btn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.arranging > .stn-btn{touch-action:none;animation:jiggle .26s ease-in-out infinite alternate}
+.arranging > .stn-btn:nth-of-type(even){animation-delay:-.13s}
+@keyframes jiggle{from{transform:rotate(-1.1deg)}to{transform:rotate(1.1deg)}}
+.arranging > .stn-btn.lifted{animation:none;z-index:20;opacity:.92;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:none}
 @media (prefers-reduced-motion:reduce){.arranging > .stn-btn{animation:none}}
-.sec-world.arranging > .stn-btn .mv,.sec-denews.arranging > .stn-btn .mv{width:26px;height:26px;margin-top:-13px;font-size:11px}
-.sec-world.arranging > .stn-btn .mv-u,.sec-world.arranging > .stn-btn .mv-d,.sec-denews.arranging > .stn-btn .mv-u,.sec-denews.arranging > .stn-btn .mv-d{margin:0 0 0 -13px}
 /* News sections (v2.56): small tiles, three in a row */
 .sec-world,.sec-denews{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
 .sec-world .section-label,.sec-denews .section-label{grid-column:1/-1;margin-bottom:0}
@@ -378,7 +369,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.58</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.59</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -574,7 +565,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.58 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:15:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.59 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:30:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -590,6 +581,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.59 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:30:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Arrange like the iPhone home screen: hold a station until the section jiggles, then drag it anywhere<br>
+        ✓ Done or a tap outside the section finishes. No more arrows
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.58 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:15:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -935,11 +932,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.58  (2026-10-19)
+//  Version : v2.59  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.59 - Arrange by long press + drag (pointer events, touchmove blocked while dragging); arrows removed
 //  v2.58 - Arrange: up/down by one grid row (gridCols), markArrows hides dead arrows
 //  v2.57 - Arrange mode per section (localStorage wradio_order), stationTile()/moveTile()
 //  v2.56 - World News + Germany News sections (n 36-41); volume slider defaults to 1
@@ -1293,7 +1291,9 @@ let seekDragging = false;
 // ============================================================
 //  BUILD UI
 // ============================================================
-// v2.57 Arrange: your own button order per section, saved on this phone
+// v2.59 Arrange, iPhone style: hold a button until the section jiggles, then drag buttons
+// with your finger; the others slide out of the way. Tap ✓ Done (or the label button) to finish.
+// The order is saved per section on this phone (localStorage wradio_order).
 let ORDER = {};
 try { ORDER = JSON.parse(localStorage.getItem('wradio_order') || '{}') || {}; } catch(e) { ORDER = {}; }
 function inOrder(key, ns) {
@@ -1301,64 +1301,110 @@ function inOrder(key, ns) {
   const rank = n => { const i = o.indexOf(n); return i < 0 ? 1000 + ns.indexOf(n) : i; };
   return ns.slice().sort((a, b) => rank(a) - rank(b));
 }
+const tilesOf = box => [...box.children].filter(x => x.classList.contains('stn-btn'));
+function saveOrder(box) {
+  ORDER[box.dataset.orderKey] = tilesOf(box).map(x => +x.id.slice(4));
+  try { localStorage.setItem('wradio_order', JSON.stringify(ORDER)); } catch(e) {}
+}
+function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch(e) {} }
+function setArranging(box, on) {
+  box.classList.toggle('arranging', on);
+  const a = box._arrBtn;
+  if (a) { a.classList.toggle('on', on); a.textContent = on ? '✓ Done' : '↔ Arrange'; }
+}
+let drag = null;         // { el, box, id, gx, gy }
+let swallowClick = false; // the click that ends a long press or a drag must not play the station
 function stationTile(s, label) {
   const b = document.createElement('button');
   b.className = 'stn-btn'; b.id = 'stn-'+s.n;
   const [, , c1, c2] = look(s);
   b.style.setProperty('--c1', c1); b.style.setProperty('--c2', c2);
-  b.innerHTML = tileHTML(s, label)
-    + '<span class="mv mv-l" data-d="l" aria-label="Move left">◀</span><span class="mv mv-r" data-d="r" aria-label="Move right">▶</span>'
-    + '<span class="mv mv-u" data-d="u" aria-label="Move up">▲</span><span class="mv mv-d" data-d="d" aria-label="Move down">▼</span>';
-  b.onclick = (e) => {
-    if (b.parentElement.classList.contains('arranging')) {
-      const mv = e.target.closest('.mv');
-      if (mv) {
-        const cols = gridCols(b.parentElement);
-        moveTile(b, { l: -1, r: 1, u: -cols, d: cols }[mv.dataset.d]);
-      }
-      return; // while arranging, taps don't play
-    }
+  b.innerHTML = tileHTML(s, label);
+  b.onclick = () => {
+    if (swallowClick) { swallowClick = false; return; }
+    if (b.parentElement.classList.contains('arranging')) return; // while arranging, taps don't play
     play(s);
   };
+  let holdT = 0, sx = 0, sy = 0;
+  b.addEventListener('pointerdown', e => {
+    if (e.button > 0 || drag) return;
+    const box = b.parentElement;
+    sx = e.clientX; sy = e.clientY;
+    if (box.classList.contains('arranging')) { startDrag(b, e); return; }
+    clearTimeout(holdT);
+    holdT = setTimeout(() => {          // long press: jiggle mode, and the held button is picked up
+      holdT = 0; swallowClick = true;
+      setArranging(box, true); buzz(15);
+      startDrag(b, e);
+    }, 480);
+  });
+  const cancelHold = e => {
+    if (!holdT) return;
+    if (e.type === 'pointermove' && Math.hypot(e.clientX - sx, e.clientY - sy) < 10) return;
+    clearTimeout(holdT); holdT = 0;
+  };
+  b.addEventListener('pointermove', cancelHold);
+  b.addEventListener('pointerup', cancelHold);
+  b.addEventListener('pointercancel', cancelHold);
+  b.addEventListener('contextmenu', e => e.preventDefault());
   return b;
 }
-function gridCols(box) {
-  const t = getComputedStyle(box).gridTemplateColumns;
-  return t && t !== 'none' ? t.split(' ').filter(Boolean).length : 1;
+function startDrag(el, e) {
+  const r = el.getBoundingClientRect();
+  drag = { el, box: el.parentElement, id: e.pointerId, gx: e.clientX - r.left, gy: e.clientY - r.top, moved: false };
+  el.classList.add('lifted');
+  try { el.setPointerCapture(e.pointerId); } catch(err) {}
 }
-const tilesOf = box => [...box.children].filter(x => x.classList.contains('stn-btn'));
-// Hide the arrows that would go nowhere (first/last button, top/bottom row)
-function markArrows(box) {
-  const tiles = tilesOf(box), cols = gridCols(box);
-  tiles.forEach((t, i) => {
-    t.classList.toggle('no-l', i === 0);
-    t.classList.toggle('no-r', i === tiles.length - 1);
-    t.classList.toggle('no-u', i - cols < 0);
-    t.classList.toggle('no-d', i + cols >= tiles.length);
+function placeLifted(x, y) {
+  const el = drag.el;
+  el.style.transform = 'none';
+  const r = el.getBoundingClientRect();
+  el.style.transform = 'translate(' + (x - drag.gx - r.left) + 'px,' + (y - drag.gy - r.top) + 'px) scale(1.06)';
+}
+document.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  drag.moved = true;
+  // Which button is under the finger? Move the lifted one into its place.
+  const others = tilesOf(drag.box).filter(t => t !== drag.el);
+  for (const t of others) {
+    const r = t.getBoundingClientRect();
+    if (e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom) {
+      const tiles = tilesOf(drag.box);
+      const from = tiles.indexOf(drag.el), to = tiles.indexOf(t);
+      drag.box.insertBefore(drag.el, from < to ? t.nextSibling : t);
+      buzz(5);
+      break;
+    }
+  }
+  placeLifted(e.clientX, e.clientY);
+});
+function endDrag(e) {
+  if (!drag || (e && e.pointerId !== drag.id)) return;
+  const { el, box, moved } = drag;
+  drag = null;
+  el.classList.remove('lifted');
+  el.style.transform = '';
+  // The click that may follow the lift is ignored; clear the flag shortly after either way,
+  // since iPhone often sends no click at the end of a long press
+  if (moved) swallowClick = true;
+  setTimeout(() => { swallowClick = false; }, 350);
+  saveOrder(box);
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+// While a button is held, the page must not scroll under the finger (iPhone)
+document.addEventListener('touchmove', e => { if (drag) e.preventDefault(); }, { passive: false });
+// Tapping outside the jiggling section finishes, like the iPhone home screen
+document.addEventListener('click', e => {
+  document.querySelectorAll('.arranging').forEach(box => {
+    if (!box.contains(e.target) && !(box._lbl && box._lbl.contains(e.target))) setArranging(box, false);
   });
-}
-function moveTile(b, delta) {
-  const box = b.parentElement;
-  const tiles = tilesOf(box);
-  const i = tiles.indexOf(b), j = Math.max(0, Math.min(tiles.length - 1, i + delta));
-  if (j === i) return;
-  tiles.splice(i, 1); tiles.splice(j, 0, b);
-  tiles.forEach(t => box.appendChild(t)); // re-append in the new order (labels stay first)
-  ORDER[box.dataset.orderKey] = tiles.map(x => +x.id.slice(4));
-  try { localStorage.setItem('wradio_order', JSON.stringify(ORDER)); } catch(e) {}
-  try { navigator.vibrate && navigator.vibrate(10); } catch(e) {}
-  markArrows(box);
-}
-function arrangeButton(box) {
+});
+function arrangeButton(box, lbl) {
   const a = document.createElement('span');
   a.className = 'arr-btn'; a.setAttribute('role', 'button'); a.textContent = '↔ Arrange';
-  a.onclick = (e) => {
-    e.stopPropagation();
-    const on = box.classList.toggle('arranging');
-    if (on) markArrows(box);
-    a.classList.toggle('on', on);
-    a.textContent = on ? '✓ Done' : '↔ Arrange';
-  };
+  box._arrBtn = a; box._lbl = lbl;
+  a.onclick = (e) => { e.stopPropagation(); setArranging(box, !box.classList.contains('arranging')); };
   return a;
 }
 
@@ -1377,7 +1423,7 @@ function buildUI() {
     const lbl = document.createElement('div');
     lbl.className = 'section-label'; lbl.textContent = cat.label;
     lbl.dataset.icon = cat.icon;
-    if (stns.length > 1) lbl.appendChild(arrangeButton(sec));
+    if (stns.length > 1) lbl.appendChild(arrangeButton(sec, lbl));
     sec.appendChild(lbl);
     stns.forEach(s => sec.appendChild(stationTile(s)));
     list.appendChild(sec);
@@ -1414,7 +1460,7 @@ function buildUI() {
     const grid = document.createElement('div');
     grid.className = 'atc-grid';
     grid.dataset.orderKey = 'atc-' + apt.icao;
-    if (apt.stns.length > 1) aptHdr.appendChild(arrangeButton(grid));
+    if (apt.stns.length > 1) aptHdr.appendChild(arrangeButton(grid, aptHdr));
     inOrder('atc-' + apt.icao, apt.stns).forEach(n => {
       const s = STATIONS.find(x => x.n === n);
       if (!s) return;
