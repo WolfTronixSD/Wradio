@@ -276,6 +276,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .atc-hdr{--c1:#00d4ff;--c2:#0062ff;border-bottom:2px solid var(--c1)!important;margin-top:14px;border-radius:0}
 .atc-hdr .icao{color:var(--c1);text-shadow:0 0 12px color-mix(in srgb,var(--c1) 60%,transparent)}
 .sec-atc .stn-tag{color:color-mix(in srgb,var(--c1) 70%,#e8edf7)}
+/* News sections (v2.56): small tiles, three in a row */
+.sec-world,.sec-denews{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.sec-world .section-label,.sec-denews .section-label{grid-column:1/-1;margin-bottom:0}
+.sec-world .stn-btn,.sec-denews .stn-btn{min-height:46px;padding:6px 8px;gap:6px;margin:0;border-width:2px;border-radius:12px}
+.sec-world .stn-ic,.sec-denews .stn-ic{width:30px;height:30px;border-radius:9px;font-size:1.05em}
+.sec-world .stn-txt .stn-name,.sec-denews .stn-txt .stn-name{font-size:0.95em;line-height:1.1;white-space:normal}
+.sec-world .stn-tag,.sec-denews .stn-tag,.sec-world .stn-eq,.sec-denews .stn-eq{display:none}
+.sec-world .stn-btn.active .stn-txt,.sec-denews .stn-btn.active .stn-txt{padding-right:0}
 /* the moving level bar on the main screen was distracting (v2.45) */
 #vuWrap{display:none}
 .vol-ios{display:none;flex:1;font-size:1.05em;color:var(--text);line-height:1.2}
@@ -564,7 +572,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 
       <div style="color:var(--accent);margin-top:4px">v2.56 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T14:45:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
-        New World News: BBC World Service, NPR News, RFI English<br>
+        New World News: BBC World Service, NPR News, RFI English (small buttons, three in a row)<br>
         New Germany News: NDR Info, WDR 5, hr-info (Deutschlandfunk stays under German Radio)<br>
         Volume slider starts at 100: the side buttons set the top, the slider turns down from there
       </div>
