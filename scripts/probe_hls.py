@@ -41,4 +41,6 @@ def test(u):
 for n, items in found.items():
     print(f"\n== {n}")
     for name, u, codec, br in sorted(items)[:40]:
-        print(f"  {name} | {codec} {br} | {u} -> {test(u)}")
+        try: res = test(u)
+        except Exception as e: res = f"ERR {e}"
+        print(f"  {name} | {codec} {br} | {u} -> {res}", flush=True)
