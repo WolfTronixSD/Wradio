@@ -12,13 +12,15 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           sleep 1
-          python3 - > probe-out.txt 2>&1 <<'PY' || true
-          import re, subprocess, urllib.parse
-          html = open("index.html", encoding="utf-8").read()
-          for n, name, url, cat in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)",\s*cat:"(\w+)"', html):
-              if cat == "atc": continue
-              r = subprocess.run(["curl","-sS","--max-time","15","-H","Origin: https://wolftronixsd.github.io","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True, text=True)
-              print(n, name, "=>", r.stdout[:200], r.stderr[:100], flush=True)
-          PY
+          UA="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+          sudo apt-get install -y -qq ffmpeg >/dev/null 2>&1 || true
+          for u in https://ice2.somafm.com/u80s-64-aac https://ice2.somafm.com/u80s-128-mp3 https://ice1.somafm.com/u80s-128-aac https://ice2.somafm.com/u80s-128-aac; do
+            echo "=== $u" >> probe-out.txt
+            curl -sS -L --max-time 6 -A "$UA" -D - -o s.bin "$u" | grep -iE "^HTTP|^location|^content-type|^icy-br|^access-control" >> probe-out.txt 2>&1
+            echo "bytes $(wc -c < s.bin)" >> probe-out.txt
+            ffprobe -v error -show_entries stream=codec_name,sample_rate,channels,bit_rate -of compact s.bin >> probe-out.txt 2>&1
+            ffmpeg -v error -i s.bin -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume" >> probe-out.txt
+            ffmpeg -v error -i s.bin -f null - >> probe-out.txt 2>&1; echo "decode-exit $?" >> probe-out.txt
+          done
           git config user.name probe; git config user.email probe@users.noreply.github.com
           git add probe-out.txt; git commit -m "relay results [skip ci]"; git push
