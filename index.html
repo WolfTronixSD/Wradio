@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.59</title>
+<title>WRadio v2.60</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -369,7 +369,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.59</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.60</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -565,7 +565,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.59 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:30:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.60 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:25:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -582,7 +582,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.59 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:30:00Z">2026-10-19</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.60 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:25:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Update button: when a newer WRadio is online, a bar appears at the bottom. Tap it to update
+      </div>
+
+      <div style="color:var(--accent);margin-top:4px">v2.59 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:14:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         Arrange like the iPhone home screen: hold a station until the section jiggles, then drag it anywhere<br>
         ✓ Done or a tap outside the section finishes. No more arrows
@@ -932,11 +937,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.59  (2026-10-19)
+//  Version : v2.60  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.60 - Update bar: checks live <title> version (no-store) on open/return/15 min
 //  v2.59 - Arrange by long press + drag (pointer events, touchmove blocked while dragging); arrows removed
 //  v2.58 - Arrange: up/down by one grid row (gridCols), markArrows hides dead arrows
 //  v2.57 - Arrange mode per section (localStorage wradio_order), stationTile()/moveTile()
@@ -3649,6 +3655,33 @@ if (IS_IOS) document.documentElement.classList.add('ios');
 // Changelog: add the release time (24-hour, this device's time zone) to dates that recorded one
 document.querySelectorAll('[data-at]').forEach(el => { const d = new Date(el.dataset.at); if (isNaN(d)) return;
   el.textContent = d.toLocaleDateString('en-CA') + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); });
+</script>
+<div id="updBar" role="button" hidden style="position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:999;
+  padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#7b2ff7,#00d4ff);color:#fff;font-family:var(--sans);font-weight:700;
+  font-size:1.05em;box-shadow:0 10px 30px rgba(0,0,0,.5);text-align:center;cursor:pointer"></div>
+<script>
+// v2.60: notice new versions. iPhone keeps a saved copy of the page for a while (GitHub allows
+// 10 minutes, a home-screen app sometimes longer), so check the live page and offer a one-tap update.
+(function () {
+  const mine = (document.title.match(/v([\d.]+)/) || [])[1];
+  let shown = '';
+  async function check() {
+    try {
+      const r = await fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const live = ((await r.text()).match(/<title>WRadio v([\d.]+)<\/title>/) || [])[1];
+      if (!live || live === mine || live === shown) return;
+      shown = live;
+      const bar = document.getElementById('updBar');
+      bar.textContent = '🆕 WRadio v' + live + ' is ready · tap to update';
+      bar.hidden = false;
+      bar.onclick = () => location.replace(location.pathname + '?v=' + live + location.hash);
+    } catch (e) {}
+  }
+  setTimeout(check, 2500);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+  setInterval(check, 15 * 60 * 1000);
+})();
 </script>
 </body>
 </html>
