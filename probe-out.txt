@@ -1,182 +1,26 @@
-1 181.FM Awesome 80s 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-2 SomaFM Underground 80s 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-28 80s Forever 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-29 Made in 80 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-30 80s New Wave Radio 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-31 Nostalgie New Wave 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-32 bigFM Workout 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-33 80s Hi‑NRG 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-34 80s Rock 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 4
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-35 Techno 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-3 Antenne Bayern 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-4 1LIVE WDR 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-5 SWR3 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-6 Bayern 3 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-7 SWR1 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-23 Deutschlandfunk 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-24 NDR 2 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-25 hr3 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-26 Bayern 1 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-27 Rock Antenne 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 4
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-36 BBC World Service 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-37 NPR News 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 2
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-38 RFI English 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 6
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-39 NDR Info 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-40 WDR 5 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 0
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
-41 hr-info 200 ['*'] HTTP/2 200 
-access-control-allow-origin: *
-age: 1
-cache-control: public,max-age=15
-cache-status: "Netlify Durable"; fwd=bypass
-cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
-content-ty 
+1 181.FM Awesome 80s => {"title":""} 
+2 SomaFM Underground 80s => {"title":"Lene Lovich - Savages"} 
+28 80s Forever => {"title":"Clocks - She Looks A Lot Like You {1982}"} 
+29 Made in 80 => {"title":"Joe Cocker - You can leave your hat on"} 
+30 80s New Wave Radio => {"title":"Björk - Human Behaviour"} 
+31 Nostalgie New Wave => {"title":"Liquid Liquid - Cavern"} 
+32 bigFM Workout => {"title":"bigFM Deutschlands biggste Beats"} 
+33 80s Hi‑NRG => {"title":"Dyva - Please My Love (Mezza Edit)"} 
+34 80s Rock => {"title":""} 
+35 Techno => {"title":""} 
+3 Antenne Bayern => {"title":"Wamdue Project - King Of My Castle"} 
+4 1LIVE WDR => {"title":"TLC - No Scrubs"} 
+5 SWR3 => {"title":"Bandaids / Katy Perry"} 
+6 Bayern 3 => {"title":"Jan Metternich - Me, Myself & I"} 
+7 SWR1 => {"title":"Platz 849: Talkin' bout the revolution / Tracy Chapman"} 
+23 Deutschlandfunk => {"title":"Radionacht - Tag für Tag - 19.10.2026, Susanne Fritz"} 
+24 NDR 2 => {"title":"Bandaids - Katy Perry"} 
+25 hr3 => {"title":"Katy Perry - Bandaids"} 
+26 Bayern 1 => {"title":"*** Bayern 1 - Gehört ins Leben"} 
+27 Rock Antenne => {"title":"Queensryche - I don't believe in love"} 
+36 BBC World Service => {"title":"BBC World Service Online"} 
+37 NPR News => {"title":""} 
+38 RFI English => {"title":""} 
+39 NDR Info => {"title":"Die ARD Infonacht - Gut informiert durch die Nacht"} 
+40 WDR 5 => {"title":"ARD Infonacht"} 
+41 hr-info => {"title":"*** hriNFO - Wer's hört, hat mehr zu sagen."} 
