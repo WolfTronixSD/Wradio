@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.63</title>
+<title>WRadio v2.64</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -375,7 +375,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.63</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.64</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -572,7 +572,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.63 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:05:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.64 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:55:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -588,6 +588,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.64 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:55:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Fixed SomaFM going silent: the song text check no longer opens a second connection to the station from your phone. It all goes through the relay now, which works for every station including SWR3, 1LIVE, NDR 2, hr3 and Bayern 3
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.63 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:05:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -961,11 +966,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.63  (2026-10-19)
+//  Version : v2.64  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.64 - RDS: phone never opens extra stream connections (SomaFM went silent); relay only, status page backup
 //  v2.63 - RDS via Netlify relay /api/nowplaying (wolf-ironmen repo), direct ICY/status as fallback
 //  v2.62 - RDS: resolve stream redirects with a plain GET first (preflights can't follow redirects)
 //  v2.61 - RDS song text (ICY in-stream metadata, Icecast status fallback); give way to other apps' audio
@@ -3677,9 +3683,10 @@ function yieldToOtherApp() {
 // ============================================================
 //  RDS (v2.61): song and show info, like RDS text on a car radio
 //  Internet radio has no real RDS; stations send the same thing as "ICY" text inside the stream
-//  (StreamTitle='Artist - Song'). Every 30 s while a station plays, WRadio downloads a few KB of
-//  the stream with that text switched on, reads it and stops (the sound itself is untouched).
-//  Icecast servers that don't allow that get their status page read instead. Shown under the
+//  (StreamTitle='Artist - Song'). Every 30 s while a station plays, WRadio asks the relay on the
+//  Netlify site, which reads that text server-side (v2.63). v2.64: the phone itself never opens a
+//  second connection to the station any more: SomaFM and others limit connections per listener and
+//  cut the audio. If the relay is down, Icecast status pages are the only backup. Shown under the
 //  station name and on the lock screen / CarPlay. Stations that offer neither show nothing.
 // ============================================================
 const RDS = { timer: 0, ctl: null, gen: 0, text: '', how: {} };
@@ -3741,70 +3748,21 @@ async function rdsRelay(url) {
 async function rdsRead(station) {
   let how = RDS.how[station.n];
   if (how === 'none') return null;
+  let relayDown = false;
   if (!how || how === 'relay') {
     const t = await rdsRelay(station.url);
     if (typeof t === 'string') { RDS.how[station.n] = 'relay'; return rdsClean(t); }
     if (how === 'relay' && t === undefined) return null; // relay hiccup, keep using it
-    how = undefined; // relay says no text, or relay down: try reading directly
-  }
-  if (!how || how === 'icy') {
-    const t = await rdsIcy(station.url).catch(() => undefined);
-    if (t !== undefined) { RDS.how[station.n] = 'icy'; return rdsClean(t); }
-    if (how === 'icy') return null; // worked before, a hiccup now
+    relayDown = t === undefined;
+    how = undefined; // relay says no text, or relay down: try the station's status page
   }
   if (!how || how === 'status') {
     const t = await rdsStatus(station.url).catch(() => undefined);
     if (t !== undefined) { RDS.how[station.n] = 'status'; return rdsClean(t); }
     if (how === 'status') return null;
   }
-  RDS.how[station.n] = 'none';
+  if (!relayDown) RDS.how[station.n] = 'none'; // relay down: try again next time
   return null;
-}
-// Many station addresses forward to another server (Antenne Bayern, Rock Antenne, SomaFM, ARD).
-// A request that asks for the song text may not follow such a forward, so look up the final address
-// with a plain request first (stopped right after the headers), then ask for the text there.
-async function rdsFinalUrl(url) {
-  const ctl = new AbortController(); RDS.ctl = ctl;
-  const timer = setTimeout(() => ctl.abort(), 6000);
-  try {
-    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
-    return r.url || url;
-  } catch (e) { return url; } finally { clearTimeout(timer); try { ctl.abort(); } catch (e) {} }
-}
-// Read the ICY text from the stream itself. Resolves to the title, or undefined if the server doesn't allow it.
-async function rdsIcy(url) {
-  url = await rdsFinalUrl(url);
-  const ctl = new AbortController(); RDS.ctl = ctl;
-  const timer = setTimeout(() => ctl.abort(), 8000);
-  try {
-    const r = await fetch(url, { headers: { 'Icy-MetaData': '1' }, signal: ctl.signal, cache: 'no-store' });
-    const every = parseInt(r.headers.get('icy-metaint') || '', 10);
-    if (!r.ok || !every || !r.body) { ctl.abort(); return undefined; }
-    const rd = r.body.getReader();
-    let got = 0, need = every + 1, len = -1, meta = null, filled = 0;
-    while (true) {
-      const { value, done } = await rd.read();
-      if (done) break;
-      let i = 0;
-      if (len < 0) {
-        if (got + value.length < need) { got += value.length; continue; }
-        i = need - 1 - got; len = value[i] * 16; i++;
-        got = need;
-        if (len === 0) { ctl.abort(); return ''; }
-        meta = new Uint8Array(len); filled = 0;
-      }
-      const take = Math.min(len - filled, value.length - i);
-      meta.set(value.subarray(i, i + take), filled); filled += take;
-      if (filled >= len) break;
-    }
-    ctl.abort();
-    if (!meta) return undefined;
-    const txt = new TextDecoder('utf-8').decode(meta).replace(/\0+$/, '');
-    const m = /StreamTitle='([\s\S]*?)';/.exec(txt);
-    return m ? m[1] : '';
-  } catch (e) {
-    return undefined;
-  } finally { clearTimeout(timer); if (RDS.ctl === ctl) RDS.ctl = null; }
 }
 // Icecast status page: lists every stream on the server with its current title
 async function rdsStatus(url) {
