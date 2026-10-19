@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.60</title>
+<title>WRadio v2.62</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -47,6 +47,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.97);
 .np-station.idle{color:var(--muted);font-weight:300}
 .np-meta{font-family:var(--mono);font-size:0.65em;color:var(--accent);margin-top:3px;min-height:1em;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* RDS (v2.61): song text from the station, scrolls like a car radio when it's long */
+.np-rds{font-family:var(--mono);font-size:0.72em;color:var(--amber);white-space:nowrap;overflow:hidden;display:none;margin-top:2px}
+.np-rds.on{display:block}
+.np-rds span{display:inline-block}
+.np-rds.scroll span{animation:rdsScroll var(--rds-time,10s) linear infinite alternate;padding-right:16px}
+@keyframes rdsScroll{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(var(--rds-shift,0))}}
 .np-controls{display:flex;align-items:center;gap:8px;margin-top:7px}
 .btn-stop{background:rgba(255,68,102,0.15);border:1px solid var(--red);color:var(--red);
   font-family:var(--mono);font-size:0.68em;letter-spacing:1px;padding:4px 10px;border-radius:4px;cursor:pointer}
@@ -369,7 +375,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.60</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.62</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -392,6 +398,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
       <div class="np-text">
         <div class="np-station idle" id="npStation">Select a station</div>
         <div class="np-meta" id="npMeta">&nbsp;</div>
+        <div class="np-rds" id="npRds" aria-live="polite"><span></span></div>
         <div class="np-meta" id="npDiag" style="font-size:0.75em;color:var(--amber);display:none"></div>
       </div>
     </div>
@@ -565,7 +572,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.60 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:25:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -581,6 +588,18 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        RDS fix: stations whose address forwards to another server (Antenne Bayern, Rock Antenne, SomaFM) now show the song too
+      </div>
+
+      <div style="color:var(--accent);margin-top:4px">v2.61 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T22:55:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        RDS: the song and show the station is sending now appears under the station name (scrolls when long), and on the lock screen / CarPlay<br>
+        Works on 181.FM, SomaFM, Made in 80, 80s New Wave, Hi-NRG, Antenne Bayern and Rock Antenne. ARD stations (SWR3, 1LIVE, NDR 2, hr3, Bayern) don't let web pages read it yet<br>
+        Morse trainer or another app takes the sound: WRadio now pauses instead of fighting it (no more stutter). Tap ▶ RESUME or play on the lock screen
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.60 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T15:25:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -937,11 +956,13 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.60  (2026-10-19)
+//  Version : v2.62  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.62 - RDS: resolve stream redirects with a plain GET first (preflights can't follow redirects)
+//  v2.61 - RDS song text (ICY in-stream metadata, Icecast status fallback); give way to other apps' audio
 //  v2.60 - Update bar: checks live <title> version (no-store) on open/return/15 min
 //  v2.59 - Arrange by long press + drag (pointer events, touchmove blocked while dragging); arrows removed
 //  v2.58 - Arrange: up/down by one grid row (gridCols), markArrows hides dead arrows
@@ -1277,6 +1298,7 @@ function mp3Release() {   // radio or stop: the MP3 path goes quiet
   if (audioMp3.src) { audioMp3.removeAttribute('src'); audioMp3.load(); }
   if (mp3Ctx && mp3Ctx.state === 'running') mp3Ctx.suspend().catch(()=>{});
 }
+let yieldedToOther = false; // v2.61: another app took the sound, WRadio waits for RESUME
 function userPausedNow() { return (document.getElementById('btnStop')?.innerHTML || '').includes('RESUME'); }
 
 // Sleep timer
@@ -1665,6 +1687,7 @@ function play(station) {
 
   mp3Release(); // radio never goes through the MP3 volume path
   curIdx = STATIONS.indexOf(station);
+  yieldedToOther = false;
   isPlaying = true; // set BEFORE play() so viz activates immediately
   stopFFTClone(); // never let the previous station's analysis copy keep running
   connectFFT(); // create/resume the AudioContext during the tap, which iOS requires
@@ -1702,6 +1725,7 @@ function play(station) {
     document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
     ensureKeepAlive();
     updateMediaSession(station.name);
+    rdsStart(station);
     startBufferWatchdog();
     // Start silent FFT clone for real viz — main audio untouched
     if (routed) checkRoutedSound(station); else startFFTClone(station.url);
@@ -1720,17 +1744,20 @@ function toggleStop() {
     audio.pause();
     if (!waMode) audioFFT.pause(); // the silent analysis copy doesn't need to keep downloading
     isPlaying = false;
+    rdsStop();
     document.getElementById('sigbars').classList.remove('active');
     document.getElementById('btnStop').innerHTML = '&#9654; RESUME';
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
   } else if (!isPlaying && audio.src) {
     // Resume
+    yieldedToOther = false;
     isPlaying = true;
     audio.play().then(() => {
       document.getElementById('sigbars').classList.add('active');
       document.getElementById('btnStop').innerHTML = '&#9632; STOP';
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
       if (!waMode && curIdx >= 0) startFFTClone(STATIONS[curIdx].url);
+      if (curIdx >= 0) rdsStart(STATIONS[curIdx]);
     }).catch(() => {
       isPlaying = false;
       // Stale stream — reload
@@ -1742,6 +1769,7 @@ function toggleStop() {
 }
 
 function stopPlay() {
+  rdsStop();
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
   reconnectDelay = 2000; frozenCount = 0;
@@ -3193,6 +3221,8 @@ function updateMediaSession(name, artist) {
 
   // Play / Pause
   navigator.mediaSession.setActionHandler('play', () => {
+    // Paused (STOP, or gave way to another app): resume the station properly
+    if (!isPlaying && mp3CurIdx < 0 && curIdx >= 0) { toggleStop(); return; }
     out().play().catch(()=>{});
     navigator.mediaSession.playbackState = 'playing';
   });
@@ -3289,6 +3319,7 @@ function escHtml(s) {
 }
 
 function playMp3(i) {
+  rdsStop();
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
   if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
   mp3CurIdx = i;
@@ -3568,8 +3599,9 @@ function startKeepAlive() {
 // station or MP3 plays fine, and runs again while buffering, paused, or for the
 // egg timer / alarm (which beep through this context).
 function keepAliveNeeded() {
-  if (!IS_IOS) return true;
   if (alarmActive || eggBeeping || eggInterval) return true;
+  if (yieldedToOther) return false; // another app has the sound; don't grab it back
+  if (!IS_IOS) return true;
   const el = out();
   return !(isPlaying && !el.paused && el.readyState >= 3);
 }
@@ -3622,12 +3654,183 @@ window.addEventListener('pageshow', e => {
   if (isPlaying && el.paused && el.src) el.play().catch(()=>{});
 });
 
+// v2.61: give way to other apps. The Morse trainer (or a video) asks iPhone for the sound, which pauses
+// WRadio. Restarting it right away took the sound back, the other app took it again, and both stuttered.
+// Now: paused by the phone while WRadio is in the background → one restart try; paused again within a
+// minute → another app wants the sound, so WRadio pauses like a tap on STOP and waits for ▶ RESUME
+// (or play on the lock screen / CarPlay).
+const phonePauses = [];
+function yieldToOtherApp() {
+  if (!isPlaying || userPausedNow()) return;
+  yieldedToOther = true;
+  toggleStop(); // pause: RESUME button, lock screen shows paused, nothing restarts it
+  document.getElementById('npMeta').textContent = 'Paused: another app is playing · ▶ RESUME';
+  syncKeepAlive();
+}
+
+// ============================================================
+//  RDS (v2.61): song and show info, like RDS text on a car radio
+//  Internet radio has no real RDS; stations send the same thing as "ICY" text inside the stream
+//  (StreamTitle='Artist - Song'). Every 30 s while a station plays, WRadio downloads a few KB of
+//  the stream with that text switched on, reads it and stops (the sound itself is untouched).
+//  Icecast servers that don't allow that get their status page read instead. Shown under the
+//  station name and on the lock screen / CarPlay. Stations that offer neither show nothing.
+// ============================================================
+const RDS = { timer: 0, ctl: null, gen: 0, text: '', how: {} };
+function rdsShow(t) {
+  const el = document.getElementById('npRds');
+  if (!el) return;
+  RDS.text = t || '';
+  el.querySelector('span').textContent = t ? '♪ ' + t : '';
+  el.classList.toggle('on', !!t);
+  el.classList.remove('scroll');
+  if (t) requestAnimationFrame(() => {
+    const sp = el.querySelector('span');
+    const over = sp.scrollWidth - el.clientWidth;
+    if (over > 4) { el.style.setProperty('--rds-shift', -over - 16 + 'px'); el.style.setProperty('--rds-time', Math.max(6, over / 25) + 's'); el.classList.add('scroll'); }
+  });
+  if (curIdx >= 0 && isPlaying) updateMediaSession(t || STATIONS[curIdx].name, t ? STATIONS[curIdx].name : undefined);
+}
+function rdsStop() {
+  RDS.gen++;
+  clearTimeout(RDS.timer); RDS.timer = 0;
+  try { RDS.ctl && RDS.ctl.abort(); } catch(e) {}
+  RDS.ctl = null;
+  if (RDS.text) rdsShow('');
+}
+function rdsStart(station) {
+  rdsStop();
+  if (!station || station.cat === 'atc' || station.rds === false) return;
+  const gen = RDS.gen;
+  const tick = async () => {
+    if (gen !== RDS.gen) return;
+    let t = null;
+    t = await rdsRead(station).catch(() => null);
+    if (gen !== RDS.gen) return;
+    if (t !== null && t !== RDS.text) rdsShow(t);
+    if (RDS.how[station.n] === 'none') return; // nothing to read for this station
+    RDS.timer = setTimeout(tick, 30000);
+  };
+  tick();
+}
+// Clean up what stations send: "Artist - Title", sometimes with ads, ids or empty parts
+function rdsClean(t) {
+  t = String(t || '').replace(/\s+/g, ' ').trim();
+  if (!t || /^[-–\s]*$/.test(t) || /^(unknown|n\/a|-|live|advert|werbung)/i.test(t)) return '';
+  return t.replace(/^\*+\s*|\s*\*+$/g, '').replace(/^-\s*|\s*-$/g, '').slice(0, 140);
+}
+// v2.63: song text relay on the Wolf Ironman Netlify site. It reads the text server-side, so it works for
+// stations that block web pages (all ARD), costs ~1 KB per check instead of ~16 KB, and old SHOUTcast too.
+const RDS_RELAY = 'https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url=';
+async function rdsRelay(url) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const r = await fetch(RDS_RELAY + encodeURIComponent(url), { signal: ctl.signal });
+    if (!r.ok) return undefined;
+    const j = await r.json();
+    return typeof j.title === 'string' ? j.title : (j.title === null ? null : undefined);
+  } catch (e) { return undefined; } finally { clearTimeout(timer); }
+}
+async function rdsRead(station) {
+  let how = RDS.how[station.n];
+  if (how === 'none') return null;
+  if (!how || how === 'relay') {
+    const t = await rdsRelay(station.url);
+    if (typeof t === 'string') { RDS.how[station.n] = 'relay'; return rdsClean(t); }
+    if (how === 'relay' && t === undefined) return null; // relay hiccup, keep using it
+    how = undefined; // relay says no text, or relay down: try reading directly
+  }
+  if (!how || how === 'icy') {
+    const t = await rdsIcy(station.url).catch(() => undefined);
+    if (t !== undefined) { RDS.how[station.n] = 'icy'; return rdsClean(t); }
+    if (how === 'icy') return null; // worked before, a hiccup now
+  }
+  if (!how || how === 'status') {
+    const t = await rdsStatus(station.url).catch(() => undefined);
+    if (t !== undefined) { RDS.how[station.n] = 'status'; return rdsClean(t); }
+    if (how === 'status') return null;
+  }
+  RDS.how[station.n] = 'none';
+  return null;
+}
+// Many station addresses forward to another server (Antenne Bayern, Rock Antenne, SomaFM, ARD).
+// A request that asks for the song text may not follow such a forward, so look up the final address
+// with a plain request first (stopped right after the headers), then ask for the text there.
+async function rdsFinalUrl(url) {
+  const ctl = new AbortController(); RDS.ctl = ctl;
+  const timer = setTimeout(() => ctl.abort(), 6000);
+  try {
+    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
+    return r.url || url;
+  } catch (e) { return url; } finally { clearTimeout(timer); try { ctl.abort(); } catch (e) {} }
+}
+// Read the ICY text from the stream itself. Resolves to the title, or undefined if the server doesn't allow it.
+async function rdsIcy(url) {
+  url = await rdsFinalUrl(url);
+  const ctl = new AbortController(); RDS.ctl = ctl;
+  const timer = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch(url, { headers: { 'Icy-MetaData': '1' }, signal: ctl.signal, cache: 'no-store' });
+    const every = parseInt(r.headers.get('icy-metaint') || '', 10);
+    if (!r.ok || !every || !r.body) { ctl.abort(); return undefined; }
+    const rd = r.body.getReader();
+    let got = 0, need = every + 1, len = -1, meta = null, filled = 0;
+    while (true) {
+      const { value, done } = await rd.read();
+      if (done) break;
+      let i = 0;
+      if (len < 0) {
+        if (got + value.length < need) { got += value.length; continue; }
+        i = need - 1 - got; len = value[i] * 16; i++;
+        got = need;
+        if (len === 0) { ctl.abort(); return ''; }
+        meta = new Uint8Array(len); filled = 0;
+      }
+      const take = Math.min(len - filled, value.length - i);
+      meta.set(value.subarray(i, i + take), filled); filled += take;
+      if (filled >= len) break;
+    }
+    ctl.abort();
+    if (!meta) return undefined;
+    const txt = new TextDecoder('utf-8').decode(meta).replace(/\0+$/, '');
+    const m = /StreamTitle='([\s\S]*?)';/.exec(txt);
+    return m ? m[1] : '';
+  } catch (e) {
+    return undefined;
+  } finally { clearTimeout(timer); if (RDS.ctl === ctl) RDS.ctl = null; }
+}
+// Icecast status page: lists every stream on the server with its current title
+async function rdsStatus(url) {
+  const u = new URL(url);
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 6000);
+  try {
+    const r = await fetch(u.origin + '/status-json.xsl', { signal: ctl.signal, cache: 'no-store' });
+    if (!r.ok) return undefined;
+    const j = await r.json();
+    let src = j && j.icestats && j.icestats.source;
+    if (!src) return undefined;
+    if (!Array.isArray(src)) src = [src];
+    const mount = u.pathname;
+    const s = src.find(x => (x.listenurl || '').endsWith(mount)) || (src.length === 1 ? src[0] : null);
+    if (!s) return undefined;
+    return s.title || s.yp_currently_playing || (s.artist ? s.artist + ' - ' + (s.title || '') : '');
+  } catch (e) { return undefined; } finally { clearTimeout(timer); }
+}
+
 // Heartbeat: audio 'pause' event fires when iOS interrupts playback
 // Restart immediately if it was not user-initiated
 onAudible('pause', () => {
   if (!isPlaying) return; // user stopped it, don't restart
   if (userPausedNow()) return;
   bumpDiag('pauses');
+  if (document.hidden) {
+    const now = Date.now();
+    phonePauses.push(now);
+    while (phonePauses.length && now - phonePauses[0] > 60000) phonePauses.shift();
+    if (phonePauses.length >= 2) { phonePauses.length = 0; yieldToOtherApp(); return; }
+  }
   // Small delay to distinguish CarPlay/system pause from network stall
   setTimeout(() => {
     const el = out();

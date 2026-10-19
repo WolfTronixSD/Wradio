@@ -55,3 +55,4 @@ for n, name, url, cat in st:
     except Exception: pass
     r["status_acao"] = sh_ac; r["status_title"] = st_title
     print(json.dumps(r, ensure_ascii=False), flush=True)
+# rerun

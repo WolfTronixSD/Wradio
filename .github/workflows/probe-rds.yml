@@ -11,7 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          python3 scripts/probe_rds.py > probe-out.txt 2>&1 || true
-          for u in https://somafm.com/songs/u80s.json https://api.somafm.com/channels.json; do echo "== $u" >> probe-out.txt; curl -sS -D - -H "Origin: https://wolftronixsd.github.io" --max-time 8 "$u" | head -c 700 >> probe-out.txt; echo >> probe-out.txt; done
+          sleep 30
+          python3 - > probe-out.txt 2>&1 <<'PY' || true
+          import re, subprocess, urllib.parse
+          html = open("index.html", encoding="utf-8").read()
+          for n, name, url, cat in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)",\s*cat:"(\w+)"', html):
+              if cat == "atc": continue
+              r = subprocess.run(["curl","-sS","--max-time","15","-D","-","-H","Origin: https://wolftronixsd.github.io","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True, text=True)
+              out = r.stdout
+              code = (re.findall(r"^HTTP/\S+ (\d+)", out, re.M) or ["-"])[-1]
+              acao = re.findall(r"(?im)^access-control-allow-origin:\s*(\S+)", out)
+              print(n, name, code, acao, out.split("\r\n\r\n")[-1][:200], r.stderr[:100], flush=True)
+          PY
           git config user.name probe; git config user.email probe@users.noreply.github.com
-          git add probe-out.txt; git commit -m "probe results [skip ci]"; git push
+          git add probe-out.txt; git commit -m "relay results [skip ci]"; git push
