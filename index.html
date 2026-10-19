@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.61</title>
+<title>WRadio v2.62</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -375,7 +375,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.61</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.62</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -572,7 +572,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.61 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T22:55:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -588,6 +588,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        RDS fix: stations whose address forwards to another server (Antenne Bayern, Rock Antenne, SomaFM) now show the song too
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.61 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T22:55:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -951,11 +956,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.61  (2026-10-19)
+//  Version : v2.62  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.62 - RDS: resolve stream redirects with a plain GET first (preflights can't follow redirects)
 //  v2.61 - RDS song text (ICY in-stream metadata, Icecast status fallback); give way to other apps' audio
 //  v2.60 - Update bar: checks live <title> version (no-store) on open/return/15 min
 //  v2.59 - Arrange by long press + drag (pointer events, touchmove blocked while dragging); arrows removed
@@ -3729,8 +3735,20 @@ async function rdsRead(station) {
   RDS.how[station.n] = 'none';
   return null;
 }
+// Many station addresses forward to another server (Antenne Bayern, Rock Antenne, SomaFM, ARD).
+// A request that asks for the song text may not follow such a forward, so look up the final address
+// with a plain request first (stopped right after the headers), then ask for the text there.
+async function rdsFinalUrl(url) {
+  const ctl = new AbortController(); RDS.ctl = ctl;
+  const timer = setTimeout(() => ctl.abort(), 6000);
+  try {
+    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
+    return r.url || url;
+  } catch (e) { return url; } finally { clearTimeout(timer); try { ctl.abort(); } catch (e) {} }
+}
 // Read the ICY text from the stream itself. Resolves to the title, or undefined if the server doesn't allow it.
 async function rdsIcy(url) {
+  url = await rdsFinalUrl(url);
   const ctl = new AbortController(); RDS.ctl = ctl;
   const timer = setTimeout(() => ctl.abort(), 8000);
   try {
