@@ -1,0 +1,57 @@
+  # name                       code     KB cors type / url
+  1 181.FM Awesome 80s          200    596  yes OK  audio/mpeg https://listen.181fm.com/181-awesome80s_128k.mp3
+  2 SomaFM Underground 80s      200    339  yes OK  audio/mpeg https://ice2.somafm.com/u80s-128-mp3 -> https://ice2.somafm.com/u80s-128-mp3?_ic2=1792421120459
+ 28 80s Forever                 200    411  yes OK  audio/mpeg https://premium.shoutcastsolutions.com/radio/8050/128.mp3
+ 29 Made in 80                  200    626  yes OK  audio/mpeg https://stream2.madein80.live/listen/madein80/play.mp3
+ 30 80s New Wave Radio          200    230  yes OK  audio/mpeg https://puma.streemlion.com:2910/stream
+ 31 Nostalgie New Wave          200     81  yes OK  audio/aac https://n03.rcs.revma.com/52g2hx43ehuvv -> https://n02-us1.rcs.revma.com/52g2hx43ehuvv?rj-ttl=5&rj-tok=AAABoVSpTu0A5dpHtpnjZcCaUw
+ 32 bigFM Workout               200    369  end OK  audio/aac https://streams.bigfm.de/bigfm-workout-128-mp3 -> https://audiotainment-sw.streamabc.net/atsw-bigfm-aac-128-8938364?sABC=6nq62q1s%230%236s4q5qoq87orr5n806q5r9o7n28546r6%23gjy&aw_0_1st.playerid=twl&amsparams=playerid:twl;skey:1792421151
+ 33 80s Hi‑NRG                  200    638  yes OK  audio/mpeg https://italo.live-streams.nl/fantasy
+ 34 80s Rock                    200    318  yes OK  audio/mpeg https://stream.0nlineradio.com/80s-rock -> https://0nlineradio.stream39.radiohost.de/0r-80s-rock?upd-meta&upd-scheme=https&_art=dD0xNzkyNDIxNDYzJmQ9MWI2Mjg5YTM1YWQ0NGIzMzk2OGU
+ 35 Techno                      200    318  yes OK  audio/mpeg https://stream.technolovers.fm/techno -> https://0nlineradio.stream42.radiohost.de/technolovers-techno?upd-meta&upd-scheme=https&_art=dD0xNzkyNDIxNDY5JmQ9YzQ5ODRlMGMzOTNlOGRhNDczOTk
+  3 Antenne Bayern              200    500  yes OK  audio/mpeg https://stream.antenne.de/antenne/stream/mp3 -> https://s6-webradio.antenne.de/antenne/stream/mp3
+  4 1LIVE WDR                   200    153  yes OK  audio/mpeg https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3 -> https://d131.rndfnk.com/ard/wdr/1live/live/mp3/128/stream.mp3?cid=01FBRZTS1K1TCD4KA2YZ1ND8X3&sid=3KuxJNzWkyJk8T9kha30LiO6N3P&token=6acYbN2UzIn_ww3G-tqcIrPlMyYZKAjOM6pi8aF9nPs&tvf=S8-bkDYJ4BhkMTMxLnJuZGZuay5jb20
+  5 SWR3                        200    155  yes OK  audio/mpeg https://liveradio.swr.de/sw282p3/swr3/play.mp3 -> https://f141.rndfnk.com/ard/swr/swr3/live/mp3/128/stream.mp3?aggregator=web&cid=01FC1X5J7PN2N3YQPZYT8YDM9M&sid=3KuxKAZ1TvrHhstNIk4x2wmHikx&token=YgnsZ3VjA-ImK1tuJLYNAEvqeir28f0p9R4yX-dCo1k&tvf=aa4B_TcJ4BhmMTQxLnJuZGZuay5jb20
+  6 Bayern 3                    200    161  yes OK  audio/mpeg https://dispatcher.rndfnk.com/br/br3/live/mp3/low -> https://f141.rndfnk.com/ard/br/br3/live/mp3/128/stream.mp3?cid=01FBPVFWX7C216W6WY4M4M7MF7&sid=3KuxKtbUusvkdUHbhcIhRmhf0fn&token=PXdL17B4r8jdfPls0jmRihSvbXO-rzhWwgIZwanx5So&tvf=ZVQaXzkJ4BhmMTQxLnJuZGZuay5jb20
+  7 SWR1                        200    163  yes OK  audio/mpeg https://liveradio.swr.de/sw282p3/swr1bw/play.mp3 -> https://f121.rndfnk.com/ard/swr/swr1/bw/mp3/128/stream.mp3?aggregator=web&cid=01FC1X3K2Z71SMDKMEC68DM7MW&sid=3KuxLhAgObjGdPJO2VxjNom6Mbo&token=MZlzrwzDpB4OMP6PBj0Uh1qGgIRTdDa_uNFUYu4meY4&tvf=KcJW0zoJ4BhmMTIxLnJuZGZuay5jb20
+ 23 Deutschlandfunk             200    162  yes OK  audio/mpeg https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3 -> https://f131.rndfnk.com/ard/dlf/01/mp3/128/stream.mp3?cid=01FBPWZ12X2XN8SDSMBZ7X0ZTT&sid=3KuxMVVmLncP5d3VdWMtUgj7mEg&token=RaLmnsjVmCZPV72_J2ovz5hLHTkpP2gZlOv8gAOBz2w&tvf=3yU-ZjwJ4BhmMTMxLnJuZGZuay5jb20
+ 24 NDR 2                       200    162  yes OK  audio/mpeg https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3 -> https://f131.rndfnk.com/ard/ndr/ndr2/niedersachsen/mp3/128/stream.mp3?cid=01FBQ2CWDYWJHGF4QAJ0SVV730&sid=3KuxNKpHPRCHGYjgd7uBaKTs5YT&token=Rn8xM2cgHdicdxcGoKn8USVAQXZznHiuEMwspYIl9SU&tvf=3FF91z0J4BhmMTMxLnJuZGZuay5jb20
+ 25 hr3                         200    164  yes OK  audio/mpeg https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high -> https://d141.rndfnk.com/ard/hr/hr3/live/mp3/128/stream.mp3?cid=01FBPYFJ2S8K48K92MWZXTG4PA&sid=3KuxO7pMhrMc5sQ9B00eUIO3GIA&token=rNcr8sw8EZO8arsu6m73NazF5HlGIeGqujdkxcIn2MQ&tvf=j9KnQz8J4BhkMTQxLnJuZGZuay5jb20
+ 26 Bayern 1                    200    158  yes OK  audio/mpeg https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid -> https://d111.rndfnk.com/ard/br/br1/obb/mp3/128/stream.mp3?cid=01FB9ME7567MEQ5G72EVEEVVCS&sid=3KuxOsTm2HtIVq5SvpXJ4iwEtsl&token=H7EvlhUjm2b3QPUdOUv50U4wk5cTbR4MJu5xzyXWdZ8&tvf=fMHtuUAJ4BhkMTExLnJuZGZuay5jb20
+ 27 Rock Antenne                200    500  yes OK  audio/mpeg https://stream.rockantenne.de/rockantenne/stream/mp3 -> https://s7-webradio.rockantenne.de/rockantenne/stream/mp3
+ 36 BBC World Service           200    103  yes OK  audio/mpeg https://stream.live.vc.bbcmedia.co.uk/bbc_world_service
+ 37 NPR News                    200    110  end OK  audio/mpeg https://npr-ice.streamguys1.com/live.mp3 -> https://npr-ice.streamguys1.com/live.mp3?_ic2=1792421243820
+ 38 RFI English                 200    158  yes OK  audio/mpeg https://rfienanglais64k.ice.infomaniak.ch/rfienanglais-64.mp3
+ 39 NDR Info                    200    160  yes OK  audio/mpeg https://icecast.ndr.de/ndr/ndrinfo/niedersachsen/mp3/128/stream.mp3 -> https://d121.rndfnk.com/ard/ndr/ndrinfo/live/mp3/128/stream.mp3?cid=01K365QMHFK0ZSMC0KAMAPG5FC&sid=3KuxSgPr2X8rkXcNi9MWLqnPC1C&token=6izrwVNKnY56mdxzn6i5J07vgCc2JsUBL3l5HuSIVLg&tvf=salCykcJ4BhkMTIxLnJuZGZuay5jb20
+ 40 WDR 5                       200    156  yes OK  audio/mpeg https://wdr-wdr5-live.icecast.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3 -> https://d121.rndfnk.com/ard/wdr/wdr5/live/mp3/128/stream.mp3?cid=01FBS0E239W9R7GR1S5Q7RTQRC&sid=3KuxTPkVyShgXrBZmmLY52vcRd6&token=K4uHfCDBCrSt2oWweQ-5NAvWWLVDGN7ICTKvL2Vyehg&tvf=R54QP0kJ4BhkMTIxLnJuZGZuay5jb20
+ 41 hr-info                     200    161  yes OK  audio/mpeg https://dispatcher.rndfnk.com/hr/hrinfo/live/mp3/high -> https://d111.rndfnk.com/ard/hr/hrinfo/live/mp3/128/stream.mp3?cid=01FBPYRECZW4SNS714QRSDEXBQ&sid=3KuxUCT78TKPH6NbRkb4yeJCT82&token=uX8h7b3wj8e0VZ-gxjn7he7O9lX96ilKayCGw5m-0Gk&tvf=sU1DoEoJ4BhkMTExLnJuZGZuay5jb20
+  8 KMYF ATIS                   200     12  yes OK  audio/mpeg https://d.liveatc.net/ksan_kmyf_atis -> https://s1-bos.liveatc.net/ksan_kmyf_atis?nocache=2026101914475343207
+  9 KMYF Tower                  404      0  yes BAD text/html https://d.liveatc.net/kmyf1_twr -> https://s1-bos.liveatc.net/kmyf1_twr?nocache=2026101914480074243
+ 10 KMYF Ground                 302      0  yes BAD text/html https://d.liveatc.net/ksan_kmyf_gnd -> https://s1-bos.liveatc.net/ksan_kmyf_gnd?nocache=2026101914480072972
+ 11 KMYF All (Twr)              302      0  yes BAD text/html https://d.liveatc.net/ksan_kmyf_twr_both -> https://s1-bos.liveatc.net/ksan_kmyf_twr_both?nocache=2026101914480928801
+ 12 KMYF SoCal Del Mar          302      0  yes BAD text/html https://d.liveatc.net/ksan_app_delmar -> https://s1-bos.liveatc.net/ksan_app_delmar?nocache=2026101914481247516
+ 13 KSAN Tower                  200     25  yes OK  audio/mpeg https://d.liveatc.net/ksan1_twr -> https://s1-bos.liveatc.net/ksan1_twr?nocache=2026101914481845675
+ 14 KSAN Ground                 200     21  yes OK  audio/mpeg https://d.liveatc.net/ksan1_gnd -> https://s1-bos.liveatc.net/ksan1_gnd?nocache=2026101914482422341
+ 15 KSAN Clearance Del          200     15  yes OK  audio/mpeg https://d.liveatc.net/ksan1_del -> https://s1-bos.liveatc.net/ksan1_del?nocache=2026101914483317001
+ 16 KSAN SoCal East             200      9  yes OK  audio/mpeg https://d.liveatc.net/ksan_app_east -> https://s1-bos.liveatc.net/ksan_app_east?nocache=2026101914484043410
+ 17 KSAN SoCal West             200     10  yes OK  audio/mpeg https://d.liveatc.net/ksan_app_west -> https://s1-bos.liveatc.net/ksan_app_west?nocache=2026101914484338058
+ 18 KSAN All                    200     25  yes OK  audio/mpeg https://d.liveatc.net/ksan1_all -> https://s1-bos.liveatc.net/ksan1_all?nocache=2026101914484934458
+ 19 KSDM Ground/Tower           302      0  yes BAD text/html https://d.liveatc.net/ksdm_twr -> https://s1-bos.liveatc.net/ksdm_twr?nocache=2026101914485857850
+ 20 KRNM Ground                 302      0  yes BAD text/html https://d.liveatc.net/krnm2_gnd -> https://s1-bos.liveatc.net/krnm2_gnd?nocache=2026101914490245072
+ 21 KRNM Ground/Tower           302      0  yes BAD text/html https://d.liveatc.net/krnm2_gnd_twr -> https://s1-bos.liveatc.net/krnm2_gnd_twr?nocache=2026101914490826524
+ 22 KRNM Tower                  302      0  yes BAD text/html https://d.liveatc.net/krnm2_twr -> https://s1-bos.liveatc.net/krnm2_twr?nocache=2026101914491413401
+  1 181.FM Awesome 80s (sturdy  200    275  yes OK  audio/aacp https://listen.181fm.com/181-awesome80s_64k.aac
+  2 SomaFM Underground 80s (st  200    297  yes OK  audio/aac https://ice2.somafm.com/u80s-64-aac -> https://ice2.somafm.com/u80s-64-aac?_ic2=1792421366514
+ 32 bigFM Workout (sturdy)      200    376  end OK  audio/aac https://streams.bigfm.de/bigfm-workout-64-aac -> https://audiotainment-sw.streamabc.net/atsw-bigfm-aac-128-8938364?sABC=6nq62qsq%230%236s4q5qoq87orr5n806q5r9o7n28546r6%23gjy&aw_0_1st.playerid=twl&amsparams=playerid:twl;skey:1792421373
+  4 1LIVE WDR (sturdy)          200      0  yes OK  application/x-mpegurl https://wdr-radio.ard-mcdn.de/wdr/radio/1live/hls/master.m3u8
+  5 SWR3 (sturdy)               200      0  yes OK  application/x-mpegurl https://swr-radio.ard-mcdn.de/swr/radio/swr3/hls/master.m3u8
+  6 Bayern 3 (sturdy)           200      0  yes OK  application/x-mpegurl https://br-radio.ard-mcdn.de/br/radio/b3/hls/master.m3u8
+  7 SWR1 (sturdy)               200      0  yes OK  application/x-mpegurl https://swr-radio.ard-mcdn.de/swr/radio/swr1bw/hls/master.m3u8
+ 23 Deutschlandfunk (sturdy)    200    206  yes OK  audio/aac https://st01.sslstream.dlf.de/dlf/01/high/aac/stream.aac -> https://d141.rndfnk.com/ard/dlf/01/aac/192/stream.aac?cid=01FBPWZ12X2XN8SDSMBZ7X0ZTT&sid=3KuxiZDbBnLj65nwUyHbugssakk&token=sho5aZQDXied4dWIcPwkwPGLULX2m6TJV5GYAB_BeHg&tvf=TPT9CWUJ4BhkMTQxLnJuZGZuay5jb20
+ 24 NDR 2 (sturdy)              200      0  yes OK  application/x-mpegurl https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2nds/hls/master.m3u8
+ 25 hr3 (sturdy)                200      0  yes OK  application/x-mpegurl https://hlshr3.akamaized.net/hls/live/2016536/hr3rheinmain/master.m3u8
+ 26 Bayern 1 (sturdy)           200    415  yes OK  application/x-mpegurl https://br-radio.ard-mcdn.de/br/radio/b1obb/hls/96/seglist.m3u8
+ 36 BBC World Service (sturdy)  200      0  yes OK  application/x-mpegurl https://a.files.bbci.co.uk/ms6/live/3441A116-B12E-4D2F-ACA8-C1984642FA4B/audio/simulcast/hls/nonuk/pc_hd_abr_v2/ak/bbc_world_service.m3u8
+ 40 WDR 5 (sturdy)              200      0  yes OK  application/x-mpegurl https://wdr-radio.ard-mcdn.de/wdr/radio/wdr5/hls/master.m3u8
+
+ATC feeds offline right now (often temporary): KMYF Tower, KMYF Ground, KMYF All (Twr), KMYF SoCal Del Mar, KSDM Ground/Tower, KRNM Ground, KRNM Ground/Tower, KRNM Tower
