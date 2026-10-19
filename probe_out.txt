@@ -1,0 +1,72 @@
+rb fail SWR1 Expecting value: line 1 column 1 (char 0)
+ARD bytes 1262023
+
+== 1LIVE
+  1LIVE | AAC 102 | https://wdr-radio.ard-mcdn.de/wdr/radio/1live/hls/master.m3u8 -> OK master bw=['102545', '101863', '200189', '199520'] target=4s seg=50760B
+  1LIVE DIGGI | AAC 102 | https://wdr-radio.ard-mcdn.de/wdr/radio/1livediggi/hls/master.m3u8 -> OK master bw=['102545', '101632', '200943', '199641'] target=4s seg=50948B
+
+== SWR3
+Traceback (most recent call last):
+  File "/home/runner/work/Wradio/Wradio/scripts/probe_hls.py", line 43, in <module>
+    print(f"  {name} | {codec} {br} | {u} -> {test(u)}")
+                                              ^^^^^^^
+  File "/home/runner/work/Wradio/Wradio/scripts/probe_hls.py", line 31, in test
+    pl2 = get(sub); segs = [l for l in pl2.splitlines() if l and not l.startswith("#")]
+          ^^^^^^^^
+  File "/home/runner/work/Wradio/Wradio/scripts/probe_hls.py", line 5, in get
+    r = subprocess.run(["curl", "-sSL", "--max-time", str(t), "-A", UA, url], capture_output=True, text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 2153, in _communicate
+    stdout = self._translate_newlines(stdout,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1086, in _translate_newlines
+    data = data.decode(encoding, errors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 2048: invalid start byte
+== Ironman sync test code AAAADJLEFKLIJGBB
+HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 06:01:14 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M59BZX6N4RBJKG69KN1JFRN4
+content-length: 818
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Redirect</title>
+</head>
+<body>
+    <script>
+        window.onload = function() {
+            var fragment = window.location.hash;
+            var url = new URL('https:\/\/app.netlify.com\/edge-access?domain=darling-kheer-93b7f4.netlify.app\u0026requested_path=%2Fapi%2Fsync%3Fcode%3DAAAADJLEFKLIJGBB\u0026site_id=ffc1f279-3418-4878-91fa-34cbfa616887');
+            if (fragment) {
+                var requestedPath = url.searchParams.get('requested_path');
+HTTP/2 401 
+content-type: text/html; charset=utf-8
+date: Mon, 19 Oct 2026 06:01:14 GMT
+server: Netlify
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-nf-request-id: 01M59BZXBWV7RBETRBDMAEDDHW
+content-length: 818
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Redirect</title>
+</head>
+<body>
+    <script>
+        window.onload = function() {
+            var fragment = window.location.hash;
+            var url = new URL('https:\/\/app.netlify.com\/edge-access?domain=darling-kheer-93b7f4.netlify.app\u0026requested_path=%2Fapi%2Fsync%3Fcode%3DAAAADJLEFKLIJGBB\u0026site_id=ffc1f279-3418-4878-91fa-34cbfa616887');
+            if (fragment) {
+                var requestedPath = url.searchParams.get('requested_path');
