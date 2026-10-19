@@ -13,6 +13,10 @@ ORIGIN = "https://wolftronixsd.github.io"
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
 html = open("index.html", encoding="utf-8").read()
 stations = re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"([^"]+)",\s*cat:"(\w+)"', html)
+# Sturdier streams (HLS or 64k AAC) the iPhone plays with the screen locked / in CarPlay
+sturdy = [(n, name + " (sturdy)", u, cat) for n, name, u, cat in
+          re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"[^"]+",\s*cat:"(\w+)",\s*hls:"([^"]+)"', html)]
+sturdy = [(n, name, u, cat) for n, name, cat, u in sturdy]
 extra = [("+", u, u, "extra") for u in sys.argv[1:]]
 
 def probe(url):
@@ -40,11 +44,13 @@ def probe(url):
 
 bad, offline = 0, []
 print(f"{'#':>3} {'name':<26} {'code':>4} {'KB':>6} {'cors':>4} type / url")
-for n, name, url, cat in stations + extra:
+for n, name, url, cat in stations + sturdy + extra:
     for u in ([url, url.replace("http://", "https://", 1)] if url.startswith("http://") else [url]):
         r = probe(u)
         # ATC feeds are low bitrate and quiet between calls, so a few KB is enough to prove they're live
         ok = r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000 and "alert.mp3" not in r["final"]
+        if "mpegurl" in r["type"].lower():  # HLS playlist: small text file, Safari fetches the chunks itself
+            ok = r["code"].startswith("2") and r["bytes"] > 50
         if n != "+" and u == url and not ok:
             # LiveATC feeds go offline when a volunteer's receiver is down; report, don't fail
             if cat == "atc": offline.append(name)

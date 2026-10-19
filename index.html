@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.53</title>
+<title>WRadio v2.56</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -281,6 +281,9 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .vol-ios{display:none;flex:1;font-size:1.05em;color:var(--text);line-height:1.2}
 .ios .vol-wrap input,.ios .vol-wrap .vol-val{display:none}
 .ios .vol-ios{display:block}
+/* v2.55: iPhone MP3s play through a volume control while the screen is on */
+.ios.mp3vol .vol-wrap input,.ios.mp3vol .vol-wrap .vol-val{display:inline-block}
+.ios.mp3vol .vol-ios{display:none}
 /* WEATHER (v2.48) */
 .wx-card[hidden]{display:none}
 .wx-card{display:flex;align-items:stretch;gap:10px;margin:4px 0 6px}
@@ -346,7 +349,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.53</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.56</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -376,10 +379,10 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
       <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
       <div class="vol-wrap">
         <span class="vol-icon">&#128264;</span>
-        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="0.8"
+        <input type="range" id="volSlider" min="0" max="1" step="0.02" value="1"
           oninput="setVolume(this.value)">
-        <span class="vol-val" id="volVal">80</span>
-        <span class="vol-ios">Use the iPhone volume buttons</span>
+        <span class="vol-val" id="volVal">100</span>
+        <span class="vol-ios">Radio: use the iPhone volume buttons</span>
       </div>
     </div>
     <!-- Seek bar — only visible during MP3 playback -->
@@ -542,7 +545,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></span>
+        <span style="color:var(--accent)">v2.56 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T14:45:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -558,6 +561,29 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.56 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T14:45:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        New World News: BBC World Service, NPR News, RFI English<br>
+        New Germany News: NDR Info, WDR 5, hr-info (Deutschlandfunk stays under German Radio)<br>
+        Volume slider starts at 100: the side buttons set the top, the slider turns down from there
+      </div>
+
+      <div style="color:var(--accent);margin-top:4px">v2.55 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T14:25:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        iPhone: volume slider for your MP3s while the screen is on<br>
+        Screen locked: the MP3 keeps playing at the same spot (side buttons for volume)<br>
+        Radio stations still use the side buttons (iPhone limit)<br>
+        MP3s no longer get stuck on "Buffering..."
+      </div>
+
+      <div style="color:var(--accent);margin-top:4px">v2.54 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T06:30:00Z">2026-10-18</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        CarPlay stutter fix: iPhone now plays sturdy streams like Spotify does<br>
+        HLS (small chunks, big buffer, auto retry): 1LIVE, SWR3, SWR1, Bayern 3, Bayern 1, NDR 2, hr3<br>
+        Lighter 64k AAC: Awesome 80s, Underground 80s, bigFM Workout; Deutschlandfunk in AAC<br>
+        Falls back to the old stream by itself if a sturdy one fails
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.53 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T05:45:00Z">2026-10-18</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -869,11 +895,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.53  (2026-10-18)
+//  Version : v2.56  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.56 - World News + Germany News sections (n 36-41); volume slider defaults to 1
+//  v2.55 - iPhone MP3 volume: audioMp3 element via Web Audio gain while visible; hands over to plain audio when hidden
+//  v2.54 - Sturdy streams (hls: field, directUrl()): HLS / 64k AAC on the plain player, MP3 fallback on error
 //  v2.53 - Home screen icon (icons/icon-180.png, apple-touch-icon) and favicon
 //  v2.52 - Changelog dates show the release time too (data-at, shown 24-hour in local time)
 //  v2.51 - CarPlay round 2: iOS viz only when its tab shows, ~20 fps; hidden VU does no work;
@@ -1012,29 +1041,37 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 // ============================================================
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
-  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music"},
+  {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music", hls:"https://listen.181fm.com/181-awesome80s_64k.aac"},
+  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music", hls:"https://ice2.somafm.com/u80s-64-aac"},
   {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/128.mp3",              cat:"music"},
   {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
   {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
   {n:31, name:"Nostalgie New Wave",   url:"https://n03.rcs.revma.com/52g2hx43ehuvv",                                cat:"music"},
   // --- Workout ---
-  {n:32, name:"bigFM Workout",        url:"https://streams.bigfm.de/bigfm-workout-128-mp3",                         cat:"workout"},
+  {n:32, name:"bigFM Workout",        url:"https://streams.bigfm.de/bigfm-workout-128-mp3",                         cat:"workout", hls:"https://streams.bigfm.de/bigfm-workout-64-aac"},
   {n:33, name:"80s Hi‑NRG",           url:"https://italo.live-streams.nl/fantasy",                                  cat:"workout"},
   {n:34, name:"80s Rock",             url:"https://stream.0nlineradio.com/80s-rock",                                cat:"workout"},
   {n:35, name:"Techno",               url:"https://stream.technolovers.fm/techno",                                  cat:"workout"},
   // --- German Radio ---
   {n:3,  name:"Antenne Bayern",       url:"https://stream.antenne.de/antenne/stream/mp3",                            cat:"german"},
-  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german"},
-  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german"},
-  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german"},
-  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german"},
-  {n:23, name:"Deutschlandfunk",      url:"https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3",                cat:"german"},
-  {n:24, name:"NDR 2",                url:"https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3",       cat:"german"},
-  {n:25, name:"hr3",                  url:"https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high",                     cat:"german"},
-  {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german"},
+  {n:4,  name:"1LIVE WDR",            url:"https://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3", cat:"german", hls:"https://wdr-radio.ard-mcdn.de/wdr/radio/1live/hls/master.m3u8"},
+  {n:5,  name:"SWR3",                 url:"https://liveradio.swr.de/sw282p3/swr3/play.mp3",                          cat:"german", hls:"https://swr-radio.ard-mcdn.de/swr/radio/swr3/hls/master.m3u8"},
+  {n:6,  name:"Bayern 3",             url:"https://dispatcher.rndfnk.com/br/br3/live/mp3/low",                       cat:"german", hls:"https://br-radio.ard-mcdn.de/br/radio/b3/hls/master.m3u8"},
+  {n:7,  name:"SWR1",                 url:"https://liveradio.swr.de/sw282p3/swr1bw/play.mp3",                        cat:"german", hls:"https://swr-radio.ard-mcdn.de/swr/radio/swr1bw/hls/master.m3u8"},
+  {n:23, name:"Deutschlandfunk",      url:"https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3",                cat:"german", hls:"https://st01.sslstream.dlf.de/dlf/01/high/aac/stream.aac"},
+  {n:24, name:"NDR 2",                url:"https://icecast.ndr.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3",       cat:"german", hls:"https://ndr-radio.ard-mcdn.de/ndr/radio/ndr2nds/hls/master.m3u8"},
+  {n:25, name:"hr3",                  url:"https://dispatcher.rndfnk.com/hr/hr3/live/mp3/high",                     cat:"german", hls:"https://hlshr3.akamaized.net/hls/live/2016536/hr3rheinmain/master.m3u8"},
+  {n:26, name:"Bayern 1",             url:"https://dispatcher.rndfnk.com/br/br1/obb/mp3/mid",                       cat:"german", hls:"https://br-radio.ard-mcdn.de/br/radio/b1obb/hls/96/seglist.m3u8"},
   {n:27, name:"Rock Antenne",         url:"https://stream.rockantenne.de/rockantenne/stream/mp3",                   cat:"german"},
   // --- ATC San Diego (KMYF = Montgomery Field) ---
+  // News (v2.56): public broadcasters, tested from GitHub's servers
+  {n:36, name:"BBC World Service",    url:"https://stream.live.vc.bbcmedia.co.uk/bbc_world_service",                cat:"world", hls:"https://a.files.bbci.co.uk/ms6/live/3441A116-B12E-4D2F-ACA8-C1984642FA4B/audio/simulcast/hls/nonuk/pc_hd_abr_v2/ak/bbc_world_service.m3u8"},
+  {n:37, name:"NPR News",             url:"https://npr-ice.streamguys1.com/live.mp3",                               cat:"world"},
+  {n:38, name:"RFI English",          url:"https://rfienanglais64k.ice.infomaniak.ch/rfienanglais-64.mp3",          cat:"world"},
+  {n:39, name:"NDR Info",             url:"https://icecast.ndr.de/ndr/ndrinfo/niedersachsen/mp3/128/stream.mp3",   cat:"denews"},
+  {n:40, name:"WDR 5",                url:"https://wdr-wdr5-live.icecast.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3", cat:"denews", hls:"https://wdr-radio.ard-mcdn.de/wdr/radio/wdr5/hls/master.m3u8"},
+  {n:41, name:"hr-info",              url:"https://dispatcher.rndfnk.com/hr/hrinfo/live/mp3/high",                 cat:"denews"},
+
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
   {n:10, name:"KMYF Ground",          url:"https://d.liveatc.net/ksan_kmyf_gnd",                                     cat:"atc"},
@@ -1074,6 +1111,10 @@ const LOOK = {
   18:['📡','Everything','#00d4ff','#2b5876'],           19:['🗼','Ground & tower','#00d4ff','#2b5876'],
   20:['🛞','Ground','#00d4ff','#2b5876'],               21:['📡','Ground & tower','#00d4ff','#2b5876'],
   22:['🗼','Tower','#00d4ff','#2b5876'],
+  36:['🌍','London · world news','#bb1919','#5a0d0d'],  37:['🇺🇸','US public radio','#2f6fde','#1a3a7a'],
+  38:['🗼','Paris · world in English','#e1000f','#002395'],
+  39:['📰','Hamburg · news','#1e90ff','#0d3b66'],       40:['🎙️','Cologne · news & talk','#00b4d8','#03045e'],
+  41:['🗞️','Frankfurt · news','#f857a6','#6a0572'],
 };
 // Each airport has its own colors so the ATC groups are easy to tell apart
 const AIRPORT_COLORS = {
@@ -1104,6 +1145,14 @@ function setNowIcon(ic, c1, c2) {
 //  All runtime variables — reset on page reload
 // ============================================================
 const audio = document.getElementById('audio');
+// v2.55 iPhone MP3 volume: iOS ignores audio.volume, so while the screen is on an MP3 plays on this
+// extra element through Web Audio (a gain node = the slider). Live radio never goes through it
+// (WebKit gives Web Audio only silence for live streams). Screen off: the MP3 moves back to the
+// plain element at the same spot, so it keeps playing on the lock screen.
+const audioMp3 = document.createElement('audio');
+audioMp3.setAttribute('playsinline', ''); audioMp3.preload = 'auto'; audioMp3.style.display = 'none';
+document.body.appendChild(audioMp3);
+let mp3Routed = false, mp3Ctx = null, mp3Gain = null;
 let curIdx    = -1;      // index into STATIONS array (-1 = nothing playing)
 let vizMode   = 'fft';
 let vizRAF    = null;    // requestAnimationFrame handle for visualizer
@@ -1124,11 +1173,63 @@ let waMode = false;    // true while audioFFT (through Web Audio) is what you he
 let outGain = null;    // volume for the Web Audio path; 0 when it only feeds the analyser
 let waBroken = false;  // set if this phone gave silence through Web Audio once
 try { waBroken = localStorage.getItem('wradio_wa_broken') === '1'; } catch(e) {}
-function out() { return waMode ? audioFFT : audio; }   // the element you hear
+function out() { return mp3Routed ? audioMp3 : waMode ? audioFFT : audio; }   // the element you hear
 function curVol() { return parseFloat(document.getElementById('volSlider').value); }
 function applyVolume(v) {
   audio.volume = v; // iOS ignores this, the gain below handles iPhone
   if (outGain) outGain.gain.value = waMode ? v : 0;
+  if (mp3Gain) mp3Gain.gain.value = v;
+}
+function setMp3Routed(on) {
+  mp3Routed = on;
+  document.documentElement.classList.toggle('mp3vol', on);
+}
+function mp3VolOk() { return IS_IOS && document.visibilityState === 'visible' && !!(window.AudioContext || window.webkitAudioContext); }
+function ensureMp3Graph() {
+  if (mp3Ctx) { if (mp3Ctx.state !== 'running') mp3Ctx.resume().catch(()=>{}); return true; }
+  try {
+    const C = window.AudioContext || window.webkitAudioContext;
+    mp3Ctx = new C();
+    const src = mp3Ctx.createMediaElementSource(audioMp3);
+    mp3Gain = mp3Ctx.createGain();
+    mp3Gain.gain.value = curVol();
+    src.connect(mp3Gain); mp3Gain.connect(mp3Ctx.destination);
+    return true;
+  } catch (e) { console.warn('[MP3 vol] no Web Audio:', e.message); mp3Ctx = null; mp3Gain = null; return false; }
+}
+// Silence guard: if iOS keeps the context suspended the routed MP3 would be mute, so go plain
+function checkMp3Ctx() {
+  setTimeout(() => { if (mp3Routed && mp3Ctx && mp3Ctx.state !== 'running') { console.warn('[MP3 vol] context not running, plain player'); mp3ToPlain(); } }, 600);
+}
+function startAt(el, url, t, play) {
+  el.src = url;
+  const seek = () => { try { if (t > 0) el.currentTime = t; } catch (e) {} };
+  if (el.readyState >= 1) seek(); else el.addEventListener('loadedmetadata', seek, { once: true });
+  if (play) return el.play();
+  return Promise.resolve();
+}
+function mp3ToPlain() {
+  if (!mp3Routed) return;
+  const t = audioMp3.currentTime, was = !audioMp3.paused;
+  setMp3Routed(false);       // first, so the pause below isn't seen as an interruption
+  audioMp3.pause();
+  if (mp3Ctx) mp3Ctx.suspend().catch(()=>{});
+  if (mp3CurIdx < 0 || !mp3Tracks[mp3CurIdx]) return;
+  audio.removeAttribute('crossorigin');
+  startAt(audio, mp3Tracks[mp3CurIdx].url, t, was).catch(e => console.warn('[MP3 vol] plain handover failed:', e.message));
+}
+function mp3ToRouted() {
+  if (mp3Routed || mp3CurIdx < 0 || !mp3Tracks[mp3CurIdx] || !mp3VolOk() || !ensureMp3Graph()) return;
+  const t = audio.currentTime, was = isPlaying && !audio.paused;
+  setMp3Routed(true);
+  audio.pause();
+  startAt(audioMp3, mp3Tracks[mp3CurIdx].url, t, was).then(checkMp3Ctx)
+    .catch(() => { mp3ToPlain(); });
+}
+function mp3Release() {   // radio or stop: the MP3 path goes quiet
+  if (mp3Routed) { setMp3Routed(false); audioMp3.pause(); }
+  if (audioMp3.src) { audioMp3.removeAttribute('src'); audioMp3.load(); }
+  if (mp3Ctx && mp3Ctx.state === 'running') mp3Ctx.suspend().catch(()=>{});
 }
 function userPausedNow() { return (document.getElementById('btnStop')?.innerHTML || '').includes('RESUME'); }
 
@@ -1154,7 +1255,7 @@ function buildUI() {
   // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
   // Music and German sections built normally
-  [{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'workout',label:'Workout',icon:'🏋️'},{key:'music',label:'80s Radio',icon:'🎶'}]
+  [{key:'world',label:'World News',icon:'🌍'},{key:'denews',label:'Germany News',icon:'📰'},{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'workout',label:'Workout',icon:'🏋️'},{key:'music',label:'80s Radio',icon:'🎶'}]
   .forEach(cat => {
     const stns = STATIONS.filter(s => s.cat === cat.key);
     if (!stns.length) return;
@@ -1369,11 +1470,12 @@ function tickClock() {
   checkSleepTimer();
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
   // Update seek bar for MP3
-  if (mp3CurIdx >= 0 && !seekDragging && audio.duration && isFinite(audio.duration)) {
-    const pct = (audio.currentTime / audio.duration) * 100;
+  const ma = out();
+  if (mp3CurIdx >= 0 && !seekDragging && ma.duration && isFinite(ma.duration)) {
+    const pct = (ma.currentTime / ma.duration) * 100;
     document.getElementById('seekSlider').value = pct;
-    document.getElementById('seekCur').textContent = fmtTime(audio.currentTime);
-    document.getElementById('seekDur').textContent = fmtTime(audio.duration);
+    document.getElementById('seekCur').textContent = fmtTime(ma.currentTime);
+    document.getElementById('seekDur').textContent = fmtTime(ma.duration);
   }
 }
 
@@ -1405,6 +1507,7 @@ function play(station) {
   // Deactivate MP3 if switching from it
   if (mp3CurIdx >= 0) { document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active'); mp3CurIdx = -1; }
 
+  mp3Release(); // radio never goes through the MP3 volume path
   curIdx = STATIONS.indexOf(station);
   isPlaying = true; // set BEFORE play() so viz activates immediately
   stopFFTClone(); // never let the previous station's analysis copy keep running
@@ -1435,7 +1538,7 @@ function play(station) {
     // Asking for CORS made stations without CORS headers fail to play at all.
     audio.removeAttribute('crossorigin');
     audio.preload = 'auto'; // buffer aggressively — helps CarPlay wireless
-    audio.src = station.url;
+    audio.src = directUrl(station);
   }
 
   el.play().then(() => {
@@ -1475,7 +1578,7 @@ function toggleStop() {
     }).catch(() => {
       isPlaying = false;
       // Stale stream — reload
-      if (curIdx >= 0) { if (waMode) audio.crossOrigin = 'anonymous'; audio.src = STATIONS[curIdx].url; audio.play().catch(()=>{}); }
+      if (curIdx >= 0) { if (waMode) audio.crossOrigin = 'anonymous'; audio.src = waMode ? STATIONS[curIdx].url : directUrl(STATIONS[curIdx]); audio.play().catch(()=>{}); }
     });
   } else {
     stopPlay();
@@ -1488,6 +1591,7 @@ function stopPlay() {
   reconnectDelay = 2000; frozenCount = 0;
   isPlaying = false;
   waMode = false;
+  mp3Release();
   audio.pause();
   audio.src = '';
   stopFFTClone(); // stop silent FFT clone too
@@ -1506,7 +1610,7 @@ function stopPlay() {
 
 function setVolume(v) {
   applyVolume(parseFloat(v));
-  if (IS_IOS && !waMode && isPlaying && !volHintShown) {
+  if (IS_IOS && !waMode && !mp3Routed && isPlaying && !volHintShown) {
     volHintShown = true;
     showToast(mp3CurIdx >= 0 ? 'iPhone: use the side buttons for MP3 volume' : 'iPhone: use the side buttons while locked', 'ok');
   }
@@ -1525,8 +1629,9 @@ function fmtTime(s) {
 
 // Called when user drags the seek slider
 function seekMp3(val) {
-  if (mp3CurIdx < 0 || !audio.duration || !isFinite(audio.duration)) return;
-  audio.currentTime = (parseFloat(val) / 100) * audio.duration;
+  const a = out();
+  if (mp3CurIdx < 0 || !a.duration || !isFinite(a.duration)) return;
+  a.currentTime = (parseFloat(val) / 100) * a.duration;
 }
 
 // ============================================================
@@ -1607,6 +1712,17 @@ function stopFFTClone() {
 // Off since v2.45: on real iPhones WebKit hands Web Audio only silence for live
 // streams (WebKit bug 180696), so this mode never gave sound, volume or a real FFT.
 const IOS_LIVE_MODE = false;
+// v2.53: the plain player (lock screen / CarPlay) uses a sturdier stream when the station has one:
+// HLS (small 4 s chunks, ~30 s buffer and automatic retries, like Spotify/YouTube) or a lighter 64k AAC.
+// The original MP3 stays for the on-screen visualizer path, and is the fallback if the sturdy one fails.
+const sturdyBad = new Set();
+const CAN_HLS = !!document.createElement('audio').canPlayType('application/vnd.apple.mpegurl');
+function directUrl(st) {
+  if (!st || !st.hls || sturdyBad.has(st.n)) return st ? st.url : '';
+  if (st.hls.includes('.m3u8') && !CAN_HLS) return st.url;
+  return st.hls;
+}
+function isStationUrl(st, url) { return !!st && (url === st.url || url === st.hls); }
 function useRouted() {
   if (!IOS_LIVE_MODE || !IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
   connectFFT();
@@ -1661,13 +1777,13 @@ function checkRoutedSound(station) {
 // Hand over from the Web Audio copy to the plain element (screen lock, or a failure)
 function toDirectNow() {
   if (!waMode) return;
-  const url = curIdx >= 0 ? STATIONS[curIdx].url : '';
+  const url = curIdx >= 0 ? directUrl(STATIONS[curIdx]) : '';
   if (!url || !isPlaying || userPausedNow()) { waMode = false; stopFFTClone(); applyVolume(curVol()); return; }
   audio.removeAttribute('crossorigin');
   audio.preload = 'auto';
   audio.src = url;
   audio.play().then(() => {
-    if (curIdx < 0 || STATIONS[curIdx].url !== url) return;
+    if (curIdx < 0 || !isStationUrl(STATIONS[curIdx], url)) return;
     waMode = false;
     applyVolume(curVol());
     stopFFTClone();
@@ -2799,7 +2915,7 @@ function hardReconnect(reason) {
   reconnectTimer = setTimeout(() => {
     reconnectTimer = null;
     if (curIdx < 0 || !isPlaying) return;
-    const url = STATIONS[curIdx].url;
+    const url = waMode ? STATIONS[curIdx].url : directUrl(STATIONS[curIdx]);
     const audio = out();   // reconnect whichever element you hear
     audio.pause();
     audio.src = '';
@@ -2854,7 +2970,7 @@ function startBufferWatchdog() {
 }
 
 function onAudible(type, fn) {
-  [audio, audioFFT].forEach(el => el.addEventListener(type, e => { if (e.target === out()) fn(e); }));
+  [audio, audioFFT, audioMp3].forEach(el => el.addEventListener(type, e => { if (e.target === out()) fn(e); }));
 }
 
 onAudible('waiting', () => {
@@ -2873,6 +2989,8 @@ onAudible('playing', () => {
     const meta = document.getElementById('npMeta');
     if (meta.textContent !== 'Live ATC')
       meta.textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC' : '';
+  } else if (mp3CurIdx >= 0) {
+    document.getElementById('npMeta').textContent = 'Local MP3';
   }
 });
 
@@ -2881,6 +2999,13 @@ onAudible('error', () => {
   console.warn('[Audio] Error');
   // On iPhone a Web Audio error can mean the station refused cross-origin access
   if (waMode) { toDirectNow(); return; }
+  const st = STATIONS[curIdx];
+  if (st.hls && audio.src === st.hls && !sturdyBad.has(st.n)) {
+    // The sturdy stream refused: use the original MP3 for this station from now on (this session)
+    sturdyBad.add(st.n);
+    console.warn('[Audio] Sturdy stream failed, back to MP3 for', st.name);
+    reconnectDelay = 500;
+  }
   hardReconnect('Error');
 });
 
@@ -2912,11 +3037,11 @@ function updateMediaSession(name, artist) {
 
   // Play / Pause
   navigator.mediaSession.setActionHandler('play', () => {
-    audio.play().catch(()=>{});
+    out().play().catch(()=>{});
     navigator.mediaSession.playbackState = 'playing';
   });
   navigator.mediaSession.setActionHandler('pause', () => {
-    if (mp3CurIdx >= 0) { audio.pause(); navigator.mediaSession.playbackState = 'paused'; }
+    if (mp3CurIdx >= 0) { out().pause(); navigator.mediaSession.playbackState = 'paused'; }
     else stopPlay();
   });
   navigator.mediaSession.setActionHandler('stop', stopPlay);
@@ -2928,14 +3053,15 @@ function updateMediaSession(name, artist) {
     mp3CurIdx >= 0 ? mp3Next : null);
 
   // Seek support for MP3 (streams are not seekable)
-  if (mp3CurIdx >= 0 && audio.duration && isFinite(audio.duration)) {
+  const ma = out();
+  if (mp3CurIdx >= 0 && ma.duration && isFinite(ma.duration)) {
     navigator.mediaSession.setActionHandler('seekto', (d) => {
-      if (d.seekTime !== undefined) audio.currentTime = d.seekTime;
+      if (d.seekTime !== undefined) out().currentTime = d.seekTime;
     });
     navigator.mediaSession.setPositionState({
-      duration:     audio.duration,
-      playbackRate: audio.playbackRate,
-      position:     audio.currentTime
+      duration:     ma.duration,
+      playbackRate: ma.playbackRate,
+      position:     ma.currentTime
     });
   } else {
     // Clear seek handlers for live streams
@@ -3023,10 +3149,16 @@ function playMp3(i) {
   document.getElementById('sigbars').classList.remove('active');
   document.getElementById('btnStop').innerHTML = '&#9632; STOP';
   audio.pause();
-  audio.removeAttribute('crossorigin'); // blob URLs don't need CORS
-  audio.src = t.url;
-  // audio.load() not needed for blob URLs — play() starts faster without it
-  audio.play().then(() => {
+  if (mp3Routed) { setMp3Routed(false); audioMp3.pause(); }
+  // iPhone with the screen on: play through the volume control (v2.55)
+  const routed = mp3VolOk() && ensureMp3Graph();
+  setMp3Routed(routed);
+  const el = routed ? audioMp3 : audio;
+  if (!routed) audio.removeAttribute('crossorigin'); // blob URLs don't need CORS
+  el.src = t.url;
+  // load() not needed for blob URLs — play() starts faster without it
+  el.play().then(() => {
+    if (routed) checkMp3Ctx();
     document.getElementById('sigbars').classList.add('active');
     const seekRow = document.getElementById('seekRow');
     seekRow.style.display = 'flex';
@@ -3044,9 +3176,10 @@ function playMp3(i) {
 }
 
 // Keep iOS lock screen position state in sync during MP3 playback
-audio.addEventListener('timeupdate', () => {
+onAudible('timeupdate', () => {
   if (mp3CurIdx < 0) return;
   if (!('mediaSession' in navigator)) return;
+  const audio = out();
   if (!audio.duration || !isFinite(audio.duration)) return;
   try {
     navigator.mediaSession.setPositionState({
@@ -3087,7 +3220,7 @@ function toggleMp3Repeat() {
 }
 
 // Auto-advance to next track when MP3 ends
-audio.addEventListener('ended', () => {
+onAudible('ended', () => {
   if (mp3CurIdx < 0) return; // was a stream, ignore
   if (mp3Repeat) { playMp3(mp3CurIdx); }
   else if (mp3CurIdx < mp3Tracks.length - 1 || mp3Shuffle) { mp3Next(); }
@@ -3306,6 +3439,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     // iPhone: hand over to the plain element, which keeps playing on the lock screen
     if (waMode) toDirectNow();
+    mp3ToPlain(); // MP3: keep playing on the lock screen
     return;
   }
   ensureKeepAlive();
@@ -3317,6 +3451,7 @@ document.addEventListener('visibilitychange', () => {
   }
   // iPhone: back to Web Audio for the volume slider and the real visualizer
   if (IS_IOS && !waMode) toRoutedNow();
+  if (IS_IOS && mp3CurIdx >= 0) mp3ToRouted(); // MP3 volume slider back
   // Resume FFT clone too
   if (!IS_IOS && isPlaying && audioFFT.src && audioFFT.paused) {
     audioFFT.play().catch(()=>{});
