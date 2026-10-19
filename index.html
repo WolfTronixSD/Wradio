@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.62</title>
+<title>WRadio v2.63</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -375,7 +375,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.62</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.63</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -572,7 +572,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.63 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:05:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -588,6 +588,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.63 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:05:00Z">2026-10-19</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        RDS for every station: song text now comes through a small relay on the Netlify site, so SWR3, 1LIVE, NDR 2, hr3 and the other ARD stations work too, with far less data. Direct reading stays as a backup
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.62 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-19T23:00:00Z">2026-10-19</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -956,11 +961,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.62  (2026-10-19)
+//  Version : v2.63  (2026-10-19)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.63 - RDS via Netlify relay /api/nowplaying (wolf-ironmen repo), direct ICY/status as fallback
 //  v2.62 - RDS: resolve stream redirects with a plain GET first (preflights can't follow redirects)
 //  v2.61 - RDS song text (ICY in-stream metadata, Icecast status fallback); give way to other apps' audio
 //  v2.60 - Update bar: checks live <title> version (no-store) on open/return/15 min
@@ -3719,9 +3725,28 @@ function rdsClean(t) {
   if (!t || /^[-–\s]*$/.test(t) || /^(unknown|n\/a|-|live|advert|werbung)/i.test(t)) return '';
   return t.replace(/^\*+\s*|\s*\*+$/g, '').replace(/^-\s*|\s*-$/g, '').slice(0, 140);
 }
+// v2.63: song text relay on the Wolf Ironman Netlify site. It reads the text server-side, so it works for
+// stations that block web pages (all ARD), costs ~1 KB per check instead of ~16 KB, and old SHOUTcast too.
+const RDS_RELAY = 'https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url=';
+async function rdsRelay(url) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const r = await fetch(RDS_RELAY + encodeURIComponent(url), { signal: ctl.signal });
+    if (!r.ok) return undefined;
+    const j = await r.json();
+    return typeof j.title === 'string' ? j.title : (j.title === null ? null : undefined);
+  } catch (e) { return undefined; } finally { clearTimeout(timer); }
+}
 async function rdsRead(station) {
-  const how = RDS.how[station.n];
+  let how = RDS.how[station.n];
   if (how === 'none') return null;
+  if (!how || how === 'relay') {
+    const t = await rdsRelay(station.url);
+    if (typeof t === 'string') { RDS.how[station.n] = 'relay'; return rdsClean(t); }
+    if (how === 'relay' && t === undefined) return null; // relay hiccup, keep using it
+    how = undefined; // relay says no text, or relay down: try reading directly
+  }
   if (!how || how === 'icy') {
     const t = await rdsIcy(station.url).catch(() => undefined);
     if (t !== undefined) { RDS.how[station.n] = 'icy'; return rdsClean(t); }
