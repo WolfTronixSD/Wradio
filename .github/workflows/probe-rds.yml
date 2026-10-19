@@ -8,4 +8,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/probe_rds.py
-      - run: for u in https://somafm.com/songs/u80s.json https://api.somafm.com/channels.json; do echo "== $u"; curl -sS -D - -H "Origin: https://wolftronixsd.github.io" --max-time 8 "$u" | head -c 700; echo; done
+      - run: |
+          for u in https://somafm.com/songs/u80s.json https://api.somafm.com/channels.json; do echo "== $u"; curl -sS -D - -H "Origin: https://wolftronixsd.github.io" --max-time 8 "$u" | head -c 700; echo; done
