@@ -1,156 +1,182 @@
-1 181.FM Awesome 80s 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:00 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-2 SomaFM Underground 80s 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:00 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-28 80s Forever 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:00 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-29 Made in 80 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-30 80s New Wave Radio 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-31 Nostalgie New Wave 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-32 bigFM Workout 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63V 
-33 80s Hi‑NRG 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-34 80s Rock 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-35 Techno 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-3 Antenne Bayern 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-4 1LIVE WDR 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-5 SWR3 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-6 Bayern 3 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:01 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-7 SWR1 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-23 Deutschlandfunk 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-24 NDR 2 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-25 hr3 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-26 Bayern 1 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-27 Rock Antenne 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-36 BBC World Service 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63W 
-37 NPR News 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63X 
-38 RFI English 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63X 
-39 NDR Info 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63X 
-40 WDR 5 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63X 
-41 hr-info 401 [] HTTP/2 401 
-content-type: text/html; charset=utf-8
-date: Mon, 19 Oct 2026 22:57:02 GMT
-server: Netlify
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-nf-request-id: 01M5B63X 
+1 181.FM Awesome 80s 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+2 SomaFM Underground 80s 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+28 80s Forever 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+29 Made in 80 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+30 80s New Wave Radio 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+31 Nostalgie New Wave 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+32 bigFM Workout 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+33 80s Hi‑NRG 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+34 80s Rock 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 4
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+35 Techno 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+3 Antenne Bayern 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+4 1LIVE WDR 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+5 SWR3 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+6 Bayern 3 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+7 SWR1 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+23 Deutschlandfunk 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+24 NDR 2 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+25 hr3 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+26 Bayern 1 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+27 Rock Antenne 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 4
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+36 BBC World Service 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+37 NPR News 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 2
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+38 RFI English 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 6
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+39 NDR Info 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+40 WDR 5 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 0
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
+41 hr-info 200 ['*'] HTTP/2 200 
+access-control-allow-origin: *
+age: 1
+cache-control: public,max-age=15
+cache-status: "Netlify Durable"; fwd=bypass
+cache-status: "Netlify Edge"; fwd=miss; fwd-status=200; stored
+content-ty 
