@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.69</title>
+<title>WRadio v2.70</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -333,6 +333,20 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 #vizCanvas{border-radius:16px}
 @media (prefers-reduced-motion:reduce){body::after,.np-icon.on,.np-icon.on::before,.np-icon.on::after,.stn-eq i,.stn-btn.active .stn-ic{animation:none}}
 @media (max-width:380px){.stn-ic{width:42px;height:42px;font-size:1.4em}.stn-btn,.sec-german .stn-btn{gap:8px;padding:10px}}
+/* v2.70: tagesschau video */
+.btn-watch{background:rgba(0,212,255,0.12);border:2px solid var(--accent);color:var(--accent);font-family:var(--mono);
+  font-weight:bold;font-size:1em;padding:10px 14px;min-height:54px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.btn-watch:active{background:rgba(0,212,255,0.3)}
+.btn-watch[hidden]{display:none}
+#vidBox{position:fixed;inset:0;z-index:1000;background:#000;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#vidBox[hidden]{display:none}
+.vid-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;color:#fff;font-family:var(--sans)}
+.vid-title{font-weight:700;font-size:1.1em}
+.vid-meta{font-size:0.8em;color:#aab;margin-top:2px}
+.vid-close{flex:none;width:48px;height:48px;border-radius:50%;border:1px solid #555;background:#222;color:#fff;font-size:1.3em;cursor:pointer}
+#vid{flex:1;width:100%;min-height:0;background:#000;object-fit:contain}
+body.vid-open{overflow:hidden}
 /* v2.65: smaller station icon and STOP button, bigger RDS song text */
 .np-head{gap:10px}
 .np-icon{width:46px;height:46px;font-size:1.45em}
@@ -382,7 +396,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.69</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.70</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -411,6 +425,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     </div>
     <div class="np-controls">
       <button class="btn-stop" id="btnStop" onclick="toggleStop()">&#9632; STOP</button>
+      <button class="btn-watch" id="btnWatch" hidden onclick="openVideo()">&#128250; WATCH</button>
       <div class="vol-wrap">
         <span class="vol-icon">&#128264;</span>
         <input type="range" id="volSlider" min="0" max="1" step="0.02" value="1"
@@ -579,7 +594,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.69 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:00:00Z">2026-10-20</span></span>
+        <span style="color:var(--accent)">v2.70 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:10:00Z">2026-10-20</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -595,6 +610,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.70 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:10:00Z">2026-10-20</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        tagesschau as video: tap 📺 WATCH while tagesschau 20 Uhr or 100 Sekunden is on. The radio pauses while you watch
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.69 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:00:00Z">2026-10-20</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -998,11 +1018,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.69  (2026-10-20)
+//  Version : v2.70  (2026-10-20)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.70 - Video for 45-46: video: feed field, WATCH button, #vidBox overlay (radio pauses)
 //  v2.69 - On-demand news 45-46 (tagesschau 20 Uhr, 100 Sekunden): feed: field, newest episode via podcast RSS
 //  v2.68 - New stations 42-44 (Antenne 80er Kulthits, FFH 80er, 1000 HITS 80s)
 //  v2.67 - Station 2: SomaFM Underground 80s -> Heart 80s
@@ -1191,8 +1212,8 @@ const STATIONS = [
   {n:40, name:"WDR 5",                url:"https://wdr-wdr5-live.icecast.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3", cat:"denews", hls:"https://wdr-radio.ard-mcdn.de/wdr/radio/wdr5/hls/master.m3u8"},
   {n:41, name:"hr-info",              url:"https://dispatcher.rndfnk.com/hr/hrinfo/live/mp3/high",                 cat:"denews"},
   // On demand (v2.69): url is filled with the newest episode from the podcast feed
-  {n:45, name:"tagesschau 20 Uhr",    url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-audio-100~podcast.xml", cat:"denews", rds:false},
-  {n:46, name:"tagesschau 100 Sek.",  url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-audio-100~podcast.xml", cat:"denews", rds:false},
+  {n:45, name:"tagesschau 20 Uhr",    url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-audio-100~podcast.xml", video:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-video-100~podcast.xml", cat:"denews", rds:false},
+  {n:46, name:"tagesschau 100 Sek.",  url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-audio-100~podcast.xml", video:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-video-100~podcast.xml", cat:"denews", rds:false},
 
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
@@ -1761,6 +1782,7 @@ function play(station, feedReady) {
   document.getElementById('stn-'+station.n)?.classList.add('active');
   document.getElementById('seekRow').style.display = 'none';
   document.getElementById('btnStop').innerHTML = '&#9632; STOP';
+  showWatch(station);
 
   // Speed optimization: set src then immediately call play() — no load()
   audio.pause();
@@ -1831,6 +1853,7 @@ function toggleStop() {
 
 function stopPlay() {
   rdsStop();
+  showWatch(null);
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
   if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
   reconnectDelay = 2000; frozenCount = 0;
@@ -1976,25 +1999,42 @@ const FEED_MAX_AGE = 10 * 60000;
 let feedTicket = 0;
 const feedFresh = st => !!st.url && Date.now() - (st.feedAt || 0) < FEED_MAX_AGE;
 const isFeedNow = () => curIdx >= 0 && mp3CurIdx < 0 && !!STATIONS[curIdx].feed;
-async function loadFeed(st) {
+// Newest episode of a podcast feed: { url, date }
+async function readFeed(feedUrl) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 8000);
   try {
-    const r = await fetch(st.feed, { cache: 'no-store', signal: ctl.signal });
+    const r = await fetch(feedUrl, { cache: 'no-store', signal: ctl.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const doc = new DOMParser().parseFromString(await r.text(), 'application/xml');
     const item = doc.querySelector('item');
     const url = item && item.querySelector('enclosure')?.getAttribute('url');
     if (!url) throw new Error('no episode in feed');
-    const fresh = url.replace(/^http:/, 'https:');
+    return { url: url.replace(/^http:/, 'https:'), date: new Date(item.querySelector('pubDate')?.textContent || '') };
+  } finally { clearTimeout(timer); }
+}
+async function loadFeed(st) {
+  try {
+    const ep = await readFeed(st.feed);
     // don't swap the file under an episode that is playing right now
-    if (!(curIdx >= 0 && STATIONS[curIdx] === st && isPlaying)) st.url = fresh;
-    st.epDate = new Date(item.querySelector('pubDate')?.textContent || '');
+    if (!(curIdx >= 0 && STATIONS[curIdx] === st && isPlaying)) st.url = ep.url;
+    st.epDate = ep.date;
     st.feedAt = Date.now();
     return true;
   } catch (e) { console.warn('[Feed]', st.name, e.message); return false; }
-  finally { clearTimeout(timer); }
 }
-function refreshFeeds() { STATIONS.forEach(s => { if (s.feed && !feedFresh(s)) loadFeed(s); }); }
+// v2.70: the same shows as video (tagesschau video podcast)
+const vidFresh = st => !!st.vidUrl && Date.now() - (st.vidAt || 0) < FEED_MAX_AGE;
+async function loadVideoFeed(st) {
+  try {
+    const ep = await readFeed(st.video);
+    st.vidUrl = ep.url; st.vidDate = ep.date; st.vidAt = Date.now();
+    return true;
+  } catch (e) { console.warn('[Video feed]', st.name, e.message); return false; }
+}
+function refreshFeeds() { STATIONS.forEach(s => {
+  if (s.feed && !feedFresh(s)) loadFeed(s);
+  if (s.video && !vidFresh(s)) loadVideoFeed(s);
+}); }
 function epLabel(st) {
   const d = st.epDate;
   if (!d || isNaN(d)) return 'Latest episode';
@@ -2013,12 +2053,42 @@ function waitForFeed(st, ticket) {
   document.getElementById('npStation').classList.remove('idle');
   { const [ic, , c1, c2] = look(st); setNowIcon(ic, c1, c2); }
   document.getElementById('npMeta').textContent = 'Finding latest episode...';
+  showWatch(st);
   loadFeed(st).then(() => {
     if (ticket !== feedTicket) return; // another station was tapped meanwhile
     if (st.url) { play(st, true); return; }
     document.getElementById('stn-'+st.n)?.classList.remove('active');
     document.getElementById('npMeta').textContent = 'Episode not found · tap to retry';
   });
+}
+// WATCH button shows for a station that has a video version
+function showWatch(st) { const b = document.getElementById('btnWatch'); if (b) b.hidden = !(st && st.video); }
+let vidStation = null;
+function openVideo() {
+  const st = curIdx >= 0 ? STATIONS[curIdx] : null;
+  if (!st || !st.video) return;
+  if (isPlaying && !out().paused) toggleStop(); // radio pauses while you watch
+  vidStation = st;
+  const box = document.getElementById('vidBox'), v = document.getElementById('vid');
+  document.getElementById('vidTitle').textContent = st.name;
+  document.getElementById('vidMeta').textContent = 'Finding latest video...';
+  box.hidden = false;
+  document.body.classList.add('vid-open');
+  const start = () => {
+    if (vidStation !== st || box.hidden) return;
+    if (!st.vidUrl) { document.getElementById('vidMeta').textContent = 'Video not found · close and try again'; return; }
+    document.getElementById('vidMeta').textContent = epLabel({ epDate: st.vidDate });
+    if (v.src !== st.vidUrl) v.src = st.vidUrl;
+    v.play().catch(() => {}); // if the phone wants a tap first, the play button is right there
+  };
+  if (vidFresh(st)) start(); else loadVideoFeed(st).then(start);
+}
+function closeVideo() {
+  const v = document.getElementById('vid');
+  v.pause(); v.removeAttribute('src'); v.load();
+  document.getElementById('vidBox').hidden = true;
+  document.body.classList.remove('vid-open');
+  vidStation = null;
 }
 function useRouted() {
   if (!IOS_LIVE_MODE || !IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
@@ -3443,6 +3513,7 @@ function escHtml(s) {
 
 function playMp3(i) {
   rdsStop();
+  showWatch(null);
   if (curIdx >= 0) { document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active'); curIdx = -1; }
   if (mp3CurIdx >= 0) document.getElementById('mp3-'+mp3CurIdx)?.classList.remove('active');
   mp3CurIdx = i;
@@ -3947,6 +4018,13 @@ if (IS_IOS) document.documentElement.classList.add('ios');
 document.querySelectorAll('[data-at]').forEach(el => { const d = new Date(el.dataset.at); if (isNaN(d)) return;
   el.textContent = d.toLocaleDateString('en-CA') + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); });
 </script>
+<div id="vidBox" hidden>
+  <div class="vid-head">
+    <div><div class="vid-title" id="vidTitle"></div><div class="vid-meta" id="vidMeta"></div></div>
+    <button class="vid-close" onclick="closeVideo()" aria-label="Close video">&#10005;</button>
+  </div>
+  <video id="vid" controls playsinline preload="metadata"></video>
+</div>
 <div id="updBar" role="button" hidden style="position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:999;
   padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#7b2ff7,#00d4ff);color:#fff;font-family:var(--sans);font-weight:700;
   font-size:1.05em;box-shadow:0 10px 30px rgba(0,0,0,.5);text-align:center;cursor:pointer"></div>
