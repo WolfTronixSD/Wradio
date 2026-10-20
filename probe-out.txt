@@ -24,3 +24,67 @@
 39 NDR Info => {"title":"Die ARD Infonacht - Gut informiert durch die Nacht"} 
 40 WDR 5 => {"title":"ARD Infonacht"} 
 41 hr-info => {"title":"*** hriNFO - Wer's hört, hat mehr zu sagen."} 
+=== https://ice2.somafm.com/u80s-64-aac
+HTTP/1.1 302 Found
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: text/html
+Location: https://ice2.somafm.com/u80s-64-aac?_ic2=1792454435353
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: audio/aac
+icy-br: 64
+bytes 306153
+stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=64116
+decode-exit 0
+=== https://ice2.somafm.com/u80s-128-mp3
+HTTP/1.1 302 Found
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: text/html
+Location: https://ice2.somafm.com/u80s-128-mp3?_ic2=1792454442079
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: audio/mpeg
+icy-br: 128
+bytes 351086
+stream|codec_name=mp3|sample_rate=44100|channels=2|bit_rate=128000
+decode-exit 0
+=== https://ice1.somafm.com/u80s-128-aac
+HTTP/1.1 302 Found
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: text/html
+Location: https://ice1.somafm.com/u80s-128-aac?_ic2=1792454448323
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: audio/aac
+icy-br: 128
+bytes 351166
+stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=127865
+decode-exit 0
+=== https://ice2.somafm.com/u80s-128-aac
+HTTP/1.1 302 Found
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: text/html
+Location: https://ice2.somafm.com/u80s-128-aac?_ic2=1792454454569
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Content-Type: audio/aac
+icy-br: 128
+bytes 353406
+stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=128971
+decode-exit 0
