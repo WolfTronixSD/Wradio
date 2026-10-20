@@ -18,24 +18,26 @@ jobs:
           python3 - >> probe-out.txt 2>&1 <<'PY'
           import json, subprocess, urllib.parse, urllib.request
           UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-          cands = [("80s80s", "https://streams.80s80s.de/web/mp3-192/streams.80s80s.de/"),
-                   ("Antenne 80er Kulthits", "https://stream.antenne.de/80er-kulthits/stream/mp3"),
+          cands = [("Antenne 80er", "https://stream.antenne.de/80er-kulthits/stream/mp3"),
                    ("FFH 80er", "https://mp3.ffh.de/ffhchannels/hq80er.mp3"),
-                   ("Absolute 80s", "https://ais.absoluteradio.co.uk/absolute80s.mp3"),
-                   ("Absolute 80s hi", "https://absolute80s.ais-a.planetradio.co.uk/absolute80s.mp3")]
-          try:
-              req = urllib.request.Request("https://de1.api.radio-browser.info/json/stations/search?tag=80s&order=votes&reverse=true&limit=20&hidebroken=true", headers={"User-Agent": "WRadio-probe"})
-              for st in json.load(urllib.request.urlopen(req, timeout=15)):
-                  cands.append((st["name"].strip()[:40] + " [" + st.get("countrycode","") + " votes " + str(st["votes"]) + "]", st["url_resolved"]))
-          except Exception as e: print("rb error", e)
+                   ("Big80 https ip", "https://158.69.114.190:8065/;"),
+                   ("1000hits https", "https://c2.auracast.net:8048/stream"),
+                   ("1000hits https2", "https://c2.auracast.net/8048/stream")]
+          for q in ["big%2080s%20station", "1000%20hits%2080s"]:
+              try:
+                  req = urllib.request.Request("https://de1.api.radio-browser.info/json/stations/byname/" + q + "?order=votes&reverse=true&limit=10", headers={"User-Agent": "WRadio-probe"})
+                  for st in json.load(urllib.request.urlopen(req, timeout=15)):
+                      for u in {st["url"], st["url_resolved"]}:
+                          cands.append((st["name"].strip()[:40] + " [" + str(st["votes"]) + "]", u))
+              except Exception as e: print("rb error", e)
           for name, url in cands:
-              h = subprocess.run(["curl","-sS","-L","--max-time","6","-A",UA,"-H","Origin: https://wolftronixsd.github.io","-D","-","-o","s.bin",url], capture_output=True, text=True).stdout.lower()
+              h = subprocess.run(["curl","-sS","-L","--max-time","6","-A",UA,"-H","Origin: https://wolftronixsd.github.io","-D","-","-o","s.bin",url], capture_output=True).stdout.decode("latin1").lower()
               import re, os
               acao = re.findall(r"^access-control-allow-origin:\s*(\S+)", h, re.M)
               ctype = (re.findall(r"^content-type:\s*([^\r\n;]+)", h, re.M) or ["-"])[-1]
               size = os.path.getsize("s.bin") if os.path.exists("s.bin") else 0
-              codec = subprocess.run(["ffprobe","-v","error","-show_entries","stream=codec_name,bit_rate","-of","csv=p=0","s.bin"], capture_output=True, text=True).stdout.strip().replace("\n"," ")
-              rel = subprocess.run(["curl","-sS","--max-time","12","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True, text=True).stdout[:100]
+              codec = subprocess.run(["ffprobe","-v","error","-show_entries","stream=codec_name,bit_rate","-of","csv=p=0","s.bin"], capture_output=True).stdout.decode("latin1").strip().replace("\n"," ")
+              rel = subprocess.run(["curl","-sS","--max-time","12","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True).stdout.decode("utf-8","replace")[:100]
               print(f"{name} | {url} | bytes {size} | {ctype} | {codec} | acao {acao[-1] if acao else '-'} | {rel}", flush=True)
           PY
           git config user.name probe; git config user.email probe@users.noreply.github.com
