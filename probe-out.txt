@@ -1,8 +1,6 @@
-Antenne 80er | https://stream.antenne.de/80er-kulthits/stream/mp3 | bytes 545771 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"U2 - Angel of harlem"}
-FFH 80er | https://mp3.ffh.de/ffhchannels/hq80er.mp3 | bytes 204800 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":""}
-Big80 https ip | https://158.69.114.190:8065/; | bytes 204800 | - | mp3,128000 | acao - | {"title":null,"error":"no song text in this stream"}
-1000hits https | https://c2.auracast.net:8048/stream | bytes 341055 | audio/mpeg | mp3,128000 | acao * | {"title":"Sheila & B. Devotion - Spacer"}
-1000hits https2 | https://c2.auracast.net/8048/stream | bytes 1924 | text/html |  | acao - | {"title":null,"error":"status 404"}
-The Big 80s Station [26079] | http://158.69.114.190:8065/; | bytes 349832 | audio/mpeg | mp3,128000 | acao * | {"title":"Kool & The Gang - Joanna"}
-The Big 80s Station [505] | http://158.69.114.190:8065/; | bytes 348996 | audio/mpeg | mp3,128000 | acao * | {"title":"Kool & The Gang - Joanna"}
-1000 HITS 80s [27441] | http://c2.auracast.net:8048/stream | bytes 362789 | audio/mpeg | mp3,128000 | acao * | {"title":"Sheila & B. Devotion - Spacer"}
+HTTP/2 200 
+content-security-policy: script-src 'self'
+<script src="app.js">
+<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="ffc1f279-3418-4878-91fa-34cbfa616887" data-app-host="app.netlify.com" data-account-tier="free">
+4
+nowplaying 200
