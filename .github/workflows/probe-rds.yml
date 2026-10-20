@@ -13,32 +13,11 @@ jobs:
       - run: |
           sleep 1
           set +e
-          sudo apt-get install -y -qq ffmpeg >/dev/null 2>&1
+          sleep 60
           rm -f probe-out.txt
-          python3 - >> probe-out.txt 2>&1 <<'PY'
-          import json, subprocess, urllib.parse, urllib.request
-          UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-          cands = [("Antenne 80er", "https://stream.antenne.de/80er-kulthits/stream/mp3"),
-                   ("FFH 80er", "https://mp3.ffh.de/ffhchannels/hq80er.mp3"),
-                   ("Big80 https ip", "https://158.69.114.190:8065/;"),
-                   ("1000hits https", "https://c2.auracast.net:8048/stream"),
-                   ("1000hits https2", "https://c2.auracast.net/8048/stream")]
-          for q in ["big%2080s%20station", "1000%20hits%2080s"]:
-              try:
-                  req = urllib.request.Request("https://de1.api.radio-browser.info/json/stations/byname/" + q + "?order=votes&reverse=true&limit=10", headers={"User-Agent": "WRadio-probe"})
-                  for st in json.load(urllib.request.urlopen(req, timeout=15)):
-                      for u in {st["url"], st["url_resolved"]}:
-                          cands.append((st["name"].strip()[:40] + " [" + str(st["votes"]) + "]", u))
-              except Exception as e: print("rb error", e)
-          for name, url in cands:
-              h = subprocess.run(["curl","-sS","-L","--max-time","6","-A",UA,"-H","Origin: https://wolftronixsd.github.io","-D","-","-o","s.bin",url], capture_output=True).stdout.decode("latin1").lower()
-              import re, os
-              acao = re.findall(r"^access-control-allow-origin:\s*(\S+)", h, re.M)
-              ctype = (re.findall(r"^content-type:\s*([^\r\n;]+)", h, re.M) or ["-"])[-1]
-              size = os.path.getsize("s.bin") if os.path.exists("s.bin") else 0
-              codec = subprocess.run(["ffprobe","-v","error","-show_entries","stream=codec_name,bit_rate","-of","csv=p=0","s.bin"], capture_output=True).stdout.decode("latin1").strip().replace("\n"," ")
-              rel = subprocess.run(["curl","-sS","--max-time","12","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True).stdout.decode("utf-8","replace")[:100]
-              print(f"{name} | {url} | bytes {size} | {ctype} | {codec} | acao {acao[-1] if acao else '-'} | {rel}", flush=True)
-          PY
+          curl -sS -D - https://darling-kheer-93b7f4.netlify.app/ -o page.html | grep -i "content-security\|^HTTP" >> probe-out.txt
+          grep -o -i "<script[^>]*>" page.html >> probe-out.txt
+          grep -c -i "netlify" page.html >> probe-out.txt
+          curl -sS -o /dev/null -w "nowplaying %{http_code}\n" "https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url=https%3A%2F%2Fstream.antenne.de%2Fantenne%2Fstream%2Fmp3" >> probe-out.txt
           git config user.name probe; git config user.email probe@users.noreply.github.com
           git add probe-out.txt; git commit -m "relay results [skip ci]"; git push
