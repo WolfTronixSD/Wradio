@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.66</title>
+<title>WRadio v2.67</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.66</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.67</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -579,7 +579,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.66 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:10:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.67 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:25:00Z">2026-10-19</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -595,6 +595,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.67 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:25:00Z">2026-10-20</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        SomaFM Underground 80s replaced by Heart 80s (UK), with song names
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.66 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:10:00Z">2026-10-20</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -983,11 +988,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.66  (2026-10-20)
+//  Version : v2.67  (2026-10-20)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.67 - Station 2: SomaFM Underground 80s -> Heart 80s
 //  v2.66 - Sturdy stream that never starts falls back to MP3 on the first reconnect
 //  v2.65 - Now playing: smaller icon/STOP, bigger RDS text
 //  v2.64 - RDS: phone never opens extra stream connections (SomaFM went silent); relay only, status page backup
@@ -1115,7 +1121,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 //  v2.14 - Added Plus One Flyers + ScheduleMaster link buttons (ATC section)
 //  v2.13 - Music section replaced with 80s Rock & Pop stations:
 //          Big 80s Station (128k, ad-free, ex-radio programmers)
-//          SomaFM Underground 80s (synthpop/new wave, ad-free)
+//          Heart 80s (UK, Global Radio; replaced SomaFM Underground 80s in v2.67)
 //  v2.12 - Added LiveATC + FlightAware link buttons
 //          Google Drive picker now shows ALL audio files (search view)
 //          KSMO (Santa Monica) ATIS/Tower/Ground added
@@ -1140,7 +1146,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 const STATIONS = [
   // --- Music: 80s Rock & Pop (all ad-free) ---
   {n:1,  name:"181.FM Awesome 80s",    url:"https://listen.181fm.com/181-awesome80s_128k.mp3",                         cat:"music", hls:"https://listen.181fm.com/181-awesome80s_64k.aac"},
-  {n:2,  name:"SomaFM Underground 80s", url:"https://ice2.somafm.com/u80s-128-mp3",                                   cat:"music", hls:"https://ice2.somafm.com/u80s-64-aac"},
+  {n:2,  name:"Heart 80s",            url:"https://media-ssl.musicradio.com/Heart80sMP3",                         cat:"music"},
   {n:28, name:"80s Forever",          url:"https://premium.shoutcastsolutions.com/radio/8050/128.mp3",              cat:"music"},
   {n:29, name:"Made in 80",           url:"https://stream2.madein80.live/listen/madein80/play.mp3",                 cat:"music"},
   {n:30, name:"80s New Wave Radio",   url:"https://puma.streemlion.com:2910/stream",                                cat:"music"},
@@ -1191,7 +1197,7 @@ const STATIONS = [
 
 // Look of each station tile: icon, short tag line, two gradient colors
 const LOOK = {
-  1:['🕺','80s pop hits','#ff3cac','#784ba0'],   2:['🌃','Synthpop · no ads','#2b86c5','#784ba0'],
+  1:['🕺','80s pop hits','#ff3cac','#784ba0'],   2:['❤️','UK · big 80s hits','#e5004b','#ff7a59'],
   28:['📼','Swiss · rare 80s · no ads','#f7971e','#ff3cac'],   29:['🥐','French · 80s hits · no ads','#4facfe','#f093fb'],
   32:['💪','Pop hits for training','#f83600','#f9d423'],   33:['🪩','80s Italo disco · Hi-NRG','#ff0844','#ffb199'],
   34:['🎸','80s rock · power','#e53935','#8e24aa'],          35:['⚡','Techno · Technolovers','#00f260','#0575e6'],
