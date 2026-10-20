@@ -3280,7 +3280,7 @@ function onAudible(type, fn) {
 }
 
 onAudible('waiting', () => {
-  if (isPlaying && curIdx >= 0 && diag.started) bumpDiag('waits'); // not the first load
+  if (isPlaying && curIdx >= 0 && diag.started && !out().seeking) bumpDiag('waits'); // not the first load or a seek
   document.getElementById('npMeta').textContent = 'Buffering...';
   document.getElementById('sigbars').classList.remove('active');
 });
