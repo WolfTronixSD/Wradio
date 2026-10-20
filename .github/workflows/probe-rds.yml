@@ -13,15 +13,30 @@ jobs:
       - run: |
           sleep 1
           set +e
-          UA="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-          sudo apt-get install -y -qq ffmpeg >/dev/null 2>&1 || true
-          for u in https://ice2.somafm.com/u80s-64-aac https://ice2.somafm.com/u80s-128-mp3 https://ice1.somafm.com/u80s-128-aac https://ice2.somafm.com/u80s-128-aac; do
-            echo "=== $u" >> probe-out.txt
-            curl -sS -L --max-time 6 -A "$UA" -D - -o s.bin "$u" | grep -iE "^HTTP|^location|^content-type|^icy-br|^access-control" >> probe-out.txt 2>&1
-            echo "bytes $(wc -c < s.bin)" >> probe-out.txt
-            ffprobe -v error -show_entries stream=codec_name,sample_rate,channels,bit_rate -of compact s.bin >> probe-out.txt 2>&1
-            ffmpeg -v error -i s.bin -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume" >> probe-out.txt
-            ffmpeg -v error -i s.bin -f null - >> probe-out.txt 2>&1; echo "decode-exit $?" >> probe-out.txt
-          done
+          sudo apt-get install -y -qq ffmpeg >/dev/null 2>&1
+          rm -f probe-out.txt
+          python3 - >> probe-out.txt 2>&1 <<'PY'
+          import json, subprocess, urllib.parse, urllib.request
+          UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+          cands = [("80s80s", "https://streams.80s80s.de/web/mp3-192/streams.80s80s.de/"),
+                   ("Antenne 80er Kulthits", "https://stream.antenne.de/80er-kulthits/stream/mp3"),
+                   ("FFH 80er", "https://mp3.ffh.de/ffhchannels/hq80er.mp3"),
+                   ("Absolute 80s", "https://ais.absoluteradio.co.uk/absolute80s.mp3"),
+                   ("Absolute 80s hi", "https://absolute80s.ais-a.planetradio.co.uk/absolute80s.mp3")]
+          try:
+              req = urllib.request.Request("https://de1.api.radio-browser.info/json/stations/search?tag=80s&order=votes&reverse=true&limit=20&hidebroken=true", headers={"User-Agent": "WRadio-probe"})
+              for st in json.load(urllib.request.urlopen(req, timeout=15)):
+                  cands.append((st["name"].strip()[:40] + " [" + st.get("countrycode","") + " votes " + str(st["votes"]) + "]", st["url_resolved"]))
+          except Exception as e: print("rb error", e)
+          for name, url in cands:
+              h = subprocess.run(["curl","-sS","-L","--max-time","6","-A",UA,"-H","Origin: https://wolftronixsd.github.io","-D","-","-o","s.bin",url], capture_output=True, text=True).stdout.lower()
+              import re, os
+              acao = re.findall(r"^access-control-allow-origin:\s*(\S+)", h, re.M)
+              ctype = (re.findall(r"^content-type:\s*([^\r\n;]+)", h, re.M) or ["-"])[-1]
+              size = os.path.getsize("s.bin") if os.path.exists("s.bin") else 0
+              codec = subprocess.run(["ffprobe","-v","error","-show_entries","stream=codec_name,bit_rate","-of","csv=p=0","s.bin"], capture_output=True, text=True).stdout.strip().replace("\n"," ")
+              rel = subprocess.run(["curl","-sS","--max-time","12","https://darling-kheer-93b7f4.netlify.app/api/nowplaying?url="+urllib.parse.quote(url, safe="")], capture_output=True, text=True).stdout[:100]
+              print(f"{name} | {url} | bytes {size} | {ctype} | {codec} | acao {acao[-1] if acao else '-'} | {rel}", flush=True)
+          PY
           git config user.name probe; git config user.email probe@users.noreply.github.com
           git add probe-out.txt; git commit -m "relay results [skip ci]"; git push
