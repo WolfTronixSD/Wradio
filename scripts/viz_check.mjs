@@ -19,7 +19,7 @@ if (extra.length) await page.evaluate(urls => urls.forEach((url, i) => {
   const s = { n: 900 + i, name: url, url, cat: "music" }; STATIONS.push(s);
   const b = document.createElement("button"); b.id = "stn-" + s.n; b.onclick = () => play(s); document.body.appendChild(b);
 }), extra);
-const ids = await page.evaluate(() => STATIONS.filter(s => s.cat !== "atc").map(s => s.n));
+const ids = await page.evaluate(() => STATIONS.filter(s => s.cat !== "atc" && !s.feed).map(s => s.n));
 let bad = 0;
 for (const n of ids) {
   await page.evaluate(n => document.getElementById("stn-" + n).click(), n);

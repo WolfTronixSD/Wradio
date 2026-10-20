@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.68</title>
+<title>WRadio v2.69</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.68</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.69</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -579,7 +579,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.68 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:40:00Z">2026-10-19</span></span>
+        <span style="color:var(--accent)">v2.69 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:00:00Z">2026-10-20</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -595,6 +595,11 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
   <div class="card">
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
+
+      <div style="color:var(--accent);margin-top:4px">v2.69 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:00:00Z">2026-10-20</span></div>
+      <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
+        Germany News: tagesschau 20 Uhr and tagesschau in 100 Sekunden. Always the newest episode, with a seek bar, and it shows when it aired (German time)
+      </div>
 
       <div style="color:var(--accent);margin-top:4px">v2.68 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T00:40:00Z">2026-10-20</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
@@ -993,11 +998,12 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.68  (2026-10-20)
+//  Version : v2.69  (2026-10-20)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.69 - On-demand news 45-46 (tagesschau 20 Uhr, 100 Sekunden): feed: field, newest episode via podcast RSS
 //  v2.68 - New stations 42-44 (Antenne 80er Kulthits, FFH 80er, 1000 HITS 80s)
 //  v2.67 - Station 2: SomaFM Underground 80s -> Heart 80s
 //  v2.66 - Sturdy stream that never starts falls back to MP3 on the first reconnect
@@ -1184,6 +1190,9 @@ const STATIONS = [
   {n:39, name:"NDR Info",             url:"https://icecast.ndr.de/ndr/ndrinfo/niedersachsen/mp3/128/stream.mp3",   cat:"denews"},
   {n:40, name:"WDR 5",                url:"https://wdr-wdr5-live.icecast.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3", cat:"denews", hls:"https://wdr-radio.ard-mcdn.de/wdr/radio/wdr5/hls/master.m3u8"},
   {n:41, name:"hr-info",              url:"https://dispatcher.rndfnk.com/hr/hrinfo/live/mp3/high",                 cat:"denews"},
+  // On demand (v2.69): url is filled with the newest episode from the podcast feed
+  {n:45, name:"tagesschau 20 Uhr",    url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-audio-100~podcast.xml", cat:"denews", rds:false},
+  {n:46, name:"tagesschau 100 Sek.",  url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-audio-100~podcast.xml", cat:"denews", rds:false},
 
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
@@ -1230,6 +1239,7 @@ const LOOK = {
   41:['🗞️','Frankfurt · news','#f857a6','#6a0572'],
   42:['📻','Bavaria · 80s cult hits','#ff9a3c','#c2185b'],  43:['🕹️','Frankfurt · 80s','#00b09b','#96c93d'],
   44:['💿','Spain · 1000 80s hits · no ads','#fc466b','#3f5efb'],
+  45:['📺','Latest 20:00 news','#0b3d91','#2a7de1'],  46:['⏱️','News in 100 seconds','#0b3d91','#00a6e0'],
 };
 // Each airport has its own colors so the ATC groups are easy to tell apart
 const AIRPORT_COLORS = {
@@ -1697,7 +1707,7 @@ function tickClock() {
   if (alarmActive) checkAlarmFire(now, hh, mm, ss);
   // Update seek bar for MP3
   const ma = out();
-  if (mp3CurIdx >= 0 && !seekDragging && ma.duration && isFinite(ma.duration)) {
+  if ((mp3CurIdx >= 0 || isFeedNow()) && !seekDragging && ma.duration && isFinite(ma.duration)) {
     const pct = (ma.currentTime / ma.duration) * 100;
     document.getElementById('seekSlider').value = pct;
     document.getElementById('seekCur').textContent = fmtTime(ma.currentTime);
@@ -1722,7 +1732,9 @@ function switchTab(id, el) {
 // ============================================================
 //  PLAYBACK
 // ============================================================
-function play(station) {
+function play(station, feedReady) {
+  const ticket = ++feedTicket;
+  if (station.feed && !feedReady && !feedFresh(station)) { waitForFeed(station, ticket); return; }
   // Deactivate previous station button
   if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
   // Clear any pending reconnect from previous station
@@ -1770,9 +1782,10 @@ function play(station) {
 
   el.play().then(() => {
     document.getElementById('sigbars').classList.add('active');
-    document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : '';
+    document.getElementById('npMeta').textContent = station.cat==='atc' ? 'Live ATC' : station.feed ? epLabel(station) : '';
+    if (station.feed) document.getElementById('seekRow').style.display = 'flex';
     ensureKeepAlive();
-    updateMediaSession(station.name);
+    updateMediaSession(station.name, station.feed ? epLabel(station) : undefined);
     rdsStart(station);
     startBufferWatchdog();
     // Start silent FFT clone for real viz — main audio untouched
@@ -1862,7 +1875,7 @@ function fmtTime(s) {
 // Called when user drags the seek slider
 function seekMp3(val) {
   const a = out();
-  if (mp3CurIdx < 0 || !a.duration || !isFinite(a.duration)) return;
+  if ((mp3CurIdx < 0 && !isFeedNow()) || !a.duration || !isFinite(a.duration)) return;
   a.currentTime = (parseFloat(val) / 100) * a.duration;
 }
 
@@ -1955,6 +1968,58 @@ function directUrl(st) {
   return st.hls;
 }
 function isStationUrl(st, url) { return !!st && (url === st.url || url === st.hls); }
+
+// ── On-demand news (v2.69): tagesschau 20 Uhr and tagesschau in 100 Sekunden ──
+// These are podcast feeds, not live streams. The newest episode's MP3 becomes the station's url.
+// Feeds are read on open, on return to the app and every 10 min, so a tap usually plays at once.
+const FEED_MAX_AGE = 10 * 60000;
+let feedTicket = 0;
+const feedFresh = st => !!st.url && Date.now() - (st.feedAt || 0) < FEED_MAX_AGE;
+const isFeedNow = () => curIdx >= 0 && mp3CurIdx < 0 && !!STATIONS[curIdx].feed;
+async function loadFeed(st) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch(st.feed, { cache: 'no-store', signal: ctl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const doc = new DOMParser().parseFromString(await r.text(), 'application/xml');
+    const item = doc.querySelector('item');
+    const url = item && item.querySelector('enclosure')?.getAttribute('url');
+    if (!url) throw new Error('no episode in feed');
+    const fresh = url.replace(/^http:/, 'https:');
+    // don't swap the file under an episode that is playing right now
+    if (!(curIdx >= 0 && STATIONS[curIdx] === st && isPlaying)) st.url = fresh;
+    st.epDate = new Date(item.querySelector('pubDate')?.textContent || '');
+    st.feedAt = Date.now();
+    return true;
+  } catch (e) { console.warn('[Feed]', st.name, e.message); return false; }
+  finally { clearTimeout(timer); }
+}
+function refreshFeeds() { STATIONS.forEach(s => { if (s.feed && !feedFresh(s)) loadFeed(s); }); }
+function epLabel(st) {
+  const d = st.epDate;
+  if (!d || isNaN(d)) return 'Latest episode';
+  return 'Latest: ' + d.toLocaleString('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short', day: 'numeric',
+    month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) + ' German time';
+}
+// Feed is old or not read yet: keep the tap's permission to play (iPhone) with a silent clip, then play
+function waitForFeed(st, ticket) {
+  if (curIdx >= 0) document.getElementById('stn-'+STATIONS[curIdx].n)?.classList.remove('active');
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  rdsStop();
+  isPlaying = false;
+  try { audio.pause(); audio.removeAttribute('crossorigin'); audio.src = SILENT_WAV; audio.play().catch(()=>{}); } catch(e) {}
+  document.getElementById('stn-'+st.n)?.classList.add('active');
+  document.getElementById('npStation').textContent = st.name;
+  document.getElementById('npStation').classList.remove('idle');
+  { const [ic, , c1, c2] = look(st); setNowIcon(ic, c1, c2); }
+  document.getElementById('npMeta').textContent = 'Finding latest episode...';
+  loadFeed(st).then(() => {
+    if (ticket !== feedTicket) return; // another station was tapped meanwhile
+    if (st.url) { play(st, true); return; }
+    document.getElementById('stn-'+st.n)?.classList.remove('active');
+    document.getElementById('npMeta').textContent = 'Episode not found · tap to retry';
+  });
+}
 function useRouted() {
   if (!IOS_LIVE_MODE || !IS_IOS || waBroken || document.visibilityState !== 'visible') return false;
   connectFFT();
@@ -3156,12 +3221,14 @@ function hardReconnect(reason) {
     if (curIdx < 0 || !isPlaying) return;
     const url = waMode ? STATIONS[curIdx].url : directUrl(STATIONS[curIdx]);
     const audio = out();   // reconnect whichever element you hear
+    const resumeAt = STATIONS[curIdx].feed ? audio.currentTime : 0; // episodes carry on where they were
     audio.pause();
     audio.src = '';
     audio.load();          // reset internal state fully
     audio.preload = 'auto'; // tell browser to buffer aggressively
     if (waMode) audio.crossOrigin = 'anonymous';
     audio.src = url;
+    if (resumeAt > 1) audio.addEventListener('loadedmetadata', () => { try { audio.currentTime = resumeAt; } catch(e) {} }, { once: true });
     // Play immediately — no artificial delay
     // preload=auto gives CarPlay the buffer it needs before consuming
     audio.play().then(() => {
@@ -3226,8 +3293,9 @@ onAudible('playing', () => {
   document.getElementById('sigbars').classList.add('active');
   if (curIdx >= 0) {
     const meta = document.getElementById('npMeta');
+    const st = STATIONS[curIdx];
     if (meta.textContent !== 'Live ATC')
-      meta.textContent = STATIONS[curIdx].cat==='atc' ? 'Live ATC' : '';
+      meta.textContent = st.cat==='atc' ? 'Live ATC' : st.feed ? epLabel(st) : '';
   } else if (mp3CurIdx >= 0) {
     document.getElementById('npMeta').textContent = 'Local MP3';
   }
@@ -3419,7 +3487,7 @@ function playMp3(i) {
 
 // Keep iOS lock screen position state in sync during MP3 playback
 onAudible('timeupdate', () => {
-  if (mp3CurIdx < 0) return;
+  if (mp3CurIdx < 0 && !isFeedNow()) return;
   if (!('mediaSession' in navigator)) return;
   const audio = out();
   if (!audio.duration || !isFinite(audio.duration)) return;
@@ -3463,6 +3531,16 @@ function toggleMp3Repeat() {
 
 // Auto-advance to next track when MP3 ends
 onAudible('ended', () => {
+  if (isFeedNow()) { // episode finished: stay on it, ready to play again
+    isPlaying = false;
+    if (bufferWatchdog) { clearInterval(bufferWatchdog); bufferWatchdog = null; }
+    if (!waMode) audioFFT.pause();
+    document.getElementById('npMeta').textContent = 'Finished · ' + epLabel(STATIONS[curIdx]);
+    document.getElementById('sigbars').classList.remove('active');
+    document.getElementById('btnStop').innerHTML = '&#9654; PLAY AGAIN';
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+    return;
+  }
   if (mp3CurIdx < 0) return; // was a stream, ignore
   if (mp3Repeat) { playMp3(mp3CurIdx); }
   else if (mp3CurIdx < mp3Tracks.length - 1 || mp3Shuffle) { mp3Next(); }
@@ -3828,8 +3906,9 @@ async function rdsStatus(url) {
 
 // Heartbeat: audio 'pause' event fires when iOS interrupts playback
 // Restart immediately if it was not user-initiated
-onAudible('pause', () => {
+onAudible('pause', e => {
   if (!isPlaying) return; // user stopped it, don't restart
+  if (e.target.ended) return; // an episode or MP3 reached its end
   if (userPausedNow()) return;
   bumpDiag('pauses');
   if (document.hidden) {
@@ -3852,6 +3931,8 @@ onAudible('pause', () => {
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e) {}
 
 window.addEventListener('load', buildUI);
+window.addEventListener('load', () => { refreshFeeds(); setInterval(refreshFeeds, FEED_MAX_AGE); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshFeeds(); });
 window.addEventListener('load', () => { wxRefresh(); setInterval(wxRefresh, 20 * 60000); });
 if (IS_IOS) document.documentElement.classList.add('ios');
 
