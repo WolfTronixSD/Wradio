@@ -1,90 +1,33 @@
-1 181.FM Awesome 80s => {"title":""} 
-2 SomaFM Underground 80s => {"title":"Lene Lovich - Savages"} 
-28 80s Forever => {"title":"Clocks - She Looks A Lot Like You {1982}"} 
-29 Made in 80 => {"title":"Joe Cocker - You can leave your hat on"} 
-30 80s New Wave Radio => {"title":"Björk - Human Behaviour"} 
-31 Nostalgie New Wave => {"title":"Liquid Liquid - Cavern"} 
-32 bigFM Workout => {"title":"bigFM Deutschlands biggste Beats"} 
-33 80s Hi‑NRG => {"title":"Dyva - Please My Love (Mezza Edit)"} 
-34 80s Rock => {"title":""} 
-35 Techno => {"title":""} 
-3 Antenne Bayern => {"title":"Wamdue Project - King Of My Castle"} 
-4 1LIVE WDR => {"title":"TLC - No Scrubs"} 
-5 SWR3 => {"title":"Bandaids / Katy Perry"} 
-6 Bayern 3 => {"title":"Jan Metternich - Me, Myself & I"} 
-7 SWR1 => {"title":"Platz 849: Talkin' bout the revolution / Tracy Chapman"} 
-23 Deutschlandfunk => {"title":"Radionacht - Tag für Tag - 19.10.2026, Susanne Fritz"} 
-24 NDR 2 => {"title":"Bandaids - Katy Perry"} 
-25 hr3 => {"title":"Katy Perry - Bandaids"} 
-26 Bayern 1 => {"title":"*** Bayern 1 - Gehört ins Leben"} 
-27 Rock Antenne => {"title":"Queensryche - I don't believe in love"} 
-36 BBC World Service => {"title":"BBC World Service Online"} 
-37 NPR News => {"title":""} 
-38 RFI English => {"title":""} 
-39 NDR Info => {"title":"Die ARD Infonacht - Gut informiert durch die Nacht"} 
-40 WDR 5 => {"title":"ARD Infonacht"} 
-41 hr-info => {"title":"*** hriNFO - Wer's hört, hat mehr zu sagen."} 
-=== https://ice2.somafm.com/u80s-64-aac
-HTTP/1.1 302 Found
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: text/html
-Location: https://ice2.somafm.com/u80s-64-aac?_ic2=1792454435353
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: audio/aac
-icy-br: 64
-bytes 306153
-stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=64116
-decode-exit 0
-=== https://ice2.somafm.com/u80s-128-mp3
-HTTP/1.1 302 Found
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: text/html
-Location: https://ice2.somafm.com/u80s-128-mp3?_ic2=1792454442079
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: audio/mpeg
-icy-br: 128
-bytes 351086
-stream|codec_name=mp3|sample_rate=44100|channels=2|bit_rate=128000
-decode-exit 0
-=== https://ice1.somafm.com/u80s-128-aac
-HTTP/1.1 302 Found
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: text/html
-Location: https://ice1.somafm.com/u80s-128-aac?_ic2=1792454448323
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: audio/aac
-icy-br: 128
-bytes 351166
-stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=127865
-decode-exit 0
-=== https://ice2.somafm.com/u80s-128-aac
-HTTP/1.1 302 Found
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: text/html
-Location: https://ice2.somafm.com/u80s-128-aac?_ic2=1792454454569
-HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Content-Type: audio/aac
-icy-br: 128
-bytes 353406
-stream|codec_name=aac|sample_rate=44100|channels=2|bit_rate=128971
-decode-exit 0
+80s80s | https://streams.80s80s.de/web/mp3-192/streams.80s80s.de/ | bytes 568006 | audio/mpeg | mp3,192000 | acao * | {"title":"80s80s Digital Web"}
+Antenne 80er Kulthits | https://stream.antenne.de/80er-kulthits/stream/mp3 | bytes 513003 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"Herbert Grönemeyer - Kinder an die Macht"}
+FFH 80er | https://mp3.ffh.de/ffhchannels/hq80er.mp3 | bytes 198530 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"Bruce Hornsby and The Range - Every Little Kiss"}
+Absolute 80s | https://ais.absoluteradio.co.uk/absolute80s.mp3 | bytes 198530 | - | mp3,128000 | acao - | {"title":null,"error":"0029B8C5B17F0000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert inte
+Absolute 80s hi | https://absolute80s.ais-a.planetradio.co.uk/absolute80s.mp3 | bytes 198530 | - | mp3,128000 | acao - | {"title":null,"error":"getaddrinfo ENOTFOUND absolute80s.ais-a.planetradio.co.uk"}
+CLASSIC HITS RADIO 70 80 DiscoFunk Moder [US votes 58976] | https://radiopanther.radiolebowski.com/play | bytes 121008 | audio/aac | aac,128108 | acao - | {"title":"Barenaked Ladies - One Week"}
+.977 80s [US votes 55466] | http://26433.live.streamtheworld.com:3690/977_80_SC | bytes 32768 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":""}
+.977 The Mix [US votes 44972] | http://15113.live.streamtheworld.com:3690/977_MIX_SC | bytes 32768 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":""}
+Big R Radio - 80s Metal FM [US votes 41632] | http://bigrradio.cdnstream1.com/5186_128 | bytes 266895 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"Whitesnake - Love Ain`t No Stranger"}
+Heart 80s [GB votes 36162] | https://media-ssl.musicradio.com/Heart80sMP3 | bytes 318952 | audio/mpeg | mp3,128000 | acao * | {"title":"U2 - With Or Without You"}
+100% Radio 80 [FR votes 35646] | http://100radio-80.ice.infomaniak.ch/100radio-80-128.mp3 | bytes 210983 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":""}
+Hard Rock Heaven [US votes 34873] | http://hydra.cdnstream.com/1521_128 | bytes 611192 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"Kiss - Rise to It"}
+80s80s [DE votes 29958] | http://streams.80s80s.de/web/mp3-192/streams.80s80s.de/ | bytes 588068 | audio/mpeg | mp3,192000 | acao * | {"title":"80s80s Digital Web"}
+LOVE RADIO Only Love Songs 70s80s90s - w [US votes 29419] | http://shoutcast3.streamingmedia.it:3162/ | bytes 4173 | text/html |  | acao - | {"title":"America - A Horse with no name (1971)"}
+SomaFM Underground 80s (128k MP3) [US votes 28636] | https://ice6.somafm.com/u80s-128-mp3 | bytes 352339 | audio/mpeg | mp3,128000 | acao * | {"title":"Wang Chung - Don't Be My Enemy"}
+1000 HITS 80s [ES votes 27441] | http://c2.auracast.net:8048/stream | bytes 344398 | audio/mpeg | mp3,128000 | acao * | {"title":"Chicago - Look Away"}
+The Big 80s Station [US votes 26079] | http://158.69.114.190:8065/; | bytes 348160 | audio/mpeg | mp3,128000 | acao * | {"title":"Gloria Estefan & Miami Sound Machine - Conga"}
+_80 EXITOS [ES votes 20127] | https://80sexitos.stream.laut.fm/80sexitos | bytes 304274 | audio/mpeg | mp3,128000 | acao https://wolftronixsd.github.io | {"title":"Kate Bush - Wuthering Heights"}
+Traceback (most recent call last):
+  File "<stdin>", line 14, in <module>
+  File "/usr/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 2153, in _communicate
+    stdout = self._translate_newlines(stdout,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1086, in _translate_newlines
+    data = data.decode(encoding, errors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf6 in position 729: invalid start byte
