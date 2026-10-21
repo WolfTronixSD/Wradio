@@ -15,7 +15,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>WRadio v2.70</title>
+<title>WRadio v2.71</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet">
@@ -295,13 +295,14 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 0 0 4px rgb
 .arranging > .stn-btn.lifted{animation:none;z-index:20;opacity:.92;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:none}
 @media (prefers-reduced-motion:reduce){.arranging > .stn-btn{animation:none}}
 /* News sections (v2.56): small tiles, three in a row */
-.sec-world,.sec-denews{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
-.sec-world .section-label,.sec-denews .section-label{grid-column:1/-1;margin-bottom:0}
-.sec-world .stn-btn,.sec-denews .stn-btn{min-height:46px;padding:6px 8px;gap:6px;margin:0;border-width:2px;border-radius:12px}
-.sec-world .stn-ic,.sec-denews .stn-ic{width:30px;height:30px;border-radius:9px;font-size:1.05em}
-.sec-world .stn-txt .stn-name,.sec-denews .stn-txt .stn-name{font-size:0.95em;line-height:1.1;white-space:normal}
-.sec-world .stn-tag,.sec-denews .stn-tag,.sec-world .stn-eq,.sec-denews .stn-eq{display:none}
-.sec-world .stn-btn.active .stn-txt,.sec-denews .stn-btn.active .stn-txt{padding-right:0}
+.sec-world,.sec-denews,.sec-podcast{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.sec-podcast{grid-template-columns:repeat(2,1fr)}
+.sec-world .section-label,.sec-denews .section-label,.sec-podcast .section-label{grid-column:1/-1;margin-bottom:0}
+.sec-world .stn-btn,.sec-denews .stn-btn,.sec-podcast .stn-btn{min-height:46px;padding:6px 8px;gap:6px;margin:0;border-width:2px;border-radius:12px}
+.sec-world .stn-ic,.sec-denews .stn-ic,.sec-podcast .stn-ic{width:30px;height:30px;border-radius:9px;font-size:1.05em}
+.sec-world .stn-txt .stn-name,.sec-denews .stn-txt .stn-name,.sec-podcast .stn-txt .stn-name{font-size:0.95em;line-height:1.1;white-space:normal}
+.sec-world .stn-tag,.sec-denews .stn-tag,.sec-podcast .stn-tag,.sec-world .stn-eq,.sec-denews .stn-eq,.sec-podcast .stn-eq{display:none}
+.sec-world .stn-btn.active .stn-txt,.sec-denews .stn-btn.active .stn-txt,.sec-podcast .stn-btn.active .stn-txt{padding-right:0}
 /* the moving level bar on the main screen was distracting (v2.45) */
 #vuWrap{display:none}
 .vol-ios{display:none;flex:1;font-size:1.05em;color:var(--text);line-height:1.2}
@@ -397,7 +398,7 @@ body.vid-open{overflow:hidden}
   <div class="header-top">
     <!-- Left: branding + date -->
     <div style="display:flex;flex-direction:column;gap:3px">
-      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.70</span></div>
+      <div class="logo">&#9632; WRADIO <span style="font-size:0.65em;color:var(--muted);letter-spacing:1px">v2.71</span></div>
       <div id="dateDisplay" style="font-family:var(--mono);font-size:0.72em;color:var(--muted);letter-spacing:2px"></div>
     </div>
     <!-- Center: signal bars -->
@@ -595,7 +596,7 @@ body.vid-open{overflow:hidden}
     <div style="font-family:var(--mono);font-size:0.7em;color:var(--text);line-height:2em">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">VERSION</span>
-        <span style="color:var(--accent)">v2.70 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:10:00Z">2026-10-20</span></span>
+        <span style="color:var(--accent)">v2.71 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-21T11:40:00Z">2026-10-21</span></span>
       </div>
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:6px">
         <span style="color:var(--muted)">AUTHOR</span>
@@ -612,7 +613,7 @@ body.vid-open{overflow:hidden}
     <div class="card-title">CHANGELOG</div>
     <div style="font-family:var(--mono);font-size:0.65em;line-height:1.9em">
 
-      <div style="color:var(--accent);margin-top:4px">v2.70 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-20T19:10:00Z">2026-10-20</span></div>
+      <div style="color:var(--accent);margin-top:4px">v2.71 <span style="color:var(--muted);font-size:0.85em" data-at="2026-10-21T11:40:00Z">2026-10-21</span></div>
       <div style="color:var(--muted);padding-left:10px;border-left:2px solid var(--border)">
         tagesschau as video: tap 📺 WATCH while tagesschau 20 Uhr or 100 Sekunden is on. The radio pauses while you watch
       </div>
@@ -1019,11 +1020,12 @@ body.vid-open{overflow:hidden}
 <script>
 // ============================================================
 //  WolfTronix Radio Player
-//  Version : v2.70  (2026-10-20)
+//  Version : v2.71  (2026-10-21)
 //  Author  : WolfTronixSD
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
+//  v2.71 - Podcasts section: 47 Joe Rogan Experience, 48 Extreme Health Radio (feed:, newest episode; feedRelay: via Netlify /api/feed)
 //  v2.70 - Video for 45-46: video: feed field, WATCH button, #vidBox overlay (radio pauses)
 //  v2.69 - On-demand news 45-46 (tagesschau 20 Uhr, 100 Sekunden): feed: field, newest episode via podcast RSS
 //  v2.68 - New stations 42-44 (Antenne 80er Kulthits, FFH 80er, 1000 HITS 80s)
@@ -1215,6 +1217,9 @@ const STATIONS = [
   // On demand (v2.69): url is filled with the newest episode from the podcast feed
   {n:45, name:"tagesschau 20 Uhr",    url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-audio-100~podcast.xml", video:"https://www.tagesschau.de/multimedia/sendung/tagesschau_20_uhr/podcast-ts2000-video-100~podcast.xml", cat:"denews", rds:false},
   {n:46, name:"tagesschau 100 Sek.",  url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-audio-100~podcast.xml", video:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-video-100~podcast.xml", cat:"denews", rds:false},
+  // Podcasts (v2.71): newest episode from the show's RSS feed, same as 45-46
+  {n:47, name:"Joe Rogan Experience", url:"", feed:"https://feeds.megaphone.fm/GLT1412515089", cat:"podcast", rds:false},
+  {n:48, name:"Extreme Health Radio", url:"", feed:"https://www.extremehealthradio.com/category/podcasts/feed/", feedRelay:true, cat:"podcast", rds:false},
 
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
@@ -1262,6 +1267,7 @@ const LOOK = {
   42:['📻','Bavaria · 80s cult hits','#ff9a3c','#c2185b'],  43:['🕹️','Frankfurt · 80s','#00b09b','#96c93d'],
   44:['💿','Spain · 1000 80s hits · no ads','#fc466b','#3f5efb'],
   45:['📺','Latest 20:00 news','#0b3d91','#2a7de1'],  46:['⏱️','News in 100 seconds','#0b3d91','#00a6e0'],
+  47:['🎙️','Latest episode','#d4145a','#fbb03b'],     48:['🥦','Latest episode','#11998e','#38ef7d'],
 };
 // Each airport has its own colors so the ATC groups are easy to tell apart
 const AIRPORT_COLORS = {
@@ -1520,7 +1526,7 @@ function buildUI() {
   // Station list — ATC grouped by airport
   const list = document.getElementById('stationList');
   // Music and German sections built normally
-  [{key:'world',label:'World News',icon:'🌍'},{key:'denews',label:'Germany News',icon:'📰'},{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'workout',label:'Workout',icon:'🏋️'},{key:'music',label:'80s Radio',icon:'🎶'}]
+  [{key:'world',label:'World News',icon:'🌍'},{key:'denews',label:'Germany News',icon:'📰'},{key:'podcast',label:'Podcasts',icon:'🎙️'},{key:'german',label:'German Radio',icon:'🇩🇪'},{key:'workout',label:'Workout',icon:'🏋️'},{key:'music',label:'80s Radio',icon:'🎶'}]
   .forEach(cat => {
     const all = STATIONS.filter(s => s.cat === cat.key);
     if (!all.length) return;
@@ -2013,9 +2019,20 @@ async function readFeed(feedUrl) {
     return { url: url.replace(/^http:/, 'https:'), date: new Date(item.querySelector('pubDate')?.textContent || '') };
   } finally { clearTimeout(timer); }
 }
+// v2.71: feeds that don't allow web pages to read them go through the Netlify relay (wolf-ironmen /api/feed)
+const FEED_RELAY = 'https://darling-kheer-93b7f4.netlify.app/api/feed?url=';
+async function readFeedRelay(feedUrl) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
+  try {
+    const r = await fetch(FEED_RELAY + encodeURIComponent(feedUrl), { signal: ctl.signal });
+    const j = await r.json();
+    if (!r.ok || !j.url) throw new Error(j.error || 'HTTP ' + r.status);
+    return { url: j.url, date: new Date(j.date || '') };
+  } finally { clearTimeout(timer); }
+}
 async function loadFeed(st) {
   try {
-    const ep = await readFeed(st.feed);
+    const ep = await (st.feedRelay ? readFeedRelay(st.feed) : readFeed(st.feed));
     // don't swap the file under an episode that is playing right now
     if (!(curIdx >= 0 && STATIONS[curIdx] === st && isPlaying)) st.url = ep.url;
     st.epDate = ep.date;
@@ -2039,6 +2056,7 @@ function refreshFeeds() { STATIONS.forEach(s => {
 function epLabel(st) {
   const d = st.epDate;
   if (!d || isNaN(d)) return 'Latest episode';
+  if (st.cat === 'podcast') return 'Latest: ' + d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   return 'Latest: ' + d.toLocaleString('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short', day: 'numeric',
     month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) + ' German time';
 }

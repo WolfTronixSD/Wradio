@@ -6,7 +6,7 @@ allows cross-origin reads on every redirect hop (needed for the real FFT
 visualizer; 'end' means only the final hop allows it, which browsers reject) and how many
 bytes arrived in a few seconds. Exits 1 if a music or German station fails; ATC feeds that are offline are only listed.
 """
-import re, subprocess, sys
+import re, subprocess, sys, urllib.parse
 
 ORIGIN = "https://wolftronixsd.github.io"
 # Some servers send a "player not supported" clip to non-browser clients
@@ -58,11 +58,14 @@ for n, name, url, cat in stations + sturdy + extra:
         print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {r['cors']:>4} {'OK ' if ok else 'BAD'} {r['type']} {u}"
               + (f" -> {r['final']}" if r["final"] != u else ""))
 # On-demand news (v2.69): the podcast feed must be readable from the page and its newest episode must play
-for n, name, feed in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"",\s*feed:"([^"]+)"', html):
-    xml = subprocess.run(["curl", "-sS", "-L", "--max-time", "8", "-H", f"Origin: {ORIGIN}", "-A", UA, "-D", "-", feed],
+RELAY = "https://darling-kheer-93b7f4.netlify.app/api/feed?url="
+for n, name, feed, relay in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"",\s*feed:"([^"]+)"(,\s*feedRelay:true)?', html):
+    # feedRelay: the page reads this feed through the Netlify relay, so check the relay's answer instead
+    src = RELAY + urllib.parse.quote(feed, safe="") if relay else feed
+    xml = subprocess.run(["curl", "-sS", "-L", "--max-time", "12", "-H", f"Origin: {ORIGIN}", "-A", UA, "-D", "-", src],
                          capture_output=True, text=True).stdout
     cors = re.search(r"^access-control-allow-origin:\s*(\*|" + re.escape(ORIGIN) + r")", xml, re.M | re.I)
-    ep = re.search(r'<enclosure[^>]*url="([^"]+)"', xml)
+    ep = re.search(r'<enclosure[^>]*url="([^"]+)"', xml) or re.search(r'"url":\s*"([^"]+)"', xml)
     r = probe(ep.group(1)) if ep else {"code": "000", "bytes": 0, "type": "-"}
     ok = bool(cors) and bool(ep) and r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000
     if not ok: bad += 1
