@@ -54,7 +54,7 @@ for n, name, url, cat in stations + sturdy + extra:
         if n != "+" and u == url and not ok:
             # LiveATC feeds go offline when a volunteer's receiver is down; report, don't fail
             if cat == "atc": offline.append(name)
-            else: bad += 1
+            else: bad += 1; print(f"::warning::BAD {name} {r['code']} {r['type']}")
         print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {r['cors']:>4} {'OK ' if ok else 'BAD'} {r['type']} {u}"
               + (f" -> {r['final']}" if r["final"] != u else ""))
 # On-demand news (v2.69): the podcast feed must be readable from the page and its newest episode must play
@@ -69,6 +69,7 @@ for n, name, feed, relay in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"
     r = probe(ep.group(1)) if ep else {"code": "000", "bytes": 0, "type": "-"}
     ok = bool(cors) and bool(ep) and r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000
     if not ok: bad += 1
+    print(f"::warning::FEED {name} relay={bool(relay)} cors={bool(cors)} ep={ep.group(1)[:80] if ep else None} code={r['code']} type={r['type']}")
     print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {'yes' if cors else 'no':>4} {'OK ' if ok else 'BAD'} feed -> {ep.group(1) if ep else 'no episode'}")
 if offline:
     print("\nATC feeds offline right now (often temporary): " + ", ".join(offline))
