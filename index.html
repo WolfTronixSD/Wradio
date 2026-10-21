@@ -1025,7 +1025,7 @@ body.vid-open{overflow:hidden}
 //  Hosted  : https://wolftronixsd.github.io/Wradio/
 //
 //  Changelog:
-//  v2.71 - Podcasts section: 47 Joe Rogan Experience, 48 Extreme Health Radio (feed:, newest episode)
+//  v2.71 - Podcasts section: 47 Joe Rogan Experience, 48 Extreme Health Radio (feed:, newest episode; feedRelay: via Netlify /api/feed)
 //  v2.70 - Video for 45-46: video: feed field, WATCH button, #vidBox overlay (radio pauses)
 //  v2.69 - On-demand news 45-46 (tagesschau 20 Uhr, 100 Sekunden): feed: field, newest episode via podcast RSS
 //  v2.68 - New stations 42-44 (Antenne 80er Kulthits, FFH 80er, 1000 HITS 80s)
@@ -1219,7 +1219,7 @@ const STATIONS = [
   {n:46, name:"tagesschau 100 Sek.",  url:"", feed:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-audio-100~podcast.xml", video:"https://www.tagesschau.de/multimedia/sendung/tagesschau_in_100_sekunden/podcast-ts100-video-100~podcast.xml", cat:"denews", rds:false},
   // Podcasts (v2.71): newest episode from the show's RSS feed, same as 45-46
   {n:47, name:"Joe Rogan Experience", url:"", feed:"https://feeds.megaphone.fm/GLT1412515089", cat:"podcast", rds:false},
-  {n:48, name:"Extreme Health Radio", url:"", feed:"https://www.extremehealthradio.com/category/podcasts/feed/", cat:"podcast", rds:false},
+  {n:48, name:"Extreme Health Radio", url:"", feed:"https://www.extremehealthradio.com/category/podcasts/feed/", feedRelay:true, cat:"podcast", rds:false},
 
   {n:8,  name:"KMYF ATIS",            url:"https://d.liveatc.net/ksan_kmyf_atis",                              cat:"atc"},
   {n:9,  name:"KMYF Tower",           url:"https://d.liveatc.net/kmyf1_twr",                                         cat:"atc"},
@@ -2019,9 +2019,20 @@ async function readFeed(feedUrl) {
     return { url: url.replace(/^http:/, 'https:'), date: new Date(item.querySelector('pubDate')?.textContent || '') };
   } finally { clearTimeout(timer); }
 }
+// v2.71: feeds that don't allow web pages to read them go through the Netlify relay (wolf-ironmen /api/feed)
+const FEED_RELAY = 'https://darling-kheer-93b7f4.netlify.app/api/feed?url=';
+async function readFeedRelay(feedUrl) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
+  try {
+    const r = await fetch(FEED_RELAY + encodeURIComponent(feedUrl), { signal: ctl.signal });
+    const j = await r.json();
+    if (!r.ok || !j.url) throw new Error(j.error || 'HTTP ' + r.status);
+    return { url: j.url, date: new Date(j.date || '') };
+  } finally { clearTimeout(timer); }
+}
 async function loadFeed(st) {
   try {
-    const ep = await readFeed(st.feed);
+    const ep = await (st.feedRelay ? readFeedRelay(st.feed) : readFeed(st.feed));
     // don't swap the file under an episode that is playing right now
     if (!(curIdx >= 0 && STATIONS[curIdx] === st && isPlaying)) st.url = ep.url;
     st.epDate = ep.date;
