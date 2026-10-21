@@ -71,6 +71,9 @@ for n, name, feed, relay in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"
     if not ok: bad += 1
     print(f"::warning::FEED {name} relay={bool(relay)} cors={bool(cors)} ep={ep.group(1)[:80] if ep else None} code={r['code']} type={r['type']}")
     print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {'yes' if cors else 'no':>4} {'OK ' if ok else 'BAD'} feed -> {ep.group(1) if ep else 'no episode'}")
+_x = subprocess.run(["curl","-sS","-L","--max-time","12","-A",UA,"https://www.extremehealthradio.com/category/podcasts/feed/"],capture_output=True,text=True).stdout
+for _it in re.findall(r"<item>[\s\S]*?</item>", _x)[:3]:
+    print("::warning::EHR " + " | ".join(m[:90] for m in re.findall(r"<title>([^<]*)</title>|<pubDate>([^<]*)</pubDate>|<enclosure[^>]*url=\"([^\"]+)\"", _it) for m in m if m))
 if offline:
     print("\nATC feeds offline right now (often temporary): " + ", ".join(offline))
 sys.exit(1 if bad else 0)
