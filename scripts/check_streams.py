@@ -67,6 +67,7 @@ for n, name, feed in re.findall(r'\{n:\s*(\d+),\s*name:"([^"]+)",\s*url:"",\s*fe
     ok = bool(cors) and bool(ep) and r["code"].startswith("2") and "audio" in r["type"] and r["bytes"] > 2000
     if not ok: bad += 1
     print(f"{n:>3} {name[:26]:<26} {r['code']:>4} {r['bytes']//1024:>6} {'yes' if cors else 'no':>4} {'OK ' if ok else 'BAD'} feed -> {ep.group(1) if ep else 'no episode'}")
+    print(f"::warning::FEED {name} cors={'yes' if cors else 'no'} ep={'yes' if ep else 'no'} code={r['code']} type={r['type']} bytes={r['bytes']}")
 if offline:
     print("\nATC feeds offline right now (often temporary): " + ", ".join(offline))
 sys.exit(1 if bad else 0)
